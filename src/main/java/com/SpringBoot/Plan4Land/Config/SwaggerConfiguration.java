@@ -28,7 +28,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.kh.springJPA241217"))
+                .apis(RequestHandlerSelectors.basePackage("com.SpringBoot.Plan4Land"))
                 .paths(PathSelectors.any())
                 .build()
                 .securitySchemes(Arrays.asList(apiKey()))
