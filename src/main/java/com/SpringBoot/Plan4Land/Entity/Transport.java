@@ -17,7 +17,7 @@ public class Transport {
     @Column(name = "tp_id")
     private Long id;
 
-    private String transportType;
+    private String type;
 
     private String grade;
 
