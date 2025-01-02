@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.SpringBoot.Plan4Land.Constant.Theme;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,6 +21,9 @@ public class Planner {
 
     // 플래너 제목
     private String title;
+
+    // 플래너 테마
+    private Theme theme;
 
     // 플래너 생성일
     private LocalDateTime regDate;
