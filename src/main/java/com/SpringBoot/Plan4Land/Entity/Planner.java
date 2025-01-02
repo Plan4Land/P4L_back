@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Table(name="planner")
 @Entity
@@ -38,7 +37,7 @@ public class Planner {
     private int view;
 
     // 메모
-    private String memo;
+    private String thumbnail;
 
     // 공개 여부
     private boolean isPublic;
