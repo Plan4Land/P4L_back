@@ -24,14 +24,11 @@ public class Plan {
     // 계획일
     private LocalDateTime date;
 
-    // 장소 코드
-    private String spotId;
-
     // 장소명
     private String spotName;
 
-    // 카테고리(소분류)
-    private String contentId;
+    // 카테고리
+    private String category;
 
     // 간단메모
     private String memo;
