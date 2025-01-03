@@ -19,14 +19,19 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Column(unique = true, nullable = false)
     private String id;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     private String profileImg;
@@ -40,14 +45,17 @@ public class Member {
 
     // 가입일
     private LocalDateTime signupDate;
-    @PrePersist
-    protected void onCreate() {
-        this.signupDate = LocalDateTime.now();
-    }
 
     // 탈퇴일
     private LocalDateTime signOutDate;
 
     // 계정 활성화 여부
     private boolean activate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.signupDate = LocalDateTime.now();
+        this.activate = true;
+        this.role = Role.ROLE_GENERAL;
+    }
 }

@@ -27,10 +27,6 @@ public class Planner {
 
     // 플래너 생성일
     private LocalDateTime regDate;
-    @PrePersist
-    protected void onCreate() {
-        this.regDate = LocalDateTime.now();
-    }
 
     // 플래너 소유자
     @ManyToOne
@@ -49,4 +45,9 @@ public class Planner {
     // 활성화 여부
     private boolean activate;
 
+    @PrePersist
+    protected void onCreate() {
+        this.regDate = LocalDateTime.now();
+        this.activate = true;
+    }
 }
