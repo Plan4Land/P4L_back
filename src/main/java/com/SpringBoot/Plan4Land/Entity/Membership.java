@@ -5,16 +5,17 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Table(name="payment")
+@Table(name="membership")
 @Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Payment {
+public class Membership {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "membership_id")
     private Long id;
 
     @ManyToOne
@@ -22,4 +23,6 @@ public class Payment {
     private Member member;
 
     private LocalDate paymentDate;
+
+    private boolean activated;
 }
