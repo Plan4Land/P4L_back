@@ -18,12 +18,12 @@ public class PlannerMembers {
     private Long id;
 
     // 플래너에 초대된 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     // 플래너
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planner_id")
     private Planner planner;
 }

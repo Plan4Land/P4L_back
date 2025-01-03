@@ -18,7 +18,7 @@ public class BookmarkSpot {
     private Long id;
 
     // 북마크한 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

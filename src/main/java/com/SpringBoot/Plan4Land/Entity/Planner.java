@@ -29,7 +29,7 @@ public class Planner {
     private LocalDateTime regDate;
 
     // 플래너 소유자
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member owner;
 

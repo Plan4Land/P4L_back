@@ -19,13 +19,13 @@ public class Report {
     private Long id;
 
     // 신고자
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
     private Member reporter;
 
     // 피신고자
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_id")
     private Member reported;
 
     // 신고내용

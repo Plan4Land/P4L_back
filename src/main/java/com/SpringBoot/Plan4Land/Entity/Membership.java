@@ -18,7 +18,7 @@ public class Membership {
     @Column(name = "membership_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

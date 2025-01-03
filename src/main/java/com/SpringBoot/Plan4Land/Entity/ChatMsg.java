@@ -19,7 +19,7 @@ public class ChatMsg {
     private Long id;
 
     // 발신자
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member sender;
 
