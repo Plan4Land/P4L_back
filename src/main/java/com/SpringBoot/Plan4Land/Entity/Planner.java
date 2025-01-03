@@ -40,7 +40,7 @@ public class Planner {
     // 조회수
     private int view;
 
-    // 메모
+    // 썸네일
     private String thumbnail;
 
     // 공개 여부
