@@ -19,6 +19,8 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    private String id;
+
     private String email;
 
     private String password;
@@ -26,8 +28,6 @@ public class Member {
     private String name;
 
     private String nickname;
-
-    private String phone;
 
     private String profileImg;
 
