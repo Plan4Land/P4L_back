@@ -27,6 +27,8 @@ public class TravelSpot {
     // 전화번호
     private String tel;
 
+    private String thumbnail;
+
     // 시, 도 코드
     private int areaCode;
     // 시군구 코드
