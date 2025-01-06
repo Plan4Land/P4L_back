@@ -23,7 +23,7 @@ public class Planner {
     private String title;
 
     // 플래너 테마
-    private Theme theme;
+    private String theme;
 
     // 플래너 생성일
     private LocalDateTime regDate;
