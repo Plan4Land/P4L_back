@@ -33,6 +33,12 @@ public class Planner {
     @JoinColumn(name = "member_id")
     private Member owner;
 
+    // 여행 시작일
+    private LocalDateTime startDate;
+    
+    // 여행 종료일
+    private LocalDateTime endDate;
+
     // 조회수
     private int view;
 
