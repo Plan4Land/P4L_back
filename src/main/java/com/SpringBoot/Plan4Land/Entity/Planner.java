@@ -49,5 +49,6 @@ public class Planner {
     protected void onCreate() {
         this.regDate = LocalDateTime.now();
         this.activate = true;
+        this.view = 0;
     }
 }
