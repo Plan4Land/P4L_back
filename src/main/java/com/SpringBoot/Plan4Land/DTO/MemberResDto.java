@@ -21,8 +21,10 @@ public class MemberResDto {
 
     public static MemberResDto of(Member member) {
         return MemberResDto.builder()
-                .name(member.getName())
                 .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .nickname(member.getNickname())
                 .imgPath(member.getProfileImg())
                 .regDate(member.getSignupDate())
                 .build();
