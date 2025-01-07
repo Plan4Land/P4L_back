@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberResDto {
     private String id;
+    private String email;
     private String name;
+    private String nickname;
     private String imgPath;
     private LocalDateTime regDate;
 
