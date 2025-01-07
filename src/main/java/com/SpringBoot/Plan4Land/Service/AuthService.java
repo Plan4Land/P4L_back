@@ -52,17 +52,15 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 비밀번호 검증
+        log.info("입력된 비밀번호: {}", memberReqDto.getPassword());
+        log.info("저장된 인코딩된 비밀번호: {}", member.getPassword());
         if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
+            log.error("비밀번호 불일치");
             throw new BadCredentialsException("잘못된 자격 증명입니다.");
         }
+        log.info("비밀번호 일치");
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                .username(member.getId())
-                .password(member.getPassword())
-                .authorities(new ArrayList<>()) // 필요한 권한 추가
-                .build();
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, memberReqDto.getPassword(), userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
         try {
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("Authentication successful: {}", authentication);

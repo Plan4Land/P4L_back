@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class MemberResDto {
-    private String email;
+    private String id;
     private String name;
     private String imgPath;
     private LocalDateTime regDate;
@@ -20,7 +20,7 @@ public class MemberResDto {
     public static MemberResDto of(Member member) {
         return MemberResDto.builder()
                 .name(member.getName())
-                .email(member.getEmail())
+                .id(member.getId())
                 .imgPath(member.getProfileImg())
                 .regDate(member.getSignupDate())
                 .build();
