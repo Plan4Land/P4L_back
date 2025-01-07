@@ -38,7 +38,12 @@ public class MemberService {
         try {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
-
+            member.setEmail(memberReqDto.getEmail());
+            member.setPassword(memberReqDto.getPassword());
+            member.setName(memberReqDto.getName());
+            member.setNickname(memberReqDto.getNickname());
+            member.setProfileImg(memberReqDto.getProfileImg());
+            memberRepository.save(member);
             return true;
         } catch (Exception e) {
             log.error("회원정보 수정 : {}", e.getMessage());
@@ -50,7 +55,8 @@ public class MemberService {
     public boolean deleteMember(String userId) {
         try {
             Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
-            memberRepository.delete(member);
+            member.setActivate(false);
+            memberRepository.save(member);
             return true;
         } catch (Exception e) {
             log.error("회원 삭제에 실패했습니다. : {}", e.getMessage());
