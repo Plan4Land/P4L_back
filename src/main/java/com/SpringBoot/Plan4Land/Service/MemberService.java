@@ -64,6 +64,11 @@ public class MemberService {
         }
     }
 
+    // 회원 비밀번호 체크
+//    public boolean getMemberByIdAndPw(String id, String pw) {
+//        Member member = memberRepository.findByIdAndPw(id, pw).orElseThrow(()->new RuntimeException("비밀번호가 같지 않습니다."));
+//    }
+
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
