@@ -52,8 +52,6 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 비밀번호 검증
-        log.info("입력된 비밀번호: {}", memberReqDto.getPassword());
-        log.info("저장된 인코딩된 비밀번호: {}", member.getPassword());
         if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
             log.error("비밀번호 불일치");
             throw new BadCredentialsException("잘못된 자격 증명입니다.");
@@ -63,7 +61,7 @@ public class AuthService {
         UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
         try {
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-            log.info("Authentication successful: {}", authentication);
+            log.info("로그인 성공: {}", authentication);
             return tokenProvider.generateTokenDto(authentication);
         } catch (BadCredentialsException e) {
             log.error("Bad credentials provided: ", e);
