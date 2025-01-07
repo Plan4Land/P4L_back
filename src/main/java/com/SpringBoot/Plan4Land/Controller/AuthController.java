@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
+    // 유저 활성화 확인
+    @GetMapping("/exists/{userId}")
+    public ResponseEntity<Boolean> isUser(@PathVariable String userId) {
+        boolean isTrue = authService.isMember(userId);
+        return ResponseEntity.ok(!isTrue);
+    }
+
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<MemberResDto> signup(@RequestBody MemberReqDto memberReqDto) {
@@ -28,5 +35,4 @@ public class AuthController {
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         return ResponseEntity.ok(authService.login(memberReqDto));
     }
-
 }

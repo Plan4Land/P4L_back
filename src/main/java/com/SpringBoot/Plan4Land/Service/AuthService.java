@@ -31,13 +31,13 @@ public class AuthService {
     private final AuthenticationManagerBuilder managerBuilder; // 인증을 담당하는 클래스
 
     // 회원 가입 여부
-    public boolean isMember(String email) {
-        return memberRepository.existsByEmail(email);
+    public boolean isMember(String userId) {
+        return memberRepository.existsById(userId);
     }
 
     // 회원 가입
     public MemberResDto signUp(MemberReqDto memberReqDto) {
-        if (memberRepository.existsByEmail(memberReqDto.getEmail())) {
+        if (memberRepository.existsById(memberReqDto.getId())) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         } else {
             Member member = memberReqDto.toEntity(passwordEncoder);
