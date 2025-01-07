@@ -23,7 +23,7 @@ public class Planner {
     private String title;
 
     // 플래너 테마
-    private Theme theme;
+    private String theme;
 
     // 플래너 생성일
     private LocalDateTime regDate;
@@ -32,6 +32,12 @@ public class Planner {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member owner;
+
+    // 여행 시작일
+    private LocalDateTime startDate;
+    
+    // 여행 종료일
+    private LocalDateTime endDate;
 
     // 조회수
     private int view;
@@ -49,5 +55,6 @@ public class Planner {
     protected void onCreate() {
         this.regDate = LocalDateTime.now();
         this.activate = true;
+        this.view = 0;
     }
 }

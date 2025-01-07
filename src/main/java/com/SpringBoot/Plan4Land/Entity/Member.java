@@ -60,4 +60,15 @@ public class Member {
         this.activate = true;
         this.role = Role.ROLE_GENERAL;
     }
+
+    @Builder
+    public Member(String id, String email, String password, String nickname, String name, String profileImg, Role role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.name = name;
+        this.profileImg = profileImg;
+        this.signupDate = LocalDateTime.now();
+    }
 }
