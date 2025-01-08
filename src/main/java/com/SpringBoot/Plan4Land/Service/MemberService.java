@@ -43,7 +43,6 @@ public class MemberService {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setEmail(memberReqDto.getEmail());
-            member.setPassword(memberReqDto.getPassword());
             member.setName(memberReqDto.getName());
             member.setNickname(memberReqDto.getNickname());
             member.setProfileImg(memberReqDto.getProfileImg());
