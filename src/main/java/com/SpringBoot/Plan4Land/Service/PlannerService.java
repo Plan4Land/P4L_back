@@ -37,6 +37,8 @@ public class PlannerService {
             planner.setTheme(plannerReqDto.getTheme());
             planner.setStartDate(plannerReqDto.getStartDate());
             planner.setEndDate(plannerReqDto.getEndDate());
+            planner.setArea(plannerReqDto.getArea());
+            planner.setSubArea(plannerReqDto.getSubArea());
             planner.setThumbnail(plannerReqDto.getThumbnail());
             planner.setPublic(plannerReqDto.isPublic());
             planner.setOwner(member);
