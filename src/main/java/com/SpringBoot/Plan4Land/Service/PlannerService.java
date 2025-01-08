@@ -27,7 +27,7 @@ public class PlannerService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public boolean makePlanner(PlannerReqDto plannerReqDto) {
+    public Long makePlanner(PlannerReqDto plannerReqDto) {
         try {
             Member member = memberRepository.findById(plannerReqDto.getId())
                     .orElseThrow(() -> new RuntimeException("Planner 작성 중 회원 조회 실패"));
@@ -42,13 +42,14 @@ public class PlannerService {
             planner.setThumbnail(plannerReqDto.getThumbnail());
             planner.setPublic(plannerReqDto.isPublic());
             planner.setOwner(member);
-            plannerRepository.save(planner);
-            return true;
+            Planner savedPlanner = plannerRepository.save(planner);
+            return savedPlanner.getId();
         } catch (RuntimeException e) {
-            return false;
+            log.error("존재하지 않는 회원입니다.");
+            return null;
         }catch (Exception e) {
             log.error("Planner 생성 실패 : {}", e.getMessage());
-            return false;
+            return null;
         }
     }
 }
