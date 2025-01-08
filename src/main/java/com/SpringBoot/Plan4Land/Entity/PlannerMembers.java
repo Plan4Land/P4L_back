@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.SpringBoot.Plan4Land.Constant.State;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,4 +27,12 @@ public class PlannerMembers {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planner_id")
     private Planner planner;
+
+    @Enumerated(EnumType.STRING)
+    private State state;
+
+    @PrePersist
+    protected void onCreate() {
+        this.state = State.WAIT;
+    }
 }

@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Entity;
 
-import com.SpringBoot.Plan4Land.Constant.ReportState;
+
+import com.SpringBoot.Plan4Land.Constant.State;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,10 +35,10 @@ public class Report {
 
     // 상태 (대기, 승인, 거절)
     @Enumerated(EnumType.STRING)
-    private ReportState state;
+    private State state;
 
     @PrePersist
     protected void onCreate() {
-        this.state = ReportState.WAIT;
+        this.state = State.WAIT;
     }
 }
