@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -40,5 +41,15 @@ public class MemberController {
     public ResponseEntity<Boolean> memberDelete(@PathVariable String userId) {
         boolean isSuccess = memberService.deleteMember(userId);
         return ResponseEntity.ok(isSuccess);
+    }
+    // 회원 비밀번호 검증
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> memberValidate(@RequestBody Map<String, String> memberInfo) {
+        // 요청으로 ID와 비밀번호 추출
+        String id = memberInfo.get("id");
+        String password = memberInfo.get("password");
+        // 검증 호출
+        boolean isValid = memberService.validateMember(id, password);
+        return ResponseEntity.ok(isValid);
     }
 }
