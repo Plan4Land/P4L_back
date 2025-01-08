@@ -35,4 +35,6 @@ public class AuthController {
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         return ResponseEntity.ok(authService.login(memberReqDto));
     }
+
+    // 로그아웃
 }

@@ -17,9 +17,9 @@ public class PlannerController {
 
     // 플래너 생성
     @PostMapping("/make")
-    public ResponseEntity<Boolean> makePlanner(@RequestBody PlannerReqDto plannerReqDto) {
+    public ResponseEntity<Long> makePlanner(@RequestBody PlannerReqDto plannerReqDto) {
         log.error(plannerReqDto.toString());
-        boolean isSuccess = plannerService.makePlanner(plannerReqDto);
+        Long isSuccess = plannerService.makePlanner(plannerReqDto);
         return ResponseEntity.ok(isSuccess);
     }
 }

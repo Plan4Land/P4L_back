@@ -39,6 +39,12 @@ public class Planner {
     // 여행 종료일
     private LocalDateTime endDate;
 
+    // 여행 지역 1차 분류
+    private String area;
+
+    // 여행 지역 2차 분류
+    private String subArea;
+
     // 조회수
     private int view;
 

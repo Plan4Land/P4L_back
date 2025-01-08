@@ -6,6 +6,8 @@ import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // 회원 전체 조회
     public List<MemberResDto> getMemberAllList() {
@@ -39,7 +43,6 @@ public class MemberService {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setEmail(memberReqDto.getEmail());
-            member.setPassword(memberReqDto.getPassword());
             member.setName(memberReqDto.getName());
             member.setNickname(memberReqDto.getNickname());
             member.setProfileImg(memberReqDto.getProfileImg());
@@ -65,9 +68,14 @@ public class MemberService {
     }
 
     // 회원 비밀번호 체크
-//    public boolean getMemberByIdAndPw(String id, String pw) {
-//        Member member = memberRepository.findByIdAndPw(id, pw).orElseThrow(()->new RuntimeException("비밀번호가 같지 않습니다."));
-//    }
+    public boolean validateMember(String id, String password) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("사용자를 찾을 수 없습니다."));
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new RuntimeException("비밀번호가 같지 않습니다.");
+        }
+        return true;
+    }
 
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
