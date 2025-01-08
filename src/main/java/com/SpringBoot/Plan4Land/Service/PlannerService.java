@@ -28,19 +28,23 @@ public class PlannerService {
 
     @Transactional
     public boolean makePlanner(PlannerReqDto plannerReqDto) {
-        try{
+        try {
             Member member = memberRepository.findById(plannerReqDto.getId())
                     .orElseThrow(() -> new RuntimeException("Planner 작성 중 회원 조회 실패"));
 
             Planner planner = new Planner();
             planner.setTitle(plannerReqDto.getTitle());
             planner.setTheme(plannerReqDto.getTheme());
+            planner.setStartDate(plannerReqDto.getStartDate());
+            planner.setEndDate(plannerReqDto.getEndDate());
             planner.setThumbnail(plannerReqDto.getThumbnail());
             planner.setPublic(plannerReqDto.isPublic());
             planner.setOwner(member);
             plannerRepository.save(planner);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            return false;
+        }catch (Exception e) {
             log.error("Planner 생성 실패 : {}", e.getMessage());
             return false;
         }
