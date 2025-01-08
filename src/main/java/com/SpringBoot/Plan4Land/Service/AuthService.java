@@ -4,8 +4,10 @@ import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
+import com.SpringBoot.Plan4Land.Entity.Token;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
+import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Slf4j // 로그 정보를 출력하기 위함
@@ -26,6 +30,7 @@ import java.util.ArrayList;
 public class AuthService {
     // 생성자를 통한 의존성 주입, 생성자를 통해서 의존성 주입을 받는 경우 Autowired 생략
     private final MemberRepository memberRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder managerBuilder; // 인증을 담당하는 클래스
@@ -62,7 +67,17 @@ public class AuthService {
         try {
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
-            return tokenProvider.generateTokenDto(authentication);
+
+            // 토큰 생성
+            TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+            // 리프레시 토큰 저장
+            String refreshToken = tokenDto.getRefreshToken();
+            LocalDateTime issuedAt = LocalDateTime.now();
+            LocalDateTime expiration = issuedAt.plusDays(7); // 7일후 만료
+            Token token = new Token(member, refreshToken, issuedAt, expiration);
+            tokenRepository.save(token);
+
+            return tokenDto;
         } catch (BadCredentialsException e) {
             log.error("Bad credentials provided: ", e);
             throw new RuntimeException("Authentication failed due to bad credentials", e);
