@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,5 +17,7 @@ public class PlannerReqDto {
     private String area;
     private String subArea;
     private String thumbnail;
+
+    @JsonProperty("isPublic")
     private boolean isPublic;
 }
