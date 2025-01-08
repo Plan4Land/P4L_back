@@ -69,9 +69,12 @@ public class MemberService {
 
     // 회원 비밀번호 체크
     public boolean validateMember(String id, String password) {
-        Member member = memberRepository.findByIdAndPassword(id, password)
-                .orElseThrow(()->new RuntimeException("비밀번호가 같지 않습니다."));
-        return passwordEncoder.matches(password, member.getPassword());
+        Member member = memberRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("사용자를 찾을 수 없습니다."));
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new RuntimeException("비밀번호가 같지 않습니다.");
+        }
+        return true;
     }
 
     // Member Entity => MemberResDto 변환
