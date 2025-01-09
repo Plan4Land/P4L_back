@@ -38,8 +38,8 @@ public class MemberController {
     }
     // 회원 비밀번호 변경
     @PutMapping("/update/password")
-    public ResponseEntity<Boolean> memberUpdatePassword(@PathVariable String id, @PathVariable String password) {
-        boolean isSuccess = memberService.updateMemberPassword(id, password);
+    public ResponseEntity<Boolean> memberUpdatePassword(@RequestBody MemberReqDto memberReqDto) {
+        boolean isSuccess = memberService.updateMemberPassword(memberReqDto);
         return ResponseEntity.ok(isSuccess);
     }
     // 회원 정보 삭제

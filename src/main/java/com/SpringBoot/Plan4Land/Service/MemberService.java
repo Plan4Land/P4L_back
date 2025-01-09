@@ -55,11 +55,11 @@ public class MemberService {
     }
 
     // 회원 비밀번호 수정
-    public boolean updateMemberPassword(String id, String password) {
+    public boolean updateMemberPassword(MemberReqDto memberReqDto) {
         try {
-            Member member = memberRepository.findById(id)
+            Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
-            member.setPassword(password);
+            member.setPassword(memberReqDto.getPassword());
             memberRepository.save(member);
             return true;
         } catch (Exception e) {
