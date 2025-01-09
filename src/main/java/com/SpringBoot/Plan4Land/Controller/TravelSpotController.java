@@ -2,17 +2,18 @@ package com.SpringBoot.Plan4Land.Controller;
 
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Service.TravelSpotService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class TravelSpotController {
-
     private final TravelSpotService travelSpotService;
-
     public TravelSpotController(TravelSpotService travelSpotService) {
         this.travelSpotService = travelSpotService;
     }
