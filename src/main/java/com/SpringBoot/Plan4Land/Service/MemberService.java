@@ -60,6 +60,11 @@ public class MemberService {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setPassword(memberReqDto.getPassword());
+
+            // 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(memberReqDto.getPassword());
+            member.setPassword(encodedPassword);
+
             memberRepository.save(member);
             return true;
         } catch (Exception e) {
