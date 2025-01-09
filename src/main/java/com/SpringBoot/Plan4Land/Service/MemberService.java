@@ -54,6 +54,20 @@ public class MemberService {
         }
     }
 
+    // 회원 비밀번호 수정
+    public boolean updateMemberPassword(String id, String password) {
+        try {
+            Member member = memberRepository.findById(id)
+                    .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+            member.setPassword(password);
+            memberRepository.save(member);
+            return true;
+        } catch (Exception e) {
+            log.error("비밀번호 변경: {}", e.getMessage());
+            return false;
+        }
+    }
+
     // 회원 삭제
     public boolean deleteMember(String userId) {
         try {
