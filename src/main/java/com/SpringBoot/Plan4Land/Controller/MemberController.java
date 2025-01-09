@@ -36,6 +36,12 @@ public class MemberController {
         boolean isSuccess = memberService.updateMember(memberReqDto);
         return ResponseEntity.ok(isSuccess);
     }
+    // 회원 비밀번호 변경
+    @PutMapping("/update/password")
+    public ResponseEntity<Boolean> memberUpdatePassword(@RequestBody MemberReqDto memberReqDto) {
+        boolean isSuccess = memberService.updateMemberPassword(memberReqDto);
+        return ResponseEntity.ok(isSuccess);
+    }
     // 회원 정보 삭제
     @DeleteMapping("/{userId}")
     public ResponseEntity<Boolean> memberDelete(@PathVariable String userId) {
