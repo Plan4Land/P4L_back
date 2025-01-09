@@ -58,4 +58,19 @@ public class MemberController {
         boolean isValid = memberService.validateMember(id, password);
         return ResponseEntity.ok(isValid);
     }
+    // 회원 아이디 중복 확인
+    @PostMapping("/exists/{id}")
+    public boolean memberIdDulicate(@PathVariable String id) {
+        return memberService.checkIdDuplicate(id);
+    }
+    // 회원 이메일 중복 확인
+    @PostMapping("/exists/{email}")
+    public boolean memberEmailDulicate(@PathVariable String email) {
+        return memberService.checkEmailDuplicate(email);
+    }
+    // 회원 닉네임 중복 확인
+    @PostMapping("/exists/{nickname}")
+    public boolean memberNicknameDulicate(@PathVariable String nickname) {
+        return memberService.checkNicknameDuplicate(nickname);
+    }
 }

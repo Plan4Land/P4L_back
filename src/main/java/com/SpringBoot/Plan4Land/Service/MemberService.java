@@ -98,6 +98,21 @@ public class MemberService {
         return true;
     }
 
+    // 회원 아이디 중복 확인
+    public boolean checkIdDuplicate(String id) {
+        return memberRepository.existsById(id);
+    }
+
+    // 회원 이메일 중복 확인
+    public boolean checkEmailDuplicate(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    // 회원 닉네임 중복 확인
+    public boolean checkNicknameDuplicate(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
