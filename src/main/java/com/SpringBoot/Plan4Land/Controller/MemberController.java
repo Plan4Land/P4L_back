@@ -59,17 +59,17 @@ public class MemberController {
         return ResponseEntity.ok(isValid);
     }
     // 회원 아이디 중복 확인
-    @PostMapping("/exists/{id}")
+    @PostMapping("/idExists/{id}")
     public boolean memberIdDulicate(@PathVariable String id) {
         return memberService.checkIdDuplicate(id);
     }
     // 회원 이메일 중복 확인
-    @PostMapping("/exists/{email}")
+    @PostMapping("/emailExists/{email}")
     public boolean memberEmailDulicate(@PathVariable String email) {
         return memberService.checkEmailDuplicate(email);
     }
     // 회원 닉네임 중복 확인
-    @PostMapping("/exists/{nickname}")
+    @PostMapping("/nicknameExists/{nickname}")
     public boolean memberNicknameDulicate(@PathVariable String nickname) {
         return memberService.checkNicknameDuplicate(nickname);
     }
