@@ -37,4 +37,8 @@ public class AuthController {
     }
 
     // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<TokenDto> logout(@RequestBody MemberReqDto memberReqDto) {
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -92,4 +92,18 @@ public class AuthService {
             throw new RuntimeException("Authentication failed", e);
         }
     }
+
+    // 로그아웃
+    public void logout(MemberReqDto memberReqDto) {
+        // ID로 사용자 검색
+        Member member = memberRepository.findById(memberReqDto.getId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 토큰 삭제
+        Token token = tokenRepository.findByMember(member)
+                .orElseThrow(()-> new RuntimeException("사용자의 리프레시 토큰을 찾을 수 없습니다."));
+        tokenRepository.delete(token);
+
+        log.info("로그아웃 성공: 리프레시 토큰 삭제.");
+    }
 }
