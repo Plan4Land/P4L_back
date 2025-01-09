@@ -3,7 +3,7 @@ package com.SpringBoot.Plan4Land.Entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name="membership")
 @Entity
@@ -22,7 +22,13 @@ public class Membership {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private LocalDate paymentDate;
+    private String payType;
+
+    private LocalDateTime expiryDate;
+
+    private LocalDateTime paymentDate;
+
+    private String billingKey;
 
     private boolean activated;
 }
