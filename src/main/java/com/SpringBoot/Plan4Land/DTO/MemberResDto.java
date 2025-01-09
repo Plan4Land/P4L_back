@@ -26,7 +26,7 @@ public class MemberResDto {
                 .name(member.getName())
                 .nickname(member.getNickname())
                 .imgPath(member.getProfileImg())
-                .regDate(member.getSignupDate())
+                .regDate(member.getSignUpDate())
                 .build();
     }
 }

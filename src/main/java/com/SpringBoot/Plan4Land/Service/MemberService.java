@@ -85,7 +85,7 @@ public class MemberService {
         memberResDto.setName(member.getName());
         memberResDto.setNickname(member.getNickname());
         memberResDto.setImgPath(member.getProfileImg());
-        memberResDto.setRegDate(member.getSignupDate());
+        memberResDto.setRegDate(member.getSignUpDate());
         return memberResDto;
     }
 }
