@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +78,7 @@ public class MemberService {
     public boolean deleteMember(String userId) {
         try {
             Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+            member.setSignOutDate(LocalDateTime.now());
             member.setActivate(false);
             memberRepository.save(member);
             return true;

@@ -54,6 +54,7 @@ public class Member {
     // 계정 활성화 여부
     private boolean activate;
 
+    // 회원가입시 데이터 자동 입력
     @PrePersist
     protected void onCreate() {
         this.signupDate = LocalDateTime.now();
