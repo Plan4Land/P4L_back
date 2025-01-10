@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,20 @@ public class MemberController {
     }
     // 회원 비밀번호 찾기
     @PostMapping("/find-password")
-    public boolean findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
-        return memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
+    public String findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
+        boolean isSuccess = memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
+        String password = generateTempPassword();
+        return isSuccess ? password : null;
+    }
+    // 임시 비밀번호 생성 함수
+    public String generateTempPassword() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder(8);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        for (int i=0; i<8; i++) {
+            int index = random.nextInt(characters.length());
+            password.append(characters.charAt(index));
+        }
+        return password.toString();
     }
 }
