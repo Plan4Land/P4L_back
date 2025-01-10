@@ -3,7 +3,7 @@ package com.SpringBoot.Plan4Land.Entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name="membership")
 @Entity
@@ -19,10 +19,26 @@ public class Membership {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_uid")
     private Member member;
 
-    private LocalDate paymentDate;
+    private String payType;
 
+    private LocalDateTime expiryDate;
+
+    private LocalDateTime paymentDate;
+
+    private String billingKey;
+
+    @Column(name = "activated", columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean activated;
+
+    @Column(name = "cancel", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean cancel;
+
+    @PrePersist
+    protected void onCreate() {
+        this.activated = true;
+        this.cancel = false;
+    }
 }

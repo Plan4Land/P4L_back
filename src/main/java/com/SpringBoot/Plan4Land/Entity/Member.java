@@ -5,8 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name="member")
 @Entity
@@ -46,7 +44,7 @@ public class Member {
     private Role role;
 
     // 가입일
-    private LocalDateTime signupDate;
+    private LocalDateTime signUpDate;
 
     // 탈퇴일
     private LocalDateTime signOutDate;
@@ -54,9 +52,10 @@ public class Member {
     // 계정 활성화 여부
     private boolean activate;
 
+    // 회원가입시 데이터 자동 입력
     @PrePersist
     protected void onCreate() {
-        this.signupDate = LocalDateTime.now();
+        this.signUpDate = LocalDateTime.now();
         this.activate = true;
         this.role = Role.ROLE_GENERAL;
     }
@@ -69,6 +68,6 @@ public class Member {
         this.nickname = nickname;
         this.name = name;
         this.profileImg = profileImg;
-        this.signupDate = LocalDateTime.now();
+        this.signUpDate = LocalDateTime.now();
     }
 }

@@ -26,4 +26,5 @@ public class BookmarkPlanner {
     @ManyToOne
     @JoinColumn(name = "planner_id")
     private Planner planner;
+
 }

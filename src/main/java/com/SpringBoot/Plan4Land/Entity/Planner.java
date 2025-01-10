@@ -63,4 +63,17 @@ public class Planner {
         this.activate = true;
         this.view = 0;
     }
+
+    @Builder
+    public Planner(String title, String theme, Member owner, LocalDateTime startDate, LocalDateTime endDate, String area, String subArea, String thumbnail, boolean isPublic){
+        this.title = title;
+        this.theme = theme;
+        this.owner = owner;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.area = area;
+        this.subArea = subArea;
+        this.thumbnail = thumbnail;
+        this.isPublic = isPublic;
+    }
 }

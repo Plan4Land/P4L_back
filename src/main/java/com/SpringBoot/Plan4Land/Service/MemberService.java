@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,10 +55,30 @@ public class MemberService {
         }
     }
 
+    // 회원 비밀번호 수정
+    public boolean updateMemberPassword(MemberReqDto memberReqDto) {
+        try {
+            Member member = memberRepository.findById(memberReqDto.getId())
+                    .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+            member.setPassword(memberReqDto.getPassword());
+
+            // 비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(memberReqDto.getPassword());
+            member.setPassword(encodedPassword);
+
+            memberRepository.save(member);
+            return true;
+        } catch (Exception e) {
+            log.error("비밀번호 변경: {}", e.getMessage());
+            return false;
+        }
+    }
+
     // 회원 삭제
     public boolean deleteMember(String userId) {
         try {
             Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+            member.setSignOutDate(LocalDateTime.now());
             member.setActivate(false);
             memberRepository.save(member);
             return true;
@@ -77,6 +98,35 @@ public class MemberService {
         return true;
     }
 
+    // 회원 아이디 중복 확인
+    public boolean checkIdDuplicate(String id) {
+        return memberRepository.existsById(id);
+    }
+
+    // 회원 이메일 중복 확인
+    public boolean checkEmailDuplicate(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    // 회원 닉네임 중복 확인
+    public boolean checkNicknameDuplicate(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
+    // 회원 아이디 찾기
+    public String findMemberId(String name, String email) {
+        Member member = memberRepository.findByNameAndEmail(name, email)
+                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return member != null ? member.getId() : null;
+    }
+
+    // 회원 비밀번호 찾기
+    public boolean findMemberPassword(String id, String email) {
+        Member member = memberRepository.findByIdAndEmail(id, email)
+                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return member != null;
+    }
+
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
@@ -85,7 +135,7 @@ public class MemberService {
         memberResDto.setName(member.getName());
         memberResDto.setNickname(member.getNickname());
         memberResDto.setImgPath(member.getProfileImg());
-        memberResDto.setRegDate(member.getSignupDate());
+        memberResDto.setRegDate(member.getSignUpDate());
         return memberResDto;
     }
 }
