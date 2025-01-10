@@ -5,14 +5,10 @@ import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.Service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +19,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
-
-    @Autowired
-    private JavaMailSender emailSender;
-
     // 전체 회원 조회
     @GetMapping("/list")
     public ResponseEntity<List<MemberResDto>> memberAllList() {
@@ -97,38 +89,5 @@ public class MemberController {
     @PostMapping("/find-password")
     public boolean findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
         return memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
-    }
-
-    // 임시 비밀번호 생성 함수
-    public static String generateTempPassword(int length) {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-        SecureRandom random = new SecureRandom(); // 보안적인 난수 생성기
-        StringBuilder password = new StringBuilder(length);
-        for (int i = 0; i<length; i++) {
-            int randomIndex = random.nextInt(characters.length());
-            password.append(characters.charAt(randomIndex));
-        }
-        return password.toString();
-    }
-
-    // 이메일 발송 함수
-    private void sendEmail(String to, String tempPassword) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("plan4land 임시 비밀번호 안내");
-        message.setText("임시 비밀번호는 " + tempPassword + " 입니다.");
-        emailSender.send(message);
-    }
-
-    // 비밀번호 재설정
-    @PostMapping("/resetPassword")
-    public boolean resetPassword(@RequestBody String email) {
-        try {
-            String tempPassword = generateTempPassword(8);
-            sendEmail(email, tempPassword);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

@@ -44,8 +44,6 @@ dependencies {
     implementation 'io.github.cdimascio:java-dotenv:5.2.2' // dotenv
 
     //implementation 'io.portone:server-sdk:0.10.0'
-
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
