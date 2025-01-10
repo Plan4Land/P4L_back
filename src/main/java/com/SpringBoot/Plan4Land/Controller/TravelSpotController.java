@@ -13,7 +13,9 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class TravelSpotController {
+
     private final TravelSpotService travelSpotService;
+
     public TravelSpotController(TravelSpotService travelSpotService) {
         this.travelSpotService = travelSpotService;
     }
