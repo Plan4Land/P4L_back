@@ -113,6 +113,20 @@ public class MemberService {
         return memberRepository.existsByNickname(nickname);
     }
 
+    // 회원 아이디 찾기
+    public String findMemberId(String name, String email) {
+        Member member = memberRepository.findByNameAndEmail(name, email)
+                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return member != null ? member.getId() : null;
+    }
+
+    // 회원 비밀번호 찾기
+    public boolean findMemberPassword(String id, String email) {
+        Member member = memberRepository.findByIdAndEmail(id, email)
+                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return member != null;
+    }
+
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
