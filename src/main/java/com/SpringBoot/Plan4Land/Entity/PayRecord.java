@@ -17,15 +17,13 @@ public class PayRecord {
     @Column(name = "record_id")
     private String recordId;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String memberId;
 
     @ManyToOne
     @JoinColumn(name = "membership_id")
     private Membership membership;
 
-    private LocalDate payDate;
+    private LocalDate payTime;
 
     private String payType;
 }
