@@ -11,6 +11,7 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BookmarkSpot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
