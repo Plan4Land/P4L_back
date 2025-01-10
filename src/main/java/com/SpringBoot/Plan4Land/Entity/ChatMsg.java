@@ -33,4 +33,9 @@ public class ChatMsg {
     @ManyToOne
     @JoinColumn(name = "planner_id")
     private Planner planner;
+
+    @PrePersist
+    protected void onCreate() {
+        this.sendTime = LocalDateTime.now();
+    }
 }
