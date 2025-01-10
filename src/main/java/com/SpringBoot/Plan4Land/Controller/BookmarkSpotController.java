@@ -22,4 +22,17 @@ public class BookmarkSpotController {
         SpotDetailsResponse response = bookMarkSpotService.getSpotDetailsWithBookmark(spotId);
         return ResponseEntity.ok(response);
     }
+    // 북마크 추가
+    @PostMapping("/add")
+    public ResponseEntity<String> addBookmark(@RequestParam Long memberId, @RequestParam String spotId) {
+        String response = bookMarkSpotService.addBookmark(memberId, spotId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 북마크 삭제
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> removeBookmark(@RequestParam Long memberId, @RequestParam String spotId) {
+        String response = bookMarkSpotService.removeBookmark(memberId, spotId);
+        return ResponseEntity.ok(response);
+    }
 }
