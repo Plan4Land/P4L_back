@@ -85,4 +85,9 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+    // 회원 비밀번호 찾기
+    @PostMapping("/find-password")
+    public boolean findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
+        return memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
+    }
 }
