@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.Service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,5 +73,16 @@ public class MemberController {
     @PostMapping("/nicknameExists/{nickname}")
     public boolean memberNicknameDulicate(@PathVariable String nickname) {
         return memberService.checkNicknameDuplicate(nickname);
+    }
+    // 회원 아이디 찾기
+    @PostMapping("/find-id")
+    public ResponseEntity<String> findMemberId(@RequestBody MemberReqDto memberReqDto) {
+        String userId = memberService.findMemberId(memberReqDto.getName(), memberReqDto.getEmail());
+
+        if (userId != null) {
+            return ResponseEntity.ok(userId);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
     }
 }
