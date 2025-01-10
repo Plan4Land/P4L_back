@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j // 로그 정보를 출력하기 위함
 @Service // 스프링 컨테이너에 빈(bean, 객체) 등록
@@ -100,9 +101,11 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 토큰 삭제
-        Token token = tokenRepository.findByMember(member)
-                .orElseThrow(()-> new RuntimeException("사용자의 리프레시 토큰을 찾을 수 없습니다."));
-        tokenRepository.delete(token);
+        List<Token> tokens = tokenRepository.findAllByMember(member);
+        if (tokens.isEmpty()) {
+            throw new RuntimeException("사용자의 리프레시 토큰을 찾을 수 없습니다.");
+        }
+        tokenRepository.deleteAll(tokens);
 
         log.info("로그아웃 성공: 리프레시 토큰 삭제.");
     }
