@@ -19,7 +19,7 @@ public class Membership {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_uid")
     private Member member;
 
     private String payType;
@@ -30,5 +30,15 @@ public class Membership {
 
     private String billingKey;
 
+    @Column(name = "activated", columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean activated;
+
+    @Column(name = "cancel", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean cancel;
+
+    @PrePersist
+    protected void onCreate() {
+        this.activated = true;
+        this.cancel = false;
+    }
 }

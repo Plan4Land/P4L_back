@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.Entity.BookmarkSpot;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Repository.BookMarkSpotRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,24 +14,13 @@ import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class BookMarkSpotService {
-    @Autowired
     private final BookMarkSpotRepository bookMarkSpotRepository;
-
-    @Autowired
     private final MemberRepository memberRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    public BookMarkSpotService(BookMarkSpotRepository bookMarkSpotRepository, MemberRepository memberRepository) {
-        this.bookMarkSpotRepository = bookMarkSpotRepository;
-        this.memberRepository = memberRepository;
-    }
-
-    public Long getBookmarkCount(String spotId) {
-        return bookMarkSpotRepository.countBySpot(spotId);
-    }
 
     // spot 상세 정보 가져오기
     public TravelSpotReqDto getSpotDetails(Long spotId) {
@@ -47,7 +37,7 @@ public class BookMarkSpotService {
 
     // 북마크 수와 spot 상세 정보를 함께 반환
     public SpotDetailsResponse getSpotDetailsWithBookmark(String spotId) {
-        Long bookmarkCount = getBookmarkCount(spotId);
+        Long bookmarkCount = bookMarkSpotRepository.countBySpot(spotId);
         TravelSpotReqDto spotDetails = getSpotDetails(Long.valueOf(spotId));
         return new SpotDetailsResponse(spotDetails, bookmarkCount);
     }
