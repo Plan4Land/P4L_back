@@ -9,9 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface BookMarkSpotRepository extends JpaRepository<BookmarkSpot, Long> {
-    Long countBySpot(String spot);
-    boolean existsByMemberIdAndSpot(String memberId, String spot);
-    void deleteByMemberIdAndSpot(String memberId, String spot);
 
     boolean existsByMemberAndSpot(Member member, String spotId);
 

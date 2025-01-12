@@ -23,7 +23,8 @@ public class BookMarkSpotService {
     private EntityManager entityManager;
 
     // 북마크 추가
-    public String addBookmark(Long memberId, String spotId) {
+    public String addBookmark(String memberId, String spotId) {
+        // id를 기준으로 회원 조회
         Optional<Member> member = memberRepository.findById(memberId);
 
         if (member.isEmpty()) {
@@ -45,7 +46,7 @@ public class BookMarkSpotService {
     }
 
     // 북마크 삭제
-    public String removeBookmark(Long memberId, String spotId) {
+    public String removeBookmark(String memberId, String spotId) {
         Optional<Member> member = memberRepository.findById(memberId);
 
         if (member.isEmpty()) {
@@ -61,6 +62,16 @@ public class BookMarkSpotService {
         // 북마크 삭제
         bookMarkSpotRepository.delete(bookmarkSpot.get());
         return "북마크가 삭제되었습니다.";
+    }
+    // 특정 사용자가 특정 여행지를 북마크했는지 확인
+    public boolean isBookmarked(String memberId, String spotId) {
+        Optional<Member> member = memberRepository.findById(memberId);
+
+        if (member.isEmpty()) {
+            throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
+        }
+
+        return bookMarkSpotRepository.existsByMemberAndSpot(member.get(), spotId);
     }
 
     // 응답용 DTO 클래스
