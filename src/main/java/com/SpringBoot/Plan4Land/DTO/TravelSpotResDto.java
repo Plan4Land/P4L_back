@@ -27,5 +27,5 @@ public class TravelSpotResDto {
     private LocalDateTime modifiedTime;
     private double mapX;
     private double mapY;
-    private int view;
+    private int bookmark;
 }

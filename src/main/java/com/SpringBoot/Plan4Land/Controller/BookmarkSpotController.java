@@ -14,13 +14,6 @@ public class BookmarkSpotController {
 
     private final BookMarkSpotService bookMarkSpotService;
 
-
-    @GetMapping("/{spotId}")
-    public ResponseEntity<SpotDetailsResponse> getSpotDetailsWithBookmark(@PathVariable String spotId) {
-        SpotDetailsResponse response = bookMarkSpotService.getSpotDetailsWithBookmark(spotId);
-        return ResponseEntity.ok(response);
-    }
-
     // 북마크 추가
     @PostMapping("/add")
     public ResponseEntity<String> addBookmark(@RequestParam Long memberId, @RequestParam String spotId) {

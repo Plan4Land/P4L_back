@@ -19,13 +19,6 @@ public class TravelSpotService {
     public TravelSpotService(TravelSpotRepository travelSpotRepository) {
         this.travelSpotRepository = travelSpotRepository;
     }
-    public List<TravelSpotResDto> getAllTravelSpots() {
-        List<TravelSpot> travelSpots = travelSpotRepository.findAll();
-        return travelSpots.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-
-    }
 
     public List<TravelSpotResDto> getAllTravelSpots(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);  // 페이지와 크기를 설정
@@ -36,6 +29,13 @@ public class TravelSpotService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+    // 상세 정보 조회
+    public TravelSpotResDto getSpotDetail(Long spotId) {
+        TravelSpot travelSpot = travelSpotRepository.findById(spotId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID로 여행지를 찾을 수 없습니다: " + spotId));
+        return convertToDTO(travelSpot);
+    }
+
 
     private TravelSpotResDto convertToDTO(TravelSpot travelSpot) {
         TravelSpotResDto dto = new TravelSpotResDto();

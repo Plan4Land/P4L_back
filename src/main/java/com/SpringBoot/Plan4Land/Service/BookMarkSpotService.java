@@ -22,26 +22,6 @@ public class BookMarkSpotService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // spot 상세 정보 가져오기
-    public TravelSpotReqDto getSpotDetails(Long spotId) {
-        String query = "SELECT new com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto(" +
-                "t.id, t.title, t.tel, t.thumbnail, t.areaCode, t.sigunguCode, " +
-                "t.addr1, t.addr2, t.cat1, t.cat2, t.cat3, t.typeId, " +
-                "t.createdTime, t.modifiedTime, t.mapX, t.mapY) " +
-                "FROM TravelSpot t WHERE t.id = :spotId";
-
-        return entityManager.createQuery(query, TravelSpotReqDto.class)
-                .setParameter("spotId", spotId)
-                .getSingleResult();
-    }
-
-    // 북마크 수와 spot 상세 정보를 함께 반환
-    public SpotDetailsResponse getSpotDetailsWithBookmark(String spotId) {
-        Long bookmarkCount = bookMarkSpotRepository.countBySpot(spotId);
-        TravelSpotReqDto spotDetails = getSpotDetails(Long.valueOf(spotId));
-        return new SpotDetailsResponse(spotDetails, bookmarkCount);
-    }
-
     // 북마크 추가
     public String addBookmark(Long memberId, String spotId) {
         Optional<Member> member = memberRepository.findById(memberId);

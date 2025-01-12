@@ -2,10 +2,7 @@ package com.SpringBoot.Plan4Land.Controller;
 
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Service.TravelSpotService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +23,11 @@ public class TravelSpotController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return travelSpotService.getAllTravelSpots(page, size); // 페이지네이션 처리된 서비스 메서드 호출
+    }
+
+    // 여행지 상세 정보 조회
+    @GetMapping("/api/travelspots/{spotId}")
+    public TravelSpotResDto getSpotDetail(@PathVariable Long spotId) {
+        return travelSpotService.getSpotDetail(spotId); // 서비스 메서드 호출
     }
 }
