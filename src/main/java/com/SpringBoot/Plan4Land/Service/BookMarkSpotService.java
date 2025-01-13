@@ -10,6 +10,10 @@ import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.TravelSpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -82,47 +86,38 @@ public class BookMarkSpotService {
     }
 
     // 내가 북마크한 모든 여행지의 정보 가져오기
-    public List<TravelSpotReqDto> getAllBookmarkedSpots(String memberId) {
-        // 1. 회원 조회
-        Optional<Member> member = memberRepository.findById(memberId);
+    public Page<TravelSpotReqDto> getBookmarkedSpots(String memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
-        if (member.isEmpty()) {
-            throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
-        }
+        // 북마크한 장소를 페이지네이션과 함께 조회
+        Page<BookmarkSpot> bookmarkedSpotsPage = bookMarkSpotRepository.findByMemberId(memberId, pageable);
 
-        // 2. 회원이 북마크한 모든 여행지 조회
-        List<BookmarkSpot> bookmarkedSpots = bookMarkSpotRepository.findByMember(member.get());
+        // Page<BookmarkSpot>을 Page<TravelSpotReqDto>로 변환
+        Page<TravelSpotReqDto> travelSpotReqDtosPage = bookmarkedSpotsPage.map(bookmark -> {
+            // 각 북마크에 해당하는 TravelSpot 정보 가져오기
+            Optional<TravelSpot> travelSpot = travelSpotRepository.findById(Long.valueOf(bookmark.getSpot()));
+            return travelSpot.map(spot -> new TravelSpotReqDto(
+                    spot.getId(),
+                    spot.getTitle(),
+                    spot.getTel(),
+                    spot.getThumbnail(),
+                    spot.getAreaCode(),
+                    spot.getSigunguCode(),
+                    spot.getAddr1(),
+                    spot.getAddr2(),
+                    spot.getCat1(),
+                    spot.getCat2(),
+                    spot.getCat3(),
+                    spot.getTypeId(),
+                    spot.getCreatedTime(),
+                    spot.getModifiedTime(),
+                    spot.getMapX(),
+                    spot.getMapY()
+            )).orElse(null);
+        });
 
-        if (bookmarkedSpots.isEmpty()) {
-            throw new IllegalArgumentException("북마크한 여행지가 없습니다.");
-        }
-
-        // 3. 여행지 상세 정보를 DTO로 변환
-        List<TravelSpotReqDto> travelSpotReqDtos = bookmarkedSpots.stream()
-                .map(bookmark -> {
-                    Optional<TravelSpot> travelSpot = travelSpotRepository.findById(Long.valueOf(bookmark.getSpot()));
-                    return travelSpot.map(spot -> new TravelSpotReqDto(
-                            spot.getId(),
-                            spot.getTitle(),
-                            spot.getTel(),
-                            spot.getThumbnail(),
-                            spot.getAreaCode(),
-                            spot.getSigunguCode(),
-                            spot.getAddr1(),
-                            spot.getAddr2(),
-                            spot.getCat1(),
-                            spot.getCat2(),
-                            spot.getCat3(),
-                            spot.getTypeId(),
-                            spot.getCreatedTime(),
-                            spot.getModifiedTime(),
-                            spot.getMapX(),
-                            spot.getMapY()
-                    )).orElse(null);
-                })
-                .collect(Collectors.toList());
-
-        return travelSpotReqDtos;
+        return travelSpotReqDtosPage;
     }
+
 
 }

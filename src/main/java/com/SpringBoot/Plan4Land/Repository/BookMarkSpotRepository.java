@@ -21,5 +21,5 @@ public interface BookMarkSpotRepository extends JpaRepository<BookmarkSpot, Long
 
     List<BookmarkSpot> findByMember(Member member);
 
-    Page<BookmarkSpot> findByMemberId(Long memberId, Pageable pageable);
+    Page<BookmarkSpot> findByMemberId(String memberId, Pageable pageable);
 }

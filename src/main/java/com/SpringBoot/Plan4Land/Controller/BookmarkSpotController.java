@@ -3,6 +3,7 @@ package com.SpringBoot.Plan4Land.Controller;
 import com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto;
 import com.SpringBoot.Plan4Land.Service.BookMarkSpotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +39,15 @@ public class BookmarkSpotController {
         return ResponseEntity.ok(isBookmarked);
     }
     @GetMapping("/myBookmarks")
-    public ResponseEntity<List<TravelSpotReqDto>> getAllBookmarkedSpots(
-            @RequestParam String memberId) {
-        List<TravelSpotReqDto> bookmarkedSpots = bookMarkSpotService.getAllBookmarkedSpots(memberId);
+    public ResponseEntity<Page<TravelSpotReqDto>> getBookmarkedSpots(
+            @RequestParam String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+
+        // 페이지네이션 처리된 북마크한 여행지 목록 가져오기
+        Page<TravelSpotReqDto> bookmarkedSpots = bookMarkSpotService.getBookmarkedSpots(memberId, page, size);
+
         return ResponseEntity.ok(bookmarkedSpots);
     }
+
 }
