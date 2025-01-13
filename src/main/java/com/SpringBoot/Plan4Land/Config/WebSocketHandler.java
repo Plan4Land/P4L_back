@@ -29,9 +29,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message)
             throws Exception { // protected : 같은 패키지 내에서나 하위 클래스에서만 호출 가능 -> WebSocket 메시지를 처리하는 로직이 외부로 노출되지 않도록 보호
         String payload = message.getPayload(); // 클라이언트가 전송한 메시지
-        log.info("payload : {}", payload);
+        log.info("여기 payload : {}", payload);
         // JSON 문자열을 ChatMessageDto로 변환 작업
         ChatMsgDto chatMessage = objectMapper.readValue(payload, ChatMsgDto.class);
+        log.info("원래 여기 왔잖아");
         Long plannerId = chatMessage.getPlannerId();
         log.info("plannerId : {}", plannerId);
 
