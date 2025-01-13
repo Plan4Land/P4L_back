@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
-    // 유저 활성화 확인
+    // 유저 존재 확인
     @GetMapping("/exists/{userId}")
     public ResponseEntity<Boolean> isUser(@PathVariable String userId) {
         boolean isTrue = authService.isMember(userId);
@@ -41,5 +41,17 @@ public class AuthController {
     public ResponseEntity<TokenDto> logout(@RequestBody MemberReqDto memberReqDto) {
         authService.logout(memberReqDto);
         return ResponseEntity.noContent().build();
+    }
+
+    // 이메일로 유저 탈퇴 확인
+    @PostMapping("/isActivate/byEmail")
+    public String isActivateById(@RequestBody MemberReqDto memberReqDto) {
+        return authService.isActivateByEmail(memberReqDto);
+    }
+
+    // 아이디+이메일로 유저 탈퇴 확인
+    @PostMapping("/isActivate/byIdAndEmail")
+    public String isActivateByIdAndEmail(@RequestBody MemberReqDto memberReqDto) {
+        return authService.isActivateByIdAndEmail(memberReqDto);
     }
 }

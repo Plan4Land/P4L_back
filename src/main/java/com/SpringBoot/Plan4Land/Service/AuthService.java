@@ -109,4 +109,32 @@ public class AuthService {
 
         log.info("로그아웃 성공: 리프레시 토큰 삭제.");
     }
+
+    // 이메일로 유저 탈퇴 확인
+    public String isActivateByEmail(MemberReqDto memberReqDto) {
+        // ID로 사용자 검색
+        Member member = memberRepository.findByEmail(memberReqDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 회원 상태 검증
+        if(!member.isActivate()) {
+            return "탈퇴한 회원입니다.";
+        } else {
+            return "활성 회원입니다.";
+        }
+    }
+
+    // 아이디+이메일로 유저 탈퇴 확인
+    public String isActivateByIdAndEmail(MemberReqDto memberReqDto) {
+        // ID로 사용자 검색
+        Member member = memberRepository.findByIdAndEmail(memberReqDto.getId(), memberReqDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 회원 상태 검증
+        if(!member.isActivate()) {
+            return "탈퇴한 회원입니다.";
+        } else {
+            return "활성 회원입니다.";
+        }
+    }
 }
