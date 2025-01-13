@@ -41,11 +41,13 @@ public interface TravelSpotRepository extends JpaRepository<TravelSpot, Long> {
                         AND (:middleTheme IS NULL OR t.cat2 = :middleTheme)
                         AND (:cat IS NULL OR t.typeId = :cat)
                         AND (COALESCE(:bottomThemes, NULL) IS NULL OR t.cat3 IN :bottomThemes)
+                        AND (:searchQuery IS NULL OR t.title LIKE %:searchQuery%)
             """)
     Page<TravelSpot> getFilterTravelSpot(Pageable pageable,
                                          @Param("areaCode") Integer areaCode, @Param("subAreaCode") Integer subAreaCode,
                                          @Param("topTheme") String topTheme, @Param("middleTheme") String middleTheme,
-                                         @Param("bottomThemes") List<String> bottomThemes, @Param("cat") String cat);
+                                         @Param("bottomThemes") List<String> bottomThemes, @Param("cat") String cat,
+                                         @Param("searchQuery") String searchQuery);
 
     Page<TravelSpot> findByAreaCodeAndSigunguCodeAndCat1AndCat2AndCat3InAndTypeId(
             Pageable pageable, Integer areaCode, Integer sigunguCode, String cat1, String cat2, List<String> cat3, String typeId);

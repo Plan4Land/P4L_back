@@ -28,15 +28,16 @@ public class TravelSpotController {
                                                  @RequestParam(required = false) String topTheme,
                                                  @RequestParam(required = false) String middleTheme,
                                                  @RequestParam(required = false) String bottomTheme,
-                                                 @RequestParam(required = false) String category) {
-        log.warn("cat3 : {}", bottomTheme);
-        log.info("{}, {}, {}, {}, \n{}, {}, {}, {}",page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomTheme, category);
+                                                 @RequestParam(required = false) String category,
+                                                 @RequestParam(required = false) String searchQuery) {
+        log.info("{}, {}, {}, {}, \n{}, {}, {}, {} {}",page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomTheme, category, searchQuery);
 
         List<String> bottomThemeList = (bottomTheme != null && !bottomTheme.isEmpty()) ? List.of(bottomTheme.split(",")) : List.of();
         log.error("bottomThemes : {}", bottomThemeList);
 
         // 필터링 로직을 추가하여 여행지 데이터를 검색합니다.
-        return travelSpotService.getFilteredTravelSpots(page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomThemeList, category);
+        return travelSpotService.getFilteredTravelSpots(page, size, areaCode, subAreaCode,
+                topTheme, middleTheme, bottomThemeList, category, searchQuery);
     }
 
     // 여행지 상세 정보 조회

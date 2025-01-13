@@ -22,10 +22,10 @@ public class TravelSpotService {
     private final BookMarkSpotRepository bookMarkSpotRepository;
 
     public List<TravelSpotResDto> getFilteredTravelSpots(int page, int size, Integer areaCode, Integer subAreaCode,
-                                                    String topTheme, String middleTheme, List<String> bottomThemes, String cat) {
+                                                    String topTheme, String middleTheme, List<String> bottomThemes, String cat, String searchQuery) {
         Pageable pageable = PageRequest.of(page, size);  // 페이지와 크기를 설정
         Page<TravelSpot> travelSpotPage = travelSpotRepository.getFilterTravelSpot(pageable, areaCode, subAreaCode,
-                topTheme, middleTheme, bottomThemes, cat);
+                topTheme, middleTheme, bottomThemes, cat, searchQuery);
 
         // 페이지된 결과를 DTO로 변환하여 반환
         return travelSpotPage.getContent().stream()
