@@ -33,6 +33,4 @@ public class PlannerController {
         PlannerResDto plannerResDto = plannerService.findByPlannerId(plannerId);
         return ResponseEntity.ok(plannerResDto);
     }
-
-    //
 }
