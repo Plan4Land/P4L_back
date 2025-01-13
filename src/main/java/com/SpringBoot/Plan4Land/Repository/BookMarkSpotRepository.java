@@ -13,4 +13,6 @@ public interface BookMarkSpotRepository extends JpaRepository<BookmarkSpot, Long
     boolean existsByMemberAndSpot(Member member, String spotId);
 
     Optional<BookmarkSpot> findByMemberAndSpot(Member member, String spotId);
+
+    int countBySpot(String spotId);
 }

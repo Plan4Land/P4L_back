@@ -13,6 +13,4 @@ import org.springframework.stereotype.Repository;
 public interface TravelSpotRepository extends JpaRepository<TravelSpot, Long> {
     Page<TravelSpot> findAll(Pageable pageable);
 
-    @Query(value = "select ts.*, bk.* from travel_spot ts inner join (select count(*) as bk_count, spot from bookmark_spot where spot = :spotId group by spot) bk on ts.spot_id=bk.spot", nativeQuery = true)
-    TravelSpotResDto getSpotDetail(@Param("spotId") Long spotId);
 }
