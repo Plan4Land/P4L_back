@@ -2,7 +2,10 @@ package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Entity.TravelSpot;
+import com.SpringBoot.Plan4Land.Repository.BookMarkSpotRepository;
 import com.SpringBoot.Plan4Land.Repository.TravelSpotRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TravelSpotService {
     private final TravelSpotRepository travelSpotRepository;
-
-    public TravelSpotService(TravelSpotRepository travelSpotRepository) {
-        this.travelSpotRepository = travelSpotRepository;
-    }
+    private final BookMarkSpotRepository bookMarkSpotRepository;
 
     public List<TravelSpotResDto> getAllTravelSpots(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);  // 페이지와 크기를 설정
@@ -33,7 +35,14 @@ public class TravelSpotService {
     public TravelSpotResDto getSpotDetail(Long spotId) {
         TravelSpot travelSpot = travelSpotRepository.findById(spotId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID로 여행지를 찾을 수 없습니다: " + spotId));
-        return convertToDTO(travelSpot);
+
+        int bookmarked = bookMarkSpotRepository.countBySpot(String.valueOf(spotId));
+        TravelSpotResDto rsp = convertToDTO(travelSpot);
+        rsp.setBookmark(bookmarked);
+
+        log.warn(rsp.toString());
+
+        return rsp;
     }
 
 
