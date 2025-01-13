@@ -27,11 +27,13 @@ public class TravelSpotController {
                                                  @RequestParam(required = false) Integer subAreaCode,
                                                  @RequestParam(required = false) String topTheme,
                                                  @RequestParam(required = false) String middleTheme,
-                                                 @RequestParam(required = false) String bottomThemes,
+                                                 @RequestParam(required = false) String bottomTheme,
                                                  @RequestParam(required = false) String category) {
-        log.info("{}, {}, {}, {}, \n{}, {}, {}, {}",page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomThemes, category);
+        log.warn("cat3 : {}", bottomTheme);
+        log.info("{}, {}, {}, {}, \n{}, {}, {}, {}",page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomTheme, category);
 
-        List<String> bottomThemeList = (bottomThemes != null && !bottomThemes.isEmpty()) ? List.of(bottomThemes.split(",")) : List.of();
+        List<String> bottomThemeList = (bottomTheme != null && !bottomTheme.isEmpty()) ? List.of(bottomTheme.split(",")) : List.of();
+        log.error("bottomThemes : {}", bottomThemeList);
         int area = Optional.ofNullable(areaCode).orElse(0);
         int subArea = Optional.ofNullable(subAreaCode).orElse(0);
 
