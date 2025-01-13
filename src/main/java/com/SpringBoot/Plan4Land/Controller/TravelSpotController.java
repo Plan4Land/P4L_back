@@ -34,8 +34,6 @@ public class TravelSpotController {
 
         List<String> bottomThemeList = (bottomTheme != null && !bottomTheme.isEmpty()) ? List.of(bottomTheme.split(",")) : List.of();
         log.error("bottomThemes : {}", bottomThemeList);
-        int area = Optional.ofNullable(areaCode).orElse(0);
-        int subArea = Optional.ofNullable(subAreaCode).orElse(0);
 
         // 필터링 로직을 추가하여 여행지 데이터를 검색합니다.
         return travelSpotService.getFilteredTravelSpots(page, size, areaCode, subAreaCode, topTheme, middleTheme, bottomThemeList, category);
