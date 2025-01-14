@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Entity;
 
 import com.SpringBoot.Plan4Land.Constant.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Member {
     @Id
     @Column(name = "member_id")

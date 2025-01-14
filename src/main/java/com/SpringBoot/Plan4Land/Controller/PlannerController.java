@@ -2,8 +2,11 @@ package com.SpringBoot.Plan4Land.Controller;
 
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
+import com.SpringBoot.Plan4Land.Entity.BookmarkPlanner;
+import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.SpringBoot.Plan4Land.Service.BookmarkPlannerService;
 import com.SpringBoot.Plan4Land.Service.PlannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -20,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PlannerController {
     private final PlannerService plannerService;
+    private final BookmarkPlannerService bookmarkPlannerService;
+
 
     // 플래너 생성
     @PostMapping("/insert")
@@ -37,6 +43,7 @@ public class PlannerController {
         return ResponseEntity.ok(plannerResDto);
     }
 
+    // 플래너 목록 조회
     @GetMapping("/planners")
     public Page<PlannerResDto> getAllPlanners(
             @RequestParam(defaultValue = "0") int page,  // 현재 페이지
@@ -47,6 +54,18 @@ public class PlannerController {
 
         // 서비스 호출
         return plannerService.findAllPlanners(pageable);
+    }
+    @GetMapping("/myPlanners")
+    public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
+            @RequestParam("memberId") String memberId,  // memberId를 받음
+            @RequestParam("page") int page,             // 페이지 번호
+            @RequestParam("size") int size) {           // 페이지 크기
+
+        // 북마크된 플래너 목록을 페이지네이션 처리하여 가져오기
+        Page<BookmarkPlanner> bookmarkedPlanners = bookmarkPlannerService.getBookmarkedPlanners(memberId, page, size);
+
+        // 페이지네이션된 결과 반환
+        return ResponseEntity.ok(bookmarkedPlanners);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.Entity.BookmarkPlanner;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
@@ -8,10 +9,15 @@ import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.awt.print.Book;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -56,4 +62,11 @@ public class BookmarkPlannerService {
         bookmarkPlannerRepository.delete(bookmarkPlanner);
         return true;
     }
+
+    @Transactional
+    public Page<BookmarkPlanner> getBookmarkedPlanners(String memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id"))); // 페이지네이션 및 정렬 설정
+        return bookmarkPlannerRepository.findByMemberId(memberId, pageable);
+    }
+
 }
