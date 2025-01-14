@@ -137,4 +137,5 @@ public class AuthService {
             return "활성 회원입니다.";
         }
     }
+
 }

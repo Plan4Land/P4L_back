@@ -4,6 +4,7 @@ import com.SpringBoot.Plan4Land.Constant.Role;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Table(name="member")
@@ -38,6 +39,9 @@ public class Member {
 
     // 제3자인증 분류
     private String sso;
+
+    // 카카오 아이디
+    private Long kakaoId;
 
     // 일반, 멤버십, 관리자
     @Enumerated(EnumType.STRING)
