@@ -4,6 +4,8 @@ import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Service.TravelSpotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,23 +23,25 @@ public class TravelSpotController {
 
     // 페이지네이션 처리된 TravelSpot 데이터를 반환
     @GetMapping("/api/travelspots")
-    public List<TravelSpotResDto> getTravelSpots(@RequestParam(defaultValue = "0") int currentPage,
-                                                 @RequestParam(defaultValue = "10") int pageSize,
-                                                 @RequestParam(required = false) Integer areaCode,
-                                                 @RequestParam(required = false) Integer subAreaCode,
-                                                 @RequestParam(required = false) String topTheme,
-                                                 @RequestParam(required = false) String middleTheme,
-                                                 @RequestParam(required = false) String bottomTheme,
-                                                 @RequestParam(required = false) String category,
-                                                 @RequestParam(required = false) String searchQuery) {
+    public ResponseEntity<Page<TravelSpotResDto>> getTravelSpots(@RequestParam(defaultValue = "0") int currentPage,
+                                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                                 @RequestParam(required = false) Integer areaCode,
+                                                                 @RequestParam(required = false) Integer subAreaCode,
+                                                                 @RequestParam(required = false) String topTheme,
+                                                                 @RequestParam(required = false) String middleTheme,
+                                                                 @RequestParam(required = false) String bottomTheme,
+                                                                 @RequestParam(required = false) String category,
+                                                                 @RequestParam(required = false) String searchQuery) {
         log.info("{}, {}, {}, {}, \n{}, {}, {}, {} {}",currentPage, pageSize, areaCode, subAreaCode, topTheme, middleTheme, bottomTheme, category, searchQuery);
 
         List<String> bottomThemeList = (bottomTheme != null && !bottomTheme.isEmpty()) ? List.of(bottomTheme.split(",")) : List.of();
         log.error("bottomThemes : {}", bottomThemeList);
 
-        // 필터링 로직을 추가하여 여행지 데이터를 검색합니다.
-        return travelSpotService.getFilteredTravelSpots(currentPage, pageSize, areaCode, subAreaCode,
+        Page<TravelSpotResDto> travelSpotResDtos = travelSpotService.getFilteredTravelSpots(currentPage, pageSize, areaCode, subAreaCode,
                 topTheme, middleTheme, bottomThemeList, category, searchQuery);
+
+        // 필터링 로직을 추가하여 여행지 데이터를 검색합니다.
+        return ResponseEntity.ok(travelSpotResDtos);
     }
 
     // 여행지 상세 정보 조회
