@@ -35,24 +35,23 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean // SecurityFilterChain 객체를 Bean으로 등록
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
-                .httpBasic()
-                .and()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/api/travelspots").permitAll()
+            .httpBasic()
+            .and()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .exceptionHandling()
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler)
+            .and()
+            .authorizeRequests()
+                .antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/api/travelspots", "/member/idExists", "/member/emailExists", "/member/nicknameExists", "/member/find-id", "/member/find-password").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/favicon.ico","/manifest.json").permitAll()
+                .antMatchers("/favicon.ico", "/manifest.json").permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+            .and()
+            .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }
