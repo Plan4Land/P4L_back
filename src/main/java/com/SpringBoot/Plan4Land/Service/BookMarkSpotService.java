@@ -35,23 +35,16 @@ public class BookMarkSpotService {
 
     // 북마크 추가
     public String addBookmark(String memberId, String spotId) {
-        // id를 기준으로 회원 조회
         Optional<Member> member = memberRepository.findById(memberId);
-
         if (member.isEmpty()) {
             throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
         }
-
-        // 이미 북마크가 있는지 확인
         if (bookMarkSpotRepository.existsByMemberAndSpot(member.get(), spotId)) {
             return "이미 북마크한 장소입니다.";
         }
-
-        // 북마크 추가
         BookmarkSpot newBookmark = new BookmarkSpot();
         newBookmark.setMember(member.get());
         newBookmark.setSpot(spotId);
-
         bookMarkSpotRepository.save(newBookmark);
         return "북마크가 추가되었습니다.";
     }
@@ -63,27 +56,23 @@ public class BookMarkSpotService {
         if (member.isEmpty()) {
             throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
         }
-
-        // 북마크 존재 여부 확인
         Optional<BookmarkSpot> bookmarkSpot = bookMarkSpotRepository.findByMemberAndSpot(member.get(), spotId);
         if (bookmarkSpot.isEmpty()) {
             return "북마크가 존재하지 않습니다.";
         }
-
-        // 북마크 삭제
         bookMarkSpotRepository.delete(bookmarkSpot.get());
         return "북마크가 삭제되었습니다.";
     }
-    // 특정 사용자가 특정 여행지를 북마크했는지 확인
+
+    // 사용자가 특정 여행지를 북마크했는지 확인
     public boolean isBookmarked(String memberId, String spotId) {
         Optional<Member> member = memberRepository.findById(memberId);
-
         if (member.isEmpty()) {
             throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
         }
-
         return bookMarkSpotRepository.existsByMemberAndSpot(member.get(), spotId);
     }
+
 
     // 내가 북마크한 모든 여행지의 정보 가져오기
     public Page<TravelSpotReqDto> getBookmarkedSpots(String memberId, int page, int size) {
@@ -92,7 +81,6 @@ public class BookMarkSpotService {
         // 북마크한 장소를 페이지네이션과 함께 조회
         Page<BookmarkSpot> bookmarkedSpotsPage = bookMarkSpotRepository.findByMemberId(memberId, pageable);
 
-        // Page<BookmarkSpot>을 Page<TravelSpotReqDto>로 변환
         Page<TravelSpotReqDto> travelSpotReqDtosPage = bookmarkedSpotsPage.map(bookmark -> {
             // 각 북마크에 해당하는 TravelSpot 정보 가져오기
             Optional<TravelSpot> travelSpot = travelSpotRepository.findById(Long.valueOf(bookmark.getSpot()));

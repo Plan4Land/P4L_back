@@ -26,12 +26,31 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        // 인증이 필요없는 경로를 제외
+        if (isExcludedPath(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String jwt = resolveToken(request); // 헤더에서 JWT 추출
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication); // 인증 객체 설정
         }
         filterChain.doFilter(request, response); // 다음 필터로 요청 전달
+    }
+
+    // 인증이 필요 없는 경로인지 확인
+    private boolean isExcludedPath(String requestUri) {
+        return requestUri.startsWith("/static/**") ||
+                requestUri.startsWith("/auth/**") ||
+                requestUri.startsWith("/ws/**") ||
+                requestUri.startsWith("/api/travelspots") ||
+                requestUri.startsWith("/member/idExists/**") ||
+                requestUri.startsWith("/member/emailExists/**") ||
+                requestUri.startsWith("/member/nicknameExists/**") ||
+                requestUri.startsWith("/member/find-id") ||
+                requestUri.startsWith("/member/find-password");
     }
 
     // Authorization 헤더에서 토큰 추출

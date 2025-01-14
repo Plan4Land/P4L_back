@@ -38,6 +38,8 @@ public class BookmarkSpotController {
         boolean isBookmarked = bookMarkSpotService.isBookmarked(memberId, spotId);
         return ResponseEntity.ok(isBookmarked);
     }
+
+    // 내 북마크 관광지 조회
     @GetMapping("/myBookmarks")
     public ResponseEntity<Page<TravelSpotReqDto>> getBookmarkedSpots(
             @RequestParam String memberId,

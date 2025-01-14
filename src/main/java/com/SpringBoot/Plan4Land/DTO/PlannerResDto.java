@@ -27,8 +27,9 @@ public class PlannerResDto {
     private boolean isPublic;
     private boolean activate;
     private List<PlannerMembersResDto> participants;
+    private Long bookmarkCount;
 
-    public static PlannerResDto fromEntity(Planner planner, List<PlannerMembersResDto> participants) {
+    public static PlannerResDto fromEntity(Planner planner, List<PlannerMembersResDto> participants, Long bookmarkCount) {
         return PlannerResDto.builder()
                 .title(planner.getTitle())
                 .theme(planner.getTheme())
@@ -43,6 +44,7 @@ public class PlannerResDto {
                 .isPublic(planner.isPublic())
                 .activate(planner.isActivate())
                 .participants(participants)
+                .bookmarkCount(bookmarkCount)
                 .build();
     }
 }
