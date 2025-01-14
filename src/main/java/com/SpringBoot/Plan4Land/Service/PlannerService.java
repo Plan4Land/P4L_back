@@ -63,9 +63,10 @@ public class PlannerService {
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
-    public Page<PlannerResDto> findAllPlanners(Pageable pageable) {
+    public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, Integer areaCode, Integer subAreaCode,
+                                                 List<String> themeList, String searchQuery) {
         // 플래너 페이지 가져오기
-        Page<Planner> planners = plannerRepository.findAll(pageable);
+        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
 
         // PlannerResDto로 변환
         return planners.map(planner -> {
