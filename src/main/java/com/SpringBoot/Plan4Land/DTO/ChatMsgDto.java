@@ -1,10 +1,9 @@
 package com.SpringBoot.Plan4Land.DTO;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter @Setter
+@NoArgsConstructor
 public class ChatMsgDto {
     public enum MessageType {
         ENTER, TALK, CLOSE
