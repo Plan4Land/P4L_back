@@ -84,5 +84,19 @@ public class PlannerService {
             return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
         });
     }
+    public List<PlannerResDto> getTop3BookmarkedPlanners() {
+        // 북마크 수 상위 3개의 플래너 ID 가져오기
+        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
 
+        // 해당 ID를 기반으로 플래너 정보 조회 및 DTO 변환
+        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
+
+        // 각 플래너의 북마크 개수 조회 및 DTO 변환
+        return topPlanners.stream()
+                .map(planner -> {
+                    Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
+                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+                })
+                .collect(Collectors.toList());
+    }
 }

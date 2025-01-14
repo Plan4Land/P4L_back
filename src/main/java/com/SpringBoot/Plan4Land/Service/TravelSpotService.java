@@ -45,6 +45,23 @@ public class TravelSpotService {
         return rsp;
     }
 
+    // 북마크가 많은 상위 5개 여행지 반환
+    public List<TravelSpotResDto> getTop5BookmarkedSpots() {
+        List<Object[]> topSpots = bookMarkSpotRepository.findTop5SpotsByBookmarkCount();
+
+        return topSpots.stream().map(data -> {
+            String spotId = (String) data[0];
+            Long bookmarkCount = (Long) data[1];
+
+            TravelSpot travelSpot = travelSpotRepository.findById(Long.parseLong(spotId))
+                    .orElseThrow(() -> new IllegalArgumentException("TravelSpot not found with id: " + spotId));
+
+            TravelSpotResDto dto = convertToDTO(travelSpot);
+            dto.setBookmark(bookmarkCount.intValue());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
 
     private TravelSpotResDto convertToDTO(TravelSpot travelSpot) {
         TravelSpotResDto dto = new TravelSpotResDto();

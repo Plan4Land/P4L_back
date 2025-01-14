@@ -78,4 +78,10 @@ public class PlannerController {
         return ResponseEntity.ok(bookmarkedPlanners);
     }
 
+    @GetMapping("/plannersTop3")
+    public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
+        List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
+        return ResponseEntity.ok(topPlanners);
+    }
+
 }

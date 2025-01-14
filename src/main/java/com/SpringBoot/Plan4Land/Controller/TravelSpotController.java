@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
@@ -49,5 +48,12 @@ public class TravelSpotController {
     public TravelSpotResDto getSpotDetail(@PathVariable Long spotId) {
         log.info("여기 찍기 : {}", spotId);
         return travelSpotService.getSpotDetail(spotId); // 서비스 메서드 호출
+    }
+
+    // 여행지 탑5
+    @GetMapping("/api/travelspotTop5")
+    public ResponseEntity<List<TravelSpotResDto>> getTop5BookmarkedSpots() {
+        List<TravelSpotResDto> top5Spots = travelSpotService.getTop5BookmarkedSpots();
+        return ResponseEntity.ok(top5Spots);
     }
 }
