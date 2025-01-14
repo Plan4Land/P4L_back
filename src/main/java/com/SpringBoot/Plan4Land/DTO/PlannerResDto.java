@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PlannerResDto {
+    private Long id;
     private String title;
     private String theme;
     private String ownerNickname;
@@ -31,6 +32,7 @@ public class PlannerResDto {
 
     public static PlannerResDto fromEntity(Planner planner, List<PlannerMembersResDto> participants, Long bookmarkCount) {
         return PlannerResDto.builder()
+                .id(planner.getId())
                 .title(planner.getTitle())
                 .theme(planner.getTheme())
                 .ownerNickname(planner.getOwner().getNickname())

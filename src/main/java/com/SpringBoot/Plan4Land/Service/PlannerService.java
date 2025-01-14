@@ -78,10 +78,8 @@ public class PlannerService {
                             member.getMember().getProfileImg()))
                     .collect(Collectors.toList());
 
-            // 북마크 개수 조회
             Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
 
-            // DTO 생성
             return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
         });
     }
