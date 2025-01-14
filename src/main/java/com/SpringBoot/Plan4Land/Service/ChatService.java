@@ -52,9 +52,9 @@ public class ChatService {
     }
 
     public ChatRoomResDto findRoomByPlannerId(Long plannerId) {
-        log.info("내가 찾는 PlannerId : {}", plannerId);
-        log.info("chatRoom이 대체 뭔데 : {}", chatRooms);
-        log.info("내가 알아야하는 부분 : {}", chatRooms.get(plannerId));
+//        log.info("내가 찾는 PlannerId : {}", plannerId);
+//        log.info("chatRoom이 대체 뭔데 : {}", chatRooms);
+//        log.info("내가 알아야하는 부분 : {}", chatRooms.get(plannerId));
         return chatRooms.get(plannerId);
     }
     // 방 개설하기
@@ -68,16 +68,16 @@ public class ChatService {
         chatRooms.put(plannerId, chatRoom); // 방 생성, 키와 방 정보 추가
         return chatRoom;
     }
-//    // 방 삭제
-//    public void removeRoom(String roomId) {
-//        ChatRoomResDto room = chatRooms.get(roomId);
-//        if (room != null) {
-//            if (room.isSessionEmpty()) {
-//                chatRooms.remove(roomId);
-//            }
-//        }
-//    }
-//
+    // 방 삭제
+    public void removeRoom(Long plannerId) {
+        ChatRoomResDto room = chatRooms.get(plannerId);
+        if (room != null) {
+            if (room.isSessionEmpty()) {
+                chatRooms.remove(plannerId);
+            }
+        }
+    }
+
     // 채팅방에 입장한 세션 추가
     public void addSessionAndHandleEnter(Long plannerId,
                                          WebSocketSession session,
@@ -90,11 +90,11 @@ public class ChatService {
         }
         if(room != null) {
             room.getSessions().add(session); // 채팅방에 입장한 세션을 추가
-            if(chatMessage.getSender() != null) { // 채팅방에 입장한 사용자가 있으면
-                chatMessage.setMessage(chatMessage.getSender() + "님이 입장했습니다.");
-                // 채팅방에 입장 메시지 전송 코드 추가
-                sendMessageToAll(plannerId, chatMessage);
-            }
+//            if(chatMessage.getSender() != null) { // 채팅방에 입장한 사용자가 있으면
+//                chatMessage.setMessage(chatMessage.getSender() + "님이 입장했습니다.");
+//                // 채팅방에 입장 메시지 전송 코드 추가
+//                sendMessageToAll(plannerId, chatMessage);
+//            }
             log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
         }
     }
@@ -112,14 +112,15 @@ public class ChatService {
                 sendMessageToAll(chatMessage.getPlannerId(), chatMessage);
             }
             log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
-//            if (room.isSessionEmpty()) {
-//                removeRoom(roomId); // 세션이 남아있지 않으면 방 삭제
-//            }
+            if (room.isSessionEmpty()) {
+                removeRoom(plannerId); // 세션이 남아있지 않으면 방 삭제
+                log.error("세션 남아있지 않아서 방 삭제");
+            }
         }
     }
 
     public void saveMessageToDB(ChatMsgDto chatMessage) {
-        if (chatMessage.getType() != ChatMsgDto.MessageType.ENTER) {
+        if ((chatMessage.getType() != ChatMsgDto.MessageType.ENTER) && (chatMessage.getType() != ChatMsgDto.MessageType.CLOSE)) {
             log.info(chatMessage.toString());
 
             Planner planner = plannerRepository.findById(chatMessage.getPlannerId())
