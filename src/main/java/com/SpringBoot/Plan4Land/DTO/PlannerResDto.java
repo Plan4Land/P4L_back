@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PlannerResDto {
+    private Long id;
     private String title;
     private String theme;
     private String ownerNickname;
@@ -27,9 +28,11 @@ public class PlannerResDto {
     private boolean isPublic;
     private boolean activate;
     private List<PlannerMembersResDto> participants;
+    private Long bookmarkCount;
 
-    public static PlannerResDto fromEntity(Planner planner, List<PlannerMembersResDto> participants) {
+    public static PlannerResDto fromEntity(Planner planner, List<PlannerMembersResDto> participants, Long bookmarkCount) {
         return PlannerResDto.builder()
+                .id(planner.getId())
                 .title(planner.getTitle())
                 .theme(planner.getTheme())
                 .ownerNickname(planner.getOwner().getNickname())
@@ -43,6 +46,7 @@ public class PlannerResDto {
                 .isPublic(planner.isPublic())
                 .activate(planner.isActivate())
                 .participants(participants)
+                .bookmarkCount(bookmarkCount)
                 .build();
     }
 }

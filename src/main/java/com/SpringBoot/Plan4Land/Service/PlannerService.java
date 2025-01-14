@@ -6,11 +6,14 @@ import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
+import com.SpringBoot.Plan4Land.Repository.BookMarkPlannerRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ public class PlannerService {
     private final PlannerRepository plannerRepository;
     private final MemberRepository memberRepository;
     private final PlannerMembersRepository plannerMembersRepository;
+    private final BookMarkPlannerRepository bookMarkPlannerRepository;
 
     @Transactional
     public Long makePlanner(PlannerReqDto plannerReqDto) {
@@ -55,6 +59,30 @@ public class PlannerService {
                         member.getMember().getNickname(),
                         member.getMember().getProfileImg()))
                 .collect(Collectors.toList());
-        return PlannerResDto.fromEntity(planner, participantDtos);
+        Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
+        return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
+
+    public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, Integer areaCode, Integer subAreaCode,
+                                                 List<String> themeList, String searchQuery) {
+        // 플래너 페이지 가져오기
+        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
+
+        // PlannerResDto로 변환
+        return planners.map(planner -> {
+            // 플래너 참여자 정보 조회
+            List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
+                    .stream()
+                    .map(member -> new PlannerMembersResDto(
+                            member.getMember().getId(),
+                            member.getMember().getNickname(),
+                            member.getMember().getProfileImg()))
+                    .collect(Collectors.toList());
+
+            Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
+
+            return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
+        });
+    }
+
 }
