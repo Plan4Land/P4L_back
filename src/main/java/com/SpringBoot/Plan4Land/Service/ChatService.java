@@ -83,80 +83,80 @@ public class ChatService {
                                          WebSocketSession session,
                                          ChatMsgDto chatMessage) {
         ChatRoomResDto room = findRoomByPlannerId(plannerId);
-        log.info("여긴 오잖아?");
 //        ChatRoomResDto room = chatRooms.get(plannerId);
         if (room == null) {
             // 방이 없으면 생성
             room = createRoom(chatMessage.getPlannerId());
         }
-        log.error("room : {}", room.toString());
         if(room != null) {
             room.getSessions().add(session); // 채팅방에 입장한 세션을 추가
             if(chatMessage.getSender() != null) { // 채팅방에 입장한 사용자가 있으면
                 chatMessage.setMessage(chatMessage.getSender() + "님이 입장했습니다.");
-                log.error(chatMessage.toString());
                 // 채팅방에 입장 메시지 전송 코드 추가
-//                sendMessageToAll(roomId, chatMessage);
+                sendMessageToAll(plannerId, chatMessage);
             }
-            log.error("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
+            log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
         }
     }
-//
-//    // 채팅방에서 퇴장한 세션 제거
-//    public void removeSessionAndHandleExit(String roomId,
-//                                           WebSocketSession session,
-//                                           ChatMsgDto chatMessage) {
-////        ChatRoomResDto room = findRoomById(roomId);
-//        ChatRoomResDto room = chatRooms.get(roomId);
-//        if (room != null) {
-//            room.getSessions().remove(session); // 채팅방에서 퇴장한 세션 제거
-//            if (chatMessage.getSender() != null) { // 채팅방에서 퇴장한 사용자가 있으면
-//                chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장하였습니다.");
-//                // 채팅방에 퇴장 메시지 전송 코드 추가
-//                sendMessageToAll(roomId, chatMessage);
+
+    // 채팅방에서 퇴장한 세션 제거
+    public void removeSessionAndHandleExit(Long plannerId,
+                                           WebSocketSession session,
+                                           ChatMsgDto chatMessage) {
+        ChatRoomResDto room = chatRooms.get(plannerId);
+        if (room != null) {
+            room.getSessions().remove(session); // 채팅방에서 퇴장한 세션 제거
+            if (chatMessage.getSender() != null) { // 채팅방에서 퇴장한 사용자가 있으면
+                chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장하였습니다.");
+                // 채팅방에 퇴장 메시지 전송 코드 추가
+                sendMessageToAll(chatMessage.getPlannerId(), chatMessage);
+            }
+            log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
+//            if (room.isSessionEmpty()) {
+//                removeRoom(roomId); // 세션이 남아있지 않으면 방 삭제
 //            }
-//            log.error("Planner ID {}에서 세션 제거: {}", roomId, session.getId());
-////            if (room.isSessionEmpty()) {
-////                removeRoom(roomId); // 세션이 남아있지 않으면 방 삭제
-////            }
-//        }
-//    }
-//
-//    public void saveMessageToDB(ChatMsgDto chatMessage) {
-//        Planner planner = plannerRepository.findById(chatMessage.getPlannerId())
-//                .orElseThrow(() -> new RuntimeException("존재하지 않는 플래너"));
-//        Member sender = memberRepository.findById(chatMessage.getSender())
-//                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원"));
-//
-//        ChatMsg chatMsg = new ChatMsg();
-//        chatMsg.setContent(chatMessage.getMessage());
-//        chatMsg.setSender(sender);
-//        chatMsg.setPlanner(planner); // plannerId로 Planner 객체 찾아서 저장
-//
-//        // 전송시간 자동 설정
-//        chatMsg.setSendTime(LocalDateTime.now());
-//
-//        // DB에 메시지 저장
-//        chatMsgRepository.save(chatMsg);  // 실제 DB 저장
-//    }
-//
-//    public void sendMessageToAll(String roomId, ChatMsgDto message) {
-//        saveMessageToDB(message); // 메시지 저장
-////        ChatRoomResDto room = findRoomById(roomId);
-//        ChatRoomResDto room = chatRooms.get(roomId);
-//        if (room != null) {
-//            for (WebSocketSession session : room.getSessions()) {
-//                // 해당 세션에 메시지 발송
-//                sendMessage(session, message);
-//            }
-//        }
-//    }
-//
-//    public <T> void sendMessage(WebSocketSession session, T message) {
-//        try {
-//            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
-//        } catch (IOException e) {
-//            log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
-//        }
-//    }
+        }
+    }
+
+    public void saveMessageToDB(ChatMsgDto chatMessage) {
+        if (chatMessage.getType() != ChatMsgDto.MessageType.ENTER) {
+            log.info(chatMessage.toString());
+
+            Planner planner = plannerRepository.findById(chatMessage.getPlannerId())
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 플래너"));
+            Member sender = memberRepository.findByNickname(chatMessage.getSender())
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 회원"));
+
+            ChatMsg chatMsg = new ChatMsg();
+            chatMsg.setContent(chatMessage.getMessage());
+            chatMsg.setSender(sender);
+            chatMsg.setPlanner(planner); // plannerId로 Planner 객체 찾아서 저장
+
+            // 전송시간 자동 설정
+            chatMsg.setSendTime(LocalDateTime.now());
+
+            // DB에 메시지 저장
+            chatMsgRepository.save(chatMsg);  // 실제 DB 저장
+        }
+    }
+
+    public void sendMessageToAll(Long plannerId, ChatMsgDto message) {
+        saveMessageToDB(message); // 메시지 저장
+//        ChatRoomResDto room = findRoomById(roomId);
+        ChatRoomResDto room = chatRooms.get(plannerId);
+        if (room != null) {
+            for (WebSocketSession session : room.getSessions()) {
+                // 해당 세션에 메시지 발송
+                sendMessage(session, message);
+            }
+        }
+    }
+
+    public <T> void sendMessage(WebSocketSession session, T message) {
+        try {
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+        } catch (IOException e) {
+            log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
+        }
+    }
 }

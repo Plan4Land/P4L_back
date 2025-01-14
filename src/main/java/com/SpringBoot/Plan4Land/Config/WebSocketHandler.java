@@ -37,22 +37,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("plannerId : {}", plannerId);
 
         if (chatMessage.getType() == ChatMsgDto.MessageType.ENTER) {
+            // 사용자가 채팅방에 입장할 때
             sessionPlannerIdMap.put(session, chatMessage.getPlannerId());
+            // ChatService를 통해 방에 세션 추가
             chatService.addSessionAndHandleEnter(plannerId, session, chatMessage);
-
+            log.info("어디서 문제??");
+        } else if (chatMessage.getType() == ChatMsgDto.MessageType.CLOSE) {
+            chatService.removeSessionAndHandleExit(plannerId, session, chatMessage);
+        } else {
+            chatService.sendMessageToAll(plannerId, chatMessage);
         }
-
-//        if (chatMessage.getType() == ChatMsgDto.MessageType.ENTER) {
-//            // 사용자가 채팅방에 입장할 때
-//            sessionPlannerIdMap.put(session, chatMessage.getPlannerId());
-//            // ChatService를 통해 방에 세션 추가
-//            chatService.addSessionAndHandleEnter(plannerId, session, chatMessage);
-//            log.info("어디서 문제??");
-//        } else if (chatMessage.getType() == ChatMsgDto.MessageType.CLOSE) {
-//            chatService.removeSessionAndHandleExit(plannerId, session, chatMessage);
-//        } else {
-//            chatService.sendMessageToAll(plannerId, chatMessage);
-//        }
     }
 
     @Override
@@ -61,10 +55,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("연결 해제하는중..");
         log.info("연결 해제 이후 동작 : {}", session);
         Long plannerId = sessionPlannerIdMap.remove(session);
-//        if(plannerId != null) {
-//            ChatMsgDto chatMessage = new ChatMsgDto();
-//            chatMessage.setType(ChatMsgDto.MessageType.CLOSE);
-//            chatService.removeSessionAndHandleExit(plannerId, session, chatMessage);
-//        }
+        if(plannerId != null) {
+            ChatMsgDto chatMessage = new ChatMsgDto();
+            chatMessage.setType(ChatMsgDto.MessageType.CLOSE);
+            chatService.removeSessionAndHandleExit(plannerId, session, chatMessage);
+        }
     }
 }
