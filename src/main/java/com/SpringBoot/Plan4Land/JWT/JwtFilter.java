@@ -46,9 +46,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 requestUri.startsWith("/auth/**") ||
                 requestUri.startsWith("/ws/**") ||
                 requestUri.startsWith("/api/travelspots") ||
-                requestUri.startsWith("/member/idExists") ||
-                requestUri.startsWith("/member/emailExists") ||
-                requestUri.startsWith("/member/nicknameExists") ||
+                requestUri.startsWith("/member/idExists/**") ||
+                requestUri.startsWith("/member/emailExists/**") ||
+                requestUri.startsWith("/member/nicknameExists/**") ||
                 requestUri.startsWith("/member/find-id") ||
                 requestUri.startsWith("/member/find-password");
     }
