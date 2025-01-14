@@ -7,6 +7,9 @@ import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import com.SpringBoot.Plan4Land.Service.PlannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,4 +36,17 @@ public class PlannerController {
         PlannerResDto plannerResDto = plannerService.findByPlannerId(plannerId);
         return ResponseEntity.ok(plannerResDto);
     }
+
+    @GetMapping("/planners")
+    public Page<PlannerResDto> getAllPlanners(
+            @RequestParam(defaultValue = "0") int page,  // 현재 페이지
+            @RequestParam(defaultValue = "10") int size // 페이지 크기
+    ) {
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 서비스 호출
+        return plannerService.findAllPlanners(pageable);
+    }
+
 }

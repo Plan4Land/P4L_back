@@ -32,6 +32,7 @@ public class TravelSpotService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
     // 상세 정보 조회
     public TravelSpotResDto getSpotDetail(Long spotId) {
         TravelSpot travelSpot = travelSpotRepository.findById(spotId)
