@@ -12,8 +12,7 @@ import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,42 +70,45 @@ public class PlannerService {
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
-    public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, String areaCode, String subAreaCode,
-                                                 String themeList, String searchQuery) {
+    public Page<PlannerResDto> getFilterdPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
+                                                 String themeList, String searchQuery, String sortBy) {
 
         String[] arr = themeList == null ? null : themeList.split(",");
-
         String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
         String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
         String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
 
-        if(arr != null){
+        Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
+        if (sortBy.equalsIgnoreCase("LatestAsc")) {
+            sort = sort.descending();
+        } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
+            sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
+        } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
+            sort = Sort.by(Sort.Direction.ASC, "bookmarkCount");
+        }
+
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+
+        if (arr != null) {
             log.warn(Arrays.toString(arr));
         }
 
-        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
+        List<Object[]> queryResults = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
 
-        // PlannerResDto로 변환
-        return planners.map(planner -> {
-            List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
-                    .stream()
-                    .map(member -> {
-                        // PlannerMembers의 상태를 함께 조회
-                        String state = member.getState() != null ? member.getState().name() : null;
-                        return new PlannerMembersResDto(
-                                member.getMember().getId(),
-                                member.getMember().getNickname(),
-                                member.getMember().getProfileImg(),
-                                state // 상태를 포함
-                        );
-                    })
-                    .collect(Collectors.toList());
+        // 처리된 데이터를 PlannerResDto로 변환
+        List<PlannerResDto> result = queryResults.stream()
+                .map(resultArray -> {
+                    Planner planner = (Planner) resultArray[0];
+                    Long bookmarkCount = (Long) resultArray[1];
+                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+                })
+                .collect(Collectors.toList());
 
-            Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
-
-            return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
-        });
+        // Page 객체로 변환하여 반환
+        return new PageImpl<>(result, pageable, result.size());
     }
+
+
 
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();

@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Repository;
 
+import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +34,9 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 //                                      @Param("themeList") List<String> themeList,
 //                                      @Param("searchQuery") String searchQuery);
     @Query(value = """
-            SELECT p
+            SELECT p, COUNT(b.planner.id)
             FROM Planner p
+            LEFT JOIN BookmarkPlanner b ON p.id = b.planner.id
             WHERE (:areaCode IS NULL OR p.area = :areaCode)
               AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
               AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
@@ -44,14 +46,16 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
                      OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
                      )
               AND p.isPublic = true
+            GROUP BY p.id
             """)
-    Page<Planner> getFilteredPlanners(Pageable pageable,
-                                      @Param("areaCode") String areaCode,
-                                      @Param("subAreaCode") String subAreaCode,
-                                      @Param("searchQuery") String searchQuery,
-                                      @Param("theme1") String theme1,
-                                      @Param("theme2") String theme2,
-                                      @Param("theme3") String theme3);
+    List<Object[]> getFilteredPlanners(Pageable pageable,
+                                        @Param("areaCode") String areaCode,
+                                        @Param("subAreaCode") String subAreaCode,
+                                        @Param("searchQuery") String searchQuery,
+                                        @Param("theme1") String theme1,
+                                        @Param("theme2") String theme2,
+                                        @Param("theme3") String theme3);
+
 
 
 

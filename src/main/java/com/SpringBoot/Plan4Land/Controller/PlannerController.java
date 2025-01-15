@@ -53,11 +53,13 @@ public class PlannerController {
                                                               @RequestParam(required = false) String areaCode,
                                                               @RequestParam(required = false) String subAreaCode,
                                                               @RequestParam(required = false) String themeList,
-                                                              @RequestParam(required = false) String searchQuery) {
-        // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
+                                                              @RequestParam(required = false) String searchQuery,
+                                                              @RequestParam(defaultValue = "LatestDesc") String sortBy) {
+        log.info(sortBy);
+
         // 서비스 호출
-        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(pageable, areaCode, subAreaCode, themeList, searchQuery);
+        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(currentPage, pageSize,areaCode, subAreaCode, themeList, searchQuery,
+                 sortBy);
 
         log.info(dto.getContent().toString());
         log.info("dto.getTotalElements() : " + dto.getTotalElements());
