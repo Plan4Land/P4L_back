@@ -64,7 +64,7 @@ public class PlannerController {
         return ResponseEntity.ok(dto);
     }
 
-
+    // 내가 북마크한 플래너 리스트
     @GetMapping("/myBookmarkPlanners")
     public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
             @RequestParam("memberId") String memberId,  // memberId를 받음
@@ -78,6 +78,7 @@ public class PlannerController {
         return ResponseEntity.ok(bookmarkedPlanners);
     }
 
+    // 북마크 갯수 상위 3개 플래너
     @GetMapping("/plannersTop3")
     public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
         List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
@@ -88,6 +89,7 @@ public class PlannerController {
         return ResponseEntity.ok(topPlanners);
     }
 
+    // 특정 유저가 작성한 플래너 리스트
     @GetMapping("/myPlanners")
     public Page<PlannerResDto> getPlannersByOwner(
             @RequestParam String memberId,
@@ -98,5 +100,12 @@ public class PlannerController {
 
         Page<Planner> planners = plannerService.getPlannersByOwner(memberId, pageable);
         return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
+    }
+
+    // 플래너에 멤버 초대
+    @PostMapping("/invite")
+    public ResponseEntity<Boolean> inviteMember(@RequestParam String memberId, @RequestParam Long plannerId) {
+        boolean isSuccess = plannerService.inviteMember(memberId, plannerId);
+        return ResponseEntity.ok(isSuccess);
     }
 }

@@ -96,4 +96,18 @@ public class PlannerService {
     public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
         return plannerRepository.findByOwnerId(memberId, pageable);
     }
+
+    public boolean inviteMember(String memberId, Long plannerId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 멤버를 찾을 수 없습니다."));
+        Planner planner = plannerRepository.findById(plannerId)
+                .orElseThrow(() -> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
+
+        PlannerMembers plannerMembers = new PlannerMembers();
+        plannerMembers.setMember(member);
+        plannerMembers.setPlanner(planner);
+        plannerMembersRepository.save(plannerMembers);
+
+        return true;
+    }
 }
