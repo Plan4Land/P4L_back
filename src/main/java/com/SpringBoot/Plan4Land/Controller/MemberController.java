@@ -34,6 +34,13 @@ public class MemberController {
         MemberResDto memberResDto = memberService.getMemberDetail(userId);
         return ResponseEntity.ok(memberResDto);
     }
+    // 회원 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<MemberResDto>> searchMember(@RequestParam String id, @RequestParam String nickname) {
+        List<MemberResDto> list = memberService.searchMember(id, nickname);
+        return ResponseEntity.ok(list);
+    }
+
     // 회원 정보 수정
     @PutMapping("/update")
     public ResponseEntity<Boolean> memberUpdate(@RequestBody MemberReqDto memberReqDto) {
