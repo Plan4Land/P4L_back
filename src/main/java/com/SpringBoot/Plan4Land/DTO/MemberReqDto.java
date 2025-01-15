@@ -19,7 +19,8 @@ public class MemberReqDto {
     private String nickname;
     private String name;
     private String profileImg;
-
+    private Long kakaoId;
+    private String sso;
 
     public Member toEntity(PasswordEncoder passwordEncoder) {
         return Member.builder()
@@ -29,6 +30,8 @@ public class MemberReqDto {
                 .nickname(nickname)
                 .name(name)
                 .profileImg(profileImg)
+                .kakaoId(kakaoId)
+                .sso(sso)
                 .build();
     }
     public UsernamePasswordAuthenticationToken toAuthentication() {

@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -56,27 +58,8 @@ public class AuthController {
     }
 
     // 카카오 로그인 처리
-//    @PostMapping("/kakao")
-//    public ResponseEntity<TokenDto> kakaoLogin(@RequestBody String kakaoToken) {
-//        // 카카오 API를 통해 kakaoToken으로 사용자 정보를 받아옵니다.
-//        MemberReqDto memberReqDto = authService.getKakaoUser(kakaoToken);
-//
-//        if (memberReqDto == null) {
-//            return ResponseEntity.status(400).body(null); // 카카오 사용자 정보 조회 실패 시 처리
-//        }
-//
-//        // 카카오 ID로 사용자 존재 여부 확인
-//        boolean isUserExist = authService.isMember(memberReqDto.getKakaoId());
-//
-//        if (isUserExist) {
-//            // 기존 사용자 로그인 처리
-//            TokenDto token = authService.login(memberReqDto);
-//            return ResponseEntity.ok(token);
-//        } else {
-//            // 새로운 사용자일 경우 회원가입 처리
-//            MemberResDto newUser = authService.signUp(memberReqDto);
-//            TokenDto token = authService.login(memberReqDto); // 회원가입 후 로그인 처리
-//            return ResponseEntity.ok(token);
-//        }
-//    }
+    @PostMapping("/kakao")
+    public ResponseEntity<TokenDto> kakaoLogin(@RequestBody MemberReqDto memberReqDto) {
+        return ResponseEntity.ok(authService.login(memberReqDto));
+    }
 }

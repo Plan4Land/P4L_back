@@ -67,7 +67,7 @@ public class Member {
     }
 
     @Builder
-    public Member(String id, String email, String password, String nickname, String name, String profileImg, Role role) {
+    public Member(String id, String email, String password, String nickname, String name, String profileImg, Role role, Long kakaoId, String sso) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -75,5 +75,7 @@ public class Member {
         this.name = name;
         this.profileImg = profileImg;
         this.signUpDate = LocalDateTime.now();
+        this.kakaoId = kakaoId;
+        this.sso = sso;
     }
 }
