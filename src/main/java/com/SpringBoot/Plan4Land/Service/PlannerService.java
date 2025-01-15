@@ -92,4 +92,8 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
+        return plannerRepository.findByOwnerId(memberId, pageable);
+    }
 }
