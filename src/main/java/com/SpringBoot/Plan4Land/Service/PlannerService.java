@@ -18,7 +18,9 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,7 +45,7 @@ public class PlannerService {
         } catch (RuntimeException e) {
             log.error("존재하지 않는 회원입니다.");
             return null;
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Planner 생성 실패 : {}", e.getMessage());
             return null;
         }
@@ -64,8 +66,19 @@ public class PlannerService {
     }
 
     public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, String areaCode, String subAreaCode,
-                                                 List<String> themeList, String searchQuery) {
-        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
+                                                 String themeList, String searchQuery) {
+
+        String[] arr = themeList == null ? null : themeList.split(",");
+
+        String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
+        String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
+        String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
+
+        if(arr != null){
+            log.warn(Arrays.toString(arr));
+        }
+
+        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
 
         // PlannerResDto로 변환
         return planners.map(planner -> {
@@ -82,6 +95,7 @@ public class PlannerService {
             return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
         });
     }
+
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
         List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);

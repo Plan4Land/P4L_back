@@ -56,10 +56,11 @@ public class PlannerController {
                                                               @RequestParam(required = false) String searchQuery) {
         // Pageable 객체 생성
         Pageable pageable = PageRequest.of(currentPage, pageSize);
-
-        List<String> themeLst = (themeList != null && !themeList.isEmpty()) ? List.of(themeList.split(",")) : List.of();
         // 서비스 호출
-        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(pageable, areaCode, subAreaCode, themeLst, searchQuery);
+        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(pageable, areaCode, subAreaCode, themeList, searchQuery);
+
+        log.info(dto.getContent().toString());
+        log.info("dto.getTotalElements() : " + dto.getTotalElements());
 
         return ResponseEntity.ok(dto);
     }
