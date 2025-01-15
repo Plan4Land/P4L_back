@@ -18,6 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByNameAndEmail(String name, String email);
     Optional<Member> findByIdAndEmail(String id, String email);
     @Query("SELECT m FROM Member m WHERE m.id LIKE %:id% OR m.nickname LIKE %:nickname%")
+    Optional<Member> findByKakaoId(Long kakaoId);
     List<Member> findByIdOrNickname(@Param("id") String id, @Param("nickname") String nickname);
 
     boolean existsById(String userId);
