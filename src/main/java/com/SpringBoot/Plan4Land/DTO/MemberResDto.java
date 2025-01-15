@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class MemberResDto {
+    private Long uid;
     private String id;
     private String email;
     private String name;
@@ -21,6 +22,7 @@ public class MemberResDto {
 
     public static MemberResDto of(Member member) {
         return MemberResDto.builder()
+                .uid(member.getUid())
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())

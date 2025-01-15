@@ -139,6 +139,7 @@ public class MemberService {
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
+        memberResDto.setUid(member.getUid());
         memberResDto.setId(member.getId());
         memberResDto.setEmail(member.getEmail());
         memberResDto.setName(member.getName());
