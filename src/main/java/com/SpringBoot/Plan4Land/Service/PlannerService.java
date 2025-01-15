@@ -65,12 +65,10 @@ public class PlannerService {
 
     public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, String areaCode, String subAreaCode,
                                                  List<String> themeList, String searchQuery) {
-        // 플래너 페이지 가져오기
         Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
 
         // PlannerResDto로 변환
         return planners.map(planner -> {
-            // 플래너 참여자 정보 조회
             List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
                     .stream()
                     .map(member -> new PlannerMembersResDto(
@@ -85,13 +83,8 @@ public class PlannerService {
         });
     }
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
-        // 북마크 수 상위 3개의 플래너 ID 가져오기
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
-
-        // 해당 ID를 기반으로 플래너 정보 조회 및 DTO 변환
         List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
-
-        // 각 플래너의 북마크 개수 조회 및 DTO 변환
         return topPlanners.stream()
                 .map(planner -> {
                     Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());

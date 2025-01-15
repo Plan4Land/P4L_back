@@ -65,7 +65,7 @@ public class PlannerController {
     }
 
 
-    @GetMapping("/myPlanners")
+    @GetMapping("/myBookmarkPlanners")
     public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
             @RequestParam("memberId") String memberId,  // memberId를 받음
             @RequestParam("page") int page,             // 페이지 번호

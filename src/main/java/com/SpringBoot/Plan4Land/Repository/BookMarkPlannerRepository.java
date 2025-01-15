@@ -24,4 +24,7 @@ public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner
 
     @Query("SELECT b.planner.id FROM BookmarkPlanner b GROUP BY b.planner.id ORDER BY COUNT(b.planner.id) DESC")
     List<Long> findTop3PlannerIdsByBookmarkCount();
+
+    Page<BookmarkPlanner> findByMemberIdAndPlannerIsPublicTrue(String memberId, Pageable pageable);
+
 }

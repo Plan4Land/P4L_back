@@ -65,8 +65,8 @@ public class BookmarkPlannerService {
 
     @Transactional
     public Page<BookmarkPlanner> getBookmarkedPlanners(String memberId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id"))); // 페이지네이션 및 정렬 설정
-        return bookmarkPlannerRepository.findByMemberId(memberId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        return bookmarkPlannerRepository.findByMemberIdAndPlannerIsPublicTrue(memberId, pageable);
     }
 
 }
