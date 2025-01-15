@@ -37,7 +37,6 @@ public class MemberController {
     // 회원 검색
     @GetMapping("/search")
     public ResponseEntity<List<MemberResDto>> searchMember(@RequestParam String id, @RequestParam String nickname, @RequestParam Long plannerId) {
-        log.info("id : {}, nickname: {}, plannerId: {}", id, nickname, plannerId);
         List<MemberResDto> list = memberService.searchMember(id, nickname, plannerId);
         return ResponseEntity.ok(list);
     }
