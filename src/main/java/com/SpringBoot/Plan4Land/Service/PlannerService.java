@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.DTO.PlannerMembersResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
@@ -134,5 +135,33 @@ public class PlannerService {
         plannerMembersRepository.save(plannerMembers);
 
         return true;
+    }
+
+    public List<PlannerResDto> selectInvitedPlanners(String memberId) {
+        log.info("memberId : {}", memberId);
+        List<PlannerMembers> invites = plannerMembersRepository.findByMemberIdAndState(memberId, State.WAIT);
+        log.info(invites.toString());
+        return invites.stream()
+                .map(plannerMember -> {
+                    Planner planner = plannerMember.getPlanner();  // PlannerMembers에서 연관된 Planner를 가져옴
+
+                    // 3. 해당 플래너에 참여한 사람들의 정보를 PlannerMembersResDto로 변환
+                    List<PlannerMembersResDto> participantDtos = plannerMembersRepository.findByPlannerId(planner.getId())
+                            .stream()
+                            .map(member -> {
+                                String state = member.getState() != null ? member.getState().name() : null;
+                                return new PlannerMembersResDto(
+                                        member.getMember().getId(),
+                                        member.getMember().getNickname(),
+                                        member.getMember().getProfileImg(),
+                                        state // 상태 포함
+                                );
+                            })
+                            .collect(Collectors.toList());
+
+                    // 4. PlannerResDto로 변환 후 반환
+                    return PlannerResDto.fromEntity(planner, participantDtos, 0L);
+                })
+                .collect(Collectors.toList());
     }
 }

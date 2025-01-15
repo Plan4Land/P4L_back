@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Repository;
 
+import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
@@ -13,4 +14,5 @@ import java.util.Optional;
 public interface PlannerMembersRepository extends JpaRepository<PlannerMembers, Long> {
     List<PlannerMembers> findByPlannerId(Long plannerId);
     Optional<PlannerMembers> findByMemberIdAndPlannerId(String memberId, Long plannerId);
+    List<PlannerMembers> findByMemberIdAndState(String memberId, State state);
 }

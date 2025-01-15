@@ -111,4 +111,12 @@ public class PlannerController {
         boolean isSuccess = plannerService.inviteMember(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
+
+    // 초대된 플래너 조회
+    @GetMapping("/invite/{memberId}")
+    public ResponseEntity<List<PlannerResDto>> selectInvitedPlanners(@PathVariable String memberId) {
+        log.info("받은 정보 : {}", memberId);
+        List<PlannerResDto> invitedPlanners = plannerService.selectInvitedPlanners(memberId);
+        return ResponseEntity.ok(invitedPlanners);
+    }
 }
