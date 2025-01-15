@@ -25,8 +25,8 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
             AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
     """)
     Page<Planner> getFilteredPlanners(Pageable pageable,
-                                      @Param("areaCode") Integer areaCode,
-                                      @Param("subAreaCode") Integer subAreaCode,
+                                      @Param("areaCode") String areaCode,
+                                      @Param("subAreaCode") String subAreaCode,
                                       @Param("themeList") List<String> themeList,
                                       @Param("searchQuery") String searchQuery);
 }
