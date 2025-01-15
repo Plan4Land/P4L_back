@@ -29,4 +29,7 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
                                       @Param("subAreaCode") String subAreaCode,
                                       @Param("themeList") List<String> themeList,
                                       @Param("searchQuery") String searchQuery);
+
+    Page<Planner> findByOwnerId(String memberId, Pageable pageable);
+
 }

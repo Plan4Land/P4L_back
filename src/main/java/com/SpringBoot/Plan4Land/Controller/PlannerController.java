@@ -87,4 +87,16 @@ public class PlannerController {
         }
         return ResponseEntity.ok(topPlanners);
     }
+
+    @GetMapping("/myPlanners")
+    public Page<PlannerResDto> getPlannersByOwner(
+            @RequestParam String memberId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Planner> planners = plannerService.getPlannersByOwner(memberId, pageable);
+        return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
+    }
 }
