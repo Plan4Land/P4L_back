@@ -123,6 +123,7 @@ public class PlannerService {
         return plannerRepository.findByOwnerId(memberId, pageable);
     }
 
+    // 플래닝에 멤버 초대
     public boolean inviteMember(String memberId, Long plannerId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 멤버를 찾을 수 없습니다."));
@@ -137,15 +138,13 @@ public class PlannerService {
         return true;
     }
 
+    // 초대받은 플래닝 조회
     public List<PlannerResDto> selectInvitedPlanners(String memberId) {
-        log.info("memberId : {}", memberId);
         List<PlannerMembers> invites = plannerMembersRepository.findByMemberIdAndState(memberId, State.WAIT);
-        log.info(invites.toString());
         return invites.stream()
                 .map(plannerMember -> {
-                    Planner planner = plannerMember.getPlanner();  // PlannerMembers에서 연관된 Planner를 가져옴
+                    Planner planner = plannerMember.getPlanner();
 
-                    // 3. 해당 플래너에 참여한 사람들의 정보를 PlannerMembersResDto로 변환
                     List<PlannerMembersResDto> participantDtos = plannerMembersRepository.findByPlannerId(planner.getId())
                             .stream()
                             .map(member -> {
@@ -163,5 +162,15 @@ public class PlannerService {
                     return PlannerResDto.fromEntity(planner, participantDtos, 0L);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public boolean acceptInvitation(String memberId, Long plannerId) {
+        PlannerMembers plannerMember = plannerMembersRepository
+                .findByMemberIdAndPlannerId(memberId, plannerId)
+                .orElseThrow(() -> new IllegalArgumentException("초대 정보가 존재하지 않습니다."));
+        plannerMember.setState(State.ACCEPT);
+        plannerMembersRepository.save(plannerMember);
+
+        return true;
     }
 }
