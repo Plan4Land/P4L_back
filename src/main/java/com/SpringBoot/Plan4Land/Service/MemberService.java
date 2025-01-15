@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,6 +37,14 @@ public class MemberService {
     public MemberResDto getMemberDetail(String userId) {
         Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
         return convertEntityToDto(member);
+    }
+
+    // 회원 검색
+    public List<MemberResDto> searchMember(String id, String nickname) {
+        List<Member> members = memberRepository.findByIdOrNickname(id, nickname);
+        return members.stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
     }
 
     // 회원 수정
