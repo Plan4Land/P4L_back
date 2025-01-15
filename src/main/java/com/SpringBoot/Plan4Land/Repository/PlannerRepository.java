@@ -43,6 +43,7 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
                      OR (:theme2 IS NOT NULL AND p.theme LIKE %:theme2%)
                      OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
                      )
+              AND p.isPublic = true
             """)
     Page<Planner> getFilteredPlanners(Pageable pageable,
                                       @Param("areaCode") String areaCode,
