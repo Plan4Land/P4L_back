@@ -63,13 +63,12 @@ public class PlannerService {
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
-    public Page<PlannerResDto> findAllPlanners(Pageable pageable) {
-        // 플래너 페이지 가져오기
-        Page<Planner> planners = plannerRepository.findAll(pageable);
+    public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, String areaCode, String subAreaCode,
+                                                 List<String> themeList, String searchQuery) {
+        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
 
         // PlannerResDto로 변환
         return planners.map(planner -> {
-            // 플래너 참여자 정보 조회
             List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
                     .stream()
                     .map(member -> new PlannerMembersResDto(
@@ -83,5 +82,14 @@ public class PlannerService {
             return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
         });
     }
-
+    public List<PlannerResDto> getTop3BookmarkedPlanners() {
+        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
+        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
+        return topPlanners.stream()
+                .map(planner -> {
+                    Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
+                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+                })
+                .collect(Collectors.toList());
+    }
 }

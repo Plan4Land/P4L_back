@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner, Long> {
     boolean existsByMemberAndPlanner(Member member, Planner planner);
@@ -18,5 +20,11 @@ public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner
     @Query("SELECT COUNT(bp) FROM BookmarkPlanner bp WHERE bp.planner.id = :plannerId")
     Long countByPlannerId(@Param("plannerId") Long plannerId);
 
-    Page<BookmarkPlanner> findByMemberId(String memberId, Pageable pageable);
+    Page<BookmarkPlanner> findByMemberId(String memberId, Pageable pageble);
+
+    @Query("SELECT b.planner.id FROM BookmarkPlanner b GROUP BY b.planner.id ORDER BY COUNT(b.planner.id) DESC")
+    List<Long> findTop3PlannerIdsByBookmarkCount();
+
+    Page<BookmarkPlanner> findByMemberIdAndPlannerIsPublicTrue(String memberId, Pageable pageable);
+
 }

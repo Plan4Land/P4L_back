@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -45,17 +48,24 @@ public class PlannerController {
 
     // 플래너 목록 조회
     @GetMapping("/planners")
-    public Page<PlannerResDto> getAllPlanners(
-            @RequestParam(defaultValue = "0") int page,  // 현재 페이지
-            @RequestParam(defaultValue = "10") int size // 페이지 크기
-    ) {
+    public ResponseEntity<Page<PlannerResDto>> getAllPlanners(@RequestParam(defaultValue = "0") int currentPage,  // 현재 페이지
+                                                              @RequestParam(defaultValue = "10") int pageSize,
+                                                              @RequestParam(required = false) String areaCode,
+                                                              @RequestParam(required = false) String subAreaCode,
+                                                              @RequestParam(required = false) String themeList,
+                                                              @RequestParam(required = false) String searchQuery) {
         // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
 
+        List<String> themeLst = (themeList != null && !themeList.isEmpty()) ? List.of(themeList.split(",")) : List.of();
         // 서비스 호출
-        return plannerService.findAllPlanners(pageable);
+        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(pageable, areaCode, subAreaCode, themeLst, searchQuery);
+
+        return ResponseEntity.ok(dto);
     }
-    @GetMapping("/myPlanners")
+
+
+    @GetMapping("/myBookmarkPlanners")
     public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
             @RequestParam("memberId") String memberId,  // memberId를 받음
             @RequestParam("page") int page,             // 페이지 번호
@@ -68,4 +78,13 @@ public class PlannerController {
         return ResponseEntity.ok(bookmarkedPlanners);
     }
 
+    @GetMapping("/plannersTop3")
+    public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
+        List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
+
+        if (topPlanners.size() > 3) {
+            topPlanners = topPlanners.subList(0, 3);
+        }
+        return ResponseEntity.ok(topPlanners);
+    }
 }
