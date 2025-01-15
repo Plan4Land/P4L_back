@@ -50,22 +50,25 @@ public class PlannerController {
     @GetMapping("/planners")
     public ResponseEntity<Page<PlannerResDto>> getAllPlanners(@RequestParam(defaultValue = "0") int currentPage,  // 현재 페이지
                                                               @RequestParam(defaultValue = "10") int pageSize,
-                                                              @RequestParam(required = false) Integer areaCode,
-                                                              @RequestParam(required = false) Integer subAreaCode,
+                                                              @RequestParam(required = false) String areaCode,
+                                                              @RequestParam(required = false) String subAreaCode,
                                                               @RequestParam(required = false) String themeList,
-                                                              @RequestParam(required = false) String searchQuery) {
-        // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
+                                                              @RequestParam(required = false) String searchQuery,
+                                                              @RequestParam(defaultValue = "LatestDesc") String sortBy) {
 
-        List<String> themeLst = (themeList != null && !themeList.isEmpty()) ? List.of(themeList.split(",")) : List.of();
         // 서비스 호출
-        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(pageable, areaCode, subAreaCode, themeLst, searchQuery);
+        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(currentPage, pageSize,areaCode, subAreaCode, themeList, searchQuery,
+                 sortBy);
+
+        log.info(dto.getContent().toString());
+        log.info("dto.getTotalElements() : " + dto.getTotalElements());
+        log.info("dto.getTotalPages() : " + dto.getTotalPages());
 
         return ResponseEntity.ok(dto);
     }
 
-
-    @GetMapping("/myPlanners")
+    // 내가 북마크한 플래너 리스트
+    @GetMapping("/myBookmarkPlanners")
     public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
             @RequestParam("memberId") String memberId,  // memberId를 받음
             @RequestParam("page") int page,             // 페이지 번호
@@ -78,10 +81,42 @@ public class PlannerController {
         return ResponseEntity.ok(bookmarkedPlanners);
     }
 
+    // 북마크 갯수 상위 3개 플래너
     @GetMapping("/plannersTop3")
     public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
         List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
+
+        if (topPlanners.size() > 3) {
+            topPlanners = topPlanners.subList(0, 3);
+        }
         return ResponseEntity.ok(topPlanners);
     }
 
+    // 특정 유저가 작성한 플래너 리스트
+    @GetMapping("/myPlanners")
+    public Page<PlannerResDto> getPlannersByOwner(
+            @RequestParam String memberId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Planner> planners = plannerService.getPlannersByOwner(memberId, pageable);
+        return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
+    }
+
+    // 플래너에 멤버 초대
+    @PostMapping("/invite")
+    public ResponseEntity<Boolean> inviteMember(@RequestParam String memberId, @RequestParam Long plannerId) {
+        boolean isSuccess = plannerService.inviteMember(memberId, plannerId);
+        return ResponseEntity.ok(isSuccess);
+    }
+
+    // 초대된 플래너 조회
+    @GetMapping("/invite/{memberId}")
+    public ResponseEntity<List<PlannerResDto>> selectInvitedPlanners(@PathVariable String memberId) {
+        log.info("받은 정보 : {}", memberId);
+        List<PlannerResDto> invitedPlanners = plannerService.selectInvitedPlanners(memberId);
+        return ResponseEntity.ok(invitedPlanners);
+    }
 }

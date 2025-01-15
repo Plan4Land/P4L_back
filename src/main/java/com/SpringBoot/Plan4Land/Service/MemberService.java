@@ -2,8 +2,14 @@ package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
+import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
+import com.SpringBoot.Plan4Land.Entity.Planner;
+import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
+import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
+import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.sun.tools.jconsole.JConsoleContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +19,18 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PlannerService plannerService;
+    private final PlannerRepository plannerRepository;
+    private final PlannerMembersRepository plannerMembersRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -36,6 +48,25 @@ public class MemberService {
     public MemberResDto getMemberDetail(String userId) {
         Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
         return convertEntityToDto(member);
+    }
+
+    // 회원 검색
+    public List<MemberResDto> searchMember(String id, String nickname, Long plannerId) {
+        List<Member> members = memberRepository.findByIdOrNickname(id, nickname);
+
+        return members.stream()
+                .map(member -> {
+                    // 회원에 해당하는 plannerId의 상태 조회
+                    Optional<PlannerMembers> plannerMember = plannerMembersRepository
+                            .findByMemberIdAndPlannerId(member.getId(), plannerId);
+
+                    // 상태가 존재하면 상태를 추가, 없으면 null
+                    String state = plannerMember.map(plannerMembers -> plannerMembers.getState().name()).orElse(null);
+
+                    // 변환된 DTO 객체 생성
+                    return MemberResDto.of(member, state); // 상태를 함께 설정
+                })
+                .collect(Collectors.toList());
     }
 
     // 회원 수정
@@ -130,6 +161,7 @@ public class MemberService {
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {
         MemberResDto memberResDto = new MemberResDto();
+        memberResDto.setUid(member.getUid());
         memberResDto.setId(member.getId());
         memberResDto.setEmail(member.getEmail());
         memberResDto.setName(member.getName());

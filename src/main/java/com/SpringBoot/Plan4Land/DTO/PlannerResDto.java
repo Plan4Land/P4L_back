@@ -17,6 +17,7 @@ public class PlannerResDto {
     private Long id;
     private String title;
     private String theme;
+    private String ownerId;
     private String ownerNickname;
     private String ownerProfileImg;
     private LocalDateTime startDate;
@@ -35,6 +36,7 @@ public class PlannerResDto {
                 .id(planner.getId())
                 .title(planner.getTitle())
                 .theme(planner.getTheme())
+                .ownerId(planner.getOwner().getId())
                 .ownerNickname(planner.getOwner().getNickname())
                 .ownerProfileImg(planner.getOwner().getProfileImg())
                 .startDate(planner.getStartDate())

@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.DTO.PlannerMembersResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
@@ -12,13 +13,15 @@ import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,7 +46,7 @@ public class PlannerService {
         } catch (RuntimeException e) {
             log.error("존재하지 않는 회원입니다.");
             return null;
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Planner 생성 실패 : {}", e.getMessage());
             return null;
         }
@@ -54,48 +57,110 @@ public class PlannerService {
                 .orElseThrow(() -> new RuntimeException("해당 Planner가 존재하지 않습니다."));
         List<PlannerMembers> participants = plannerMembersRepository.findByPlannerId(id);
         List<PlannerMembersResDto> participantDtos = participants.stream()
-                .map(member -> new PlannerMembersResDto(
-                        member.getMember().getId(),
-                        member.getMember().getNickname(),
-                        member.getMember().getProfileImg()))
+                .map(member -> {
+                    // PlannerMembers의 상태를 함께 조회
+                    String state = member.getState() != null ? member.getState().name() : null;
+                    return new PlannerMembersResDto(
+                            member.getMember().getId(),
+                            member.getMember().getNickname(),
+                            member.getMember().getProfileImg(),
+                            state // 상태를 포함
+                    );
+                })
                 .collect(Collectors.toList());
         Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
-    public Page<PlannerResDto> getFilterdPlanner(Pageable pageable, Integer areaCode, Integer subAreaCode,
-                                                 List<String> themeList, String searchQuery) {
-        // 플래너 페이지 가져오기
-        Page<Planner> planners = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, themeList, searchQuery);
+    public Page<PlannerResDto> getFilterdPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
+                                                 String themeList, String searchQuery, String sortBy) {
 
-        // PlannerResDto로 변환
-        return planners.map(planner -> {
-            // 플래너 참여자 정보 조회
-            List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
-                    .stream()
-                    .map(member -> new PlannerMembersResDto(
-                            member.getMember().getId(),
-                            member.getMember().getNickname(),
-                            member.getMember().getProfileImg()))
-                    .collect(Collectors.toList());
+        String[] arr = themeList == null ? null : themeList.split(",");
+        String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
+        String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
+        String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
 
-            Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
+        Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
+        if (sortBy.equalsIgnoreCase("LatestAsc")) {
+            sort = Sort.by(Sort.Direction.ASC, "regDate");
+        } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
+            sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
+        } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
+            sort = Sort.by(Sort.Direction.ASC, "bookmarkCount");
+        }
 
-            return PlannerResDto.fromEntity(planner, participants, bookmarkCount);
-        });
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+
+        Page<Object[]> queryResults = plannerRepository.findFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
+
+        List<PlannerResDto> result = queryResults.getContent().stream()
+                .map(resultArray -> {
+                    Planner planner = (Planner) resultArray[0];
+                    Long bookmarkCount = (Long) resultArray[1];
+                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(result, pageable, queryResults.getTotalElements());
     }
+
+
+
+
+
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
-        // 북마크 수 상위 3개의 플래너 ID 가져오기
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
-
-        // 해당 ID를 기반으로 플래너 정보 조회 및 DTO 변환
         List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
-
-        // 각 플래너의 북마크 개수 조회 및 DTO 변환
         return topPlanners.stream()
                 .map(planner -> {
                     Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
                     return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
+        return plannerRepository.findByOwnerId(memberId, pageable);
+    }
+
+    public boolean inviteMember(String memberId, Long plannerId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 멤버를 찾을 수 없습니다."));
+        Planner planner = plannerRepository.findById(plannerId)
+                .orElseThrow(() -> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
+
+        PlannerMembers plannerMembers = new PlannerMembers();
+        plannerMembers.setMember(member);
+        plannerMembers.setPlanner(planner);
+        plannerMembersRepository.save(plannerMembers);
+
+        return true;
+    }
+
+    public List<PlannerResDto> selectInvitedPlanners(String memberId) {
+        log.info("memberId : {}", memberId);
+        List<PlannerMembers> invites = plannerMembersRepository.findByMemberIdAndState(memberId, State.WAIT);
+        log.info(invites.toString());
+        return invites.stream()
+                .map(plannerMember -> {
+                    Planner planner = plannerMember.getPlanner();  // PlannerMembers에서 연관된 Planner를 가져옴
+
+                    // 3. 해당 플래너에 참여한 사람들의 정보를 PlannerMembersResDto로 변환
+                    List<PlannerMembersResDto> participantDtos = plannerMembersRepository.findByPlannerId(planner.getId())
+                            .stream()
+                            .map(member -> {
+                                String state = member.getState() != null ? member.getState().name() : null;
+                                return new PlannerMembersResDto(
+                                        member.getMember().getId(),
+                                        member.getMember().getNickname(),
+                                        member.getMember().getProfileImg(),
+                                        state // 상태 포함
+                                );
+                            })
+                            .collect(Collectors.toList());
+
+                    // 4. PlannerResDto로 변환 후 반환
+                    return PlannerResDto.fromEntity(planner, participantDtos, 0L);
                 })
                 .collect(Collectors.toList());
     }
