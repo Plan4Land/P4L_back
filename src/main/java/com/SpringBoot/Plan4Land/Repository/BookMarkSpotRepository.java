@@ -26,4 +26,6 @@ public interface BookMarkSpotRepository extends JpaRepository<BookmarkSpot, Long
 
     @Query("SELECT bs.spot, COUNT(bs) FROM BookmarkSpot bs GROUP BY bs.spot ORDER BY COUNT(bs) DESC")
     List<Object[]> findTop5SpotsByBookmarkCount();
+
+
 }

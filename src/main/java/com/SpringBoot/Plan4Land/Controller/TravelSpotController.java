@@ -54,6 +54,9 @@ public class TravelSpotController {
     @GetMapping("/api/travelspotTop5")
     public ResponseEntity<List<TravelSpotResDto>> getTop5BookmarkedSpots() {
         List<TravelSpotResDto> top5Spots = travelSpotService.getTop5BookmarkedSpots();
+        if (top5Spots.size() > 5) {
+            top5Spots = top5Spots.subList(0, 5);
+        }
         return ResponseEntity.ok(top5Spots);
     }
 }

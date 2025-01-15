@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class TravelSpotService {
 
     // 북마크가 많은 상위 5개 여행지 반환
     public List<TravelSpotResDto> getTop5BookmarkedSpots() {
+        // 상위 5개를 반환하는 쿼리 실행
         List<Object[]> topSpots = bookMarkSpotRepository.findTop5SpotsByBookmarkCount();
 
         return topSpots.stream().map(data -> {
@@ -62,6 +64,7 @@ public class TravelSpotService {
             return dto;
         }).collect(Collectors.toList());
     }
+
 
     private TravelSpotResDto convertToDTO(TravelSpot travelSpot) {
         TravelSpotResDto dto = new TravelSpotResDto();

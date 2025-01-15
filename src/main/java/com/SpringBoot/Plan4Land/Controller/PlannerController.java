@@ -81,7 +81,10 @@ public class PlannerController {
     @GetMapping("/plannersTop3")
     public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
         List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
+
+        if (topPlanners.size() > 3) {
+            topPlanners = topPlanners.subList(0, 3);
+        }
         return ResponseEntity.ok(topPlanners);
     }
-
 }
