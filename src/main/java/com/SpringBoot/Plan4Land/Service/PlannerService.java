@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public class PlannerService {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
         if (sortBy.equalsIgnoreCase("LatestAsc")) {
-            sort = sort.descending();
+            sort = Sort.by(Sort.Direction.ASC, "regDate");
         } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
             sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
         } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
@@ -89,14 +90,9 @@ public class PlannerService {
 
         Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
 
-        if (arr != null) {
-            log.warn(Arrays.toString(arr));
-        }
+        Page<Object[]> queryResults = plannerRepository.findFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
 
-        List<Object[]> queryResults = plannerRepository.getFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
-
-        // 처리된 데이터를 PlannerResDto로 변환
-        List<PlannerResDto> result = queryResults.stream()
+        List<PlannerResDto> result = queryResults.getContent().stream()
                 .map(resultArray -> {
                     Planner planner = (Planner) resultArray[0];
                     Long bookmarkCount = (Long) resultArray[1];
@@ -104,9 +100,10 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
 
-        // Page 객체로 변환하여 반환
-        return new PageImpl<>(result, pageable, result.size());
+        return new PageImpl<>(result, pageable, queryResults.getTotalElements());
     }
+
+
 
 
 

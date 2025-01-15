@@ -55,7 +55,6 @@ public class PlannerController {
                                                               @RequestParam(required = false) String themeList,
                                                               @RequestParam(required = false) String searchQuery,
                                                               @RequestParam(defaultValue = "LatestDesc") String sortBy) {
-        log.info(sortBy);
 
         // 서비스 호출
         Page<PlannerResDto> dto = plannerService.getFilterdPlanner(currentPage, pageSize,areaCode, subAreaCode, themeList, searchQuery,
@@ -63,6 +62,7 @@ public class PlannerController {
 
         log.info(dto.getContent().toString());
         log.info("dto.getTotalElements() : " + dto.getTotalElements());
+        log.info("dto.getTotalPages() : " + dto.getTotalPages());
 
         return ResponseEntity.ok(dto);
     }
