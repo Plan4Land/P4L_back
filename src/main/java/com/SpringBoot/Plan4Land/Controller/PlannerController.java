@@ -50,8 +50,8 @@ public class PlannerController {
     @GetMapping("/planners")
     public ResponseEntity<Page<PlannerResDto>> getAllPlanners(@RequestParam(defaultValue = "0") int currentPage,  // 현재 페이지
                                                               @RequestParam(defaultValue = "10") int pageSize,
-                                                              @RequestParam(required = false) Integer areaCode,
-                                                              @RequestParam(required = false) Integer subAreaCode,
+                                                              @RequestParam(required = false) String areaCode,
+                                                              @RequestParam(required = false) String subAreaCode,
                                                               @RequestParam(required = false) String themeList,
                                                               @RequestParam(required = false) String searchQuery) {
         // Pageable 객체 생성
