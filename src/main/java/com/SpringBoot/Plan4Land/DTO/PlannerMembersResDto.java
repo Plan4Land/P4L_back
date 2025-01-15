@@ -11,4 +11,5 @@ public class PlannerMembersResDto {
     private String id;
     private String memberNickname;
     private String memberProfileImg;
+    private String state;
 }

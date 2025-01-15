@@ -56,10 +56,16 @@ public class PlannerService {
                 .orElseThrow(() -> new RuntimeException("해당 Planner가 존재하지 않습니다."));
         List<PlannerMembers> participants = plannerMembersRepository.findByPlannerId(id);
         List<PlannerMembersResDto> participantDtos = participants.stream()
-                .map(member -> new PlannerMembersResDto(
-                        member.getMember().getId(),
-                        member.getMember().getNickname(),
-                        member.getMember().getProfileImg()))
+                .map(member -> {
+                    // PlannerMembers의 상태를 함께 조회
+                    String state = member.getState() != null ? member.getState().name() : null;
+                    return new PlannerMembersResDto(
+                            member.getMember().getId(),
+                            member.getMember().getNickname(),
+                            member.getMember().getProfileImg(),
+                            state // 상태를 포함
+                    );
+                })
                 .collect(Collectors.toList());
         Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
@@ -84,10 +90,16 @@ public class PlannerService {
         return planners.map(planner -> {
             List<PlannerMembersResDto> participants = plannerMembersRepository.findByPlannerId(planner.getId())
                     .stream()
-                    .map(member -> new PlannerMembersResDto(
-                            member.getMember().getId(),
-                            member.getMember().getNickname(),
-                            member.getMember().getProfileImg()))
+                    .map(member -> {
+                        // PlannerMembers의 상태를 함께 조회
+                        String state = member.getState() != null ? member.getState().name() : null;
+                        return new PlannerMembersResDto(
+                                member.getMember().getId(),
+                                member.getMember().getNickname(),
+                                member.getMember().getProfileImg(),
+                                state // 상태를 포함
+                        );
+                    })
                     .collect(Collectors.toList());
 
             Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
