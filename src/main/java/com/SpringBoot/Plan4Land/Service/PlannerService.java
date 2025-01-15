@@ -164,12 +164,23 @@ public class PlannerService {
                 .collect(Collectors.toList());
     }
 
+    // 초대 수락
     public boolean acceptInvitation(String memberId, Long plannerId) {
         PlannerMembers plannerMember = plannerMembersRepository
                 .findByMemberIdAndPlannerId(memberId, plannerId)
                 .orElseThrow(() -> new IllegalArgumentException("초대 정보가 존재하지 않습니다."));
         plannerMember.setState(State.ACCEPT);
         plannerMembersRepository.save(plannerMember);
+
+        return true;
+    }
+
+    // 초대 거절
+    public boolean rejectInvitation(String memberId, Long plannerId) {
+        PlannerMembers plannerMember = plannerMembersRepository
+                .findByMemberIdAndPlannerId(memberId, plannerId)
+                .orElseThrow(() -> new IllegalArgumentException("초대 정보가 존재하지 않습니다."));
+        plannerMembersRepository.delete(plannerMember);
 
         return true;
     }

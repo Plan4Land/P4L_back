@@ -125,4 +125,11 @@ public class PlannerController {
         boolean isSuccess = plannerService.acceptInvitation(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
+
+    // 초대된 플래너 거절
+    @DeleteMapping("/invite/reject")
+    public ResponseEntity<Boolean> rejectInvitation(@RequestParam String memberId, @RequestParam Long plannerId) {
+        boolean isSuccess = plannerService.rejectInvitation(memberId, plannerId);
+        return ResponseEntity.ok(isSuccess);
+    }
 }
