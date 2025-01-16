@@ -72,40 +72,86 @@ public class PlannerService {
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
-    public Page<PlannerResDto> getFilterdPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
-                                                 String themeList, String searchQuery, String sortBy) {
+    public Page<PlannerResDto> getFilteredPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
+                                                  String themeList, String searchQuery, String sortBy) {
 
-        String[] arr = themeList == null ? null : themeList.split(",");
-        String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
-        String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
-        String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
+        String[] themes = themeList == null ? new String[0] : themeList.split(",");
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
-        if (sortBy.equalsIgnoreCase("LatestAsc")) {
-            sort = Sort.by(Sort.Direction.ASC, "regDate");
-        } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
-            sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
-        } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
-            sort = Sort.by(Sort.Direction.ASC, "bookmarkCount");
-        }
+        List<Planner> planners = plannerRepository.getFilteredPlanners(areaCode, subAreaCode, searchQuery,
+                themes.length > 0 ? themes[0] : null,
+                themes.length > 1 ? themes[1] : null,
+                themes.length > 2 ? themes[2] : null);
 
-        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
-
-        Page<Object[]> queryResults = plannerRepository.findFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
-
-        List<PlannerResDto> result = queryResults.getContent().stream()
-                .map(resultArray -> {
-                    Planner planner = (Planner) resultArray[0];
-                    Long bookmarkCount = (Long) resultArray[1];
+        List<PlannerResDto> plannerResDtos = planners.stream()
+                .map(planner -> {
+                    Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
                     return PlannerResDto.fromEntity(planner, null, bookmarkCount);
                 })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(result, pageable, queryResults.getTotalElements());
+        // bookmarkCount와 id 기준 정렬
+        Comparator<PlannerResDto> comparator;
+        switch (sortBy) {
+            case "LatestAsc":
+                comparator = Comparator.comparing(PlannerResDto::getId);
+                break;
+            case "BookmarkAsc":
+                comparator = Comparator.comparing(PlannerResDto::getBookmarkCount);
+                break;
+            case "BookmarkDesc":
+                comparator = Comparator.comparing(PlannerResDto::getBookmarkCount).reversed();
+                break;
+            default:
+                comparator = Comparator.comparing(PlannerResDto::getId).reversed();
+                break;
+        }
+
+        List<PlannerResDto> sortedPlannerResDtos = plannerResDtos.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+
+        // 정렬된 리스트에서 페이징 처리
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
+        int start = Math.min((int) pageable.getOffset(), sortedPlannerResDtos.size());
+        int end = Math.min((start + pageable.getPageSize()), sortedPlannerResDtos.size());
+        List<PlannerResDto> paginatedList = sortedPlannerResDtos.subList(start, end);
+
+        return new PageImpl<>(paginatedList, pageable, sortedPlannerResDtos.size());
     }
 
 
 
+//    public Page<PlannerResDto> getFilterdPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
+//                                                 String themeList, String searchQuery, String sortBy) {
+//
+//        String[] arr = themeList == null ? null : themeList.split(",");
+//        String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
+//        String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
+//        String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
+//
+//        Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
+//        if (sortBy.equalsIgnoreCase("LatestAsc")) {
+//            sort = Sort.by(Sort.Direction.ASC, "regDate");
+//        } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
+//            sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
+//        } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
+//            sort = Sort.by(Sort.Direction.ASC, "bookmarkCount");
+//        }
+//
+//        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+//
+//        Page<Object[]> queryResults = plannerRepository.findFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
+//
+//        List<PlannerResDto> result = queryResults.getContent().stream()
+//                .map(resultArray -> {
+//                    Planner planner = (Planner) resultArray[0];
+//                    Long bookmarkCount = (Long) resultArray[1];
+//                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
+//                })
+//                .collect(Collectors.toList());
+//
+//        return new PageImpl<>(result, pageable, queryResults.getTotalElements());
+//    }
 
 
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
@@ -183,5 +229,32 @@ public class PlannerService {
         plannerMembersRepository.delete(plannerMember);
 
         return true;
+    }
+
+    public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 사용자가 소유한 플래너 목록 조회
+        Page<Planner> ownedPlanners = plannerRepository.findByOwnerId(memberId, pageable);
+
+        // 사용자가 포함된 플래너 목록 조회
+        Page<PlannerMembers> plannerMembers = plannerMembersRepository.findByMemberId(memberId, pageable);
+
+        // 소유한 플래너 목록을 Dto로 변환
+        List<PlannerResDto> ownedPlannerDtos = ownedPlanners.stream()
+                .map(planner -> PlannerResDto.fromEntity(planner, null, 0L)) // bookmarkCount는 0으로 설정
+                .collect(Collectors.toList());
+
+        // 포함된 플래너 목록을 Dto로 변환
+        List<PlannerResDto> memberPlannersDtos = plannerMembers.stream()
+                .map(plannerMember -> PlannerResDto.fromEntity(plannerMember.getPlanner(), null, 0L)) // bookmarkCount는 0으로 설정
+                .collect(Collectors.toList());
+
+        // 두 리스트 결합
+        List<PlannerResDto> allPlanners = ownedPlannerDtos;
+        allPlanners.addAll(memberPlannersDtos);
+
+        // 페이지네이션 처리된 결과 반환
+        return new PageImpl<>(allPlanners, pageable, ownedPlanners.getTotalElements());
     }
 }

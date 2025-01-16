@@ -57,39 +57,16 @@ public class PlannerController {
                                                               @RequestParam(defaultValue = "LatestDesc") String sortBy) {
 
         // 서비스 호출
-        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(currentPage, pageSize,areaCode, subAreaCode, themeList, searchQuery,
+        Page<PlannerResDto> dto = plannerService.getFilteredPlanner(currentPage, pageSize, areaCode, subAreaCode, themeList, searchQuery,
                  sortBy);
 
         log.info(dto.getContent().toString());
+        log.info(sortBy);
+        log.info(dto.getSort().toString());
         log.info("dto.getTotalElements() : " + dto.getTotalElements());
         log.info("dto.getTotalPages() : " + dto.getTotalPages());
 
         return ResponseEntity.ok(dto);
-    }
-
-    // 내가 북마크한 플래너 리스트
-    @GetMapping("/myBookmarkPlanners")
-    public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
-            @RequestParam("memberId") String memberId,  // memberId를 받음
-            @RequestParam("page") int page,             // 페이지 번호
-            @RequestParam("size") int size) {           // 페이지 크기
-
-        // 북마크된 플래너 목록을 페이지네이션 처리하여 가져오기
-        Page<BookmarkPlanner> bookmarkedPlanners = bookmarkPlannerService.getBookmarkedPlanners(memberId, page, size);
-
-        // 페이지네이션된 결과 반환
-        return ResponseEntity.ok(bookmarkedPlanners);
-    }
-
-    // 북마크 갯수 상위 3개 플래너
-    @GetMapping("/plannersTop3")
-    public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
-        List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
-
-        if (topPlanners.size() > 3) {
-            topPlanners = topPlanners.subList(0, 3);
-        }
-        return ResponseEntity.ok(topPlanners);
     }
 
     // 특정 유저가 작성한 플래너 리스트
@@ -131,5 +108,15 @@ public class PlannerController {
     public ResponseEntity<Boolean> rejectInvitation(@RequestParam String memberId, @RequestParam Long plannerId) {
         boolean isSuccess = plannerService.rejectInvitation(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
+    }
+
+    @GetMapping("/inPlanners")
+    public Page<PlannerResDto> getPlanners(
+            @RequestParam String memberId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        // 플래너 목록을 서비스에서 처리하여 반환
+        return plannerService.getPlanners(memberId, page, size);
     }
 }
