@@ -4,6 +4,8 @@ import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,6 @@ public interface PlannerMembersRepository extends JpaRepository<PlannerMembers, 
     List<PlannerMembers> findByPlannerId(Long plannerId);
     Optional<PlannerMembers> findByMemberIdAndPlannerId(String memberId, Long plannerId);
     List<PlannerMembers> findByMemberIdAndState(String memberId, State state);
+
+    Page<PlannerMembers> findByMemberId(String memberId, Pageable pageable);
 }

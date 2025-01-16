@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Repository;
 
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
+import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,5 +76,10 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 
 
     Page<Planner> findByOwnerId(String memberId, Pageable pageable);
+
+    @Query("SELECT p FROM Planner p " +
+            "LEFT JOIN PlannerMembers pm ON pm.planner = p " +
+            "WHERE p.owner = :owner OR pm.member = :owner")
+    Page<Planner> findPlannersByOwnerOrMember(Member owner, Pageable pageable);
 
 }

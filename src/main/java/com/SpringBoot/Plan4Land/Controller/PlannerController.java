@@ -107,4 +107,14 @@ public class PlannerController {
         boolean isSuccess = plannerService.rejectInvitation(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
+
+    @GetMapping("/inPlanners")
+    public Page<PlannerResDto> getPlanners(
+            @RequestParam String memberId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        // 플래너 목록을 서비스에서 처리하여 반환
+        return plannerService.getPlanners(memberId, page, size);
+    }
 }
