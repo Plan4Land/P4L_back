@@ -86,7 +86,7 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 
     @Query("SELECT p FROM Planner p " +
             "WHERE p.owner = :owner OR p.id IN (" +
-            "SELECT pm.planner FROM PlannerMembers pm WHERE pm.member.id = :owner)")
+            "SELECT pm.planner FROM PlannerMembers pm WHERE pm.member = :owner AND pm.state = 'ACCEPT')")
     Page<Planner> findPlannersByOwnerOrMember(Member owner, Pageable pageable);
 
 
