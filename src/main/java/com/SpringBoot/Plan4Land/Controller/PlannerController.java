@@ -81,6 +81,17 @@ public class PlannerController {
         Page<Planner> planners = plannerService.getPlannersByOwner(memberId, pageable);
         return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
     }
+// 특정 유저가 작성한 플래너 리스트 중 공개 정보만
+    @GetMapping("/userPlanners")
+    public Page<PlannerResDto> getPrivatePlannersByOwner(
+            @RequestParam String memberId,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Planner> planners = plannerService.getPrivatePlannersByOwner(memberId, pageable);
+        return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
+    }
 
     // 플래너에 멤버 초대
     @PostMapping("/invite")
@@ -110,13 +121,13 @@ public class PlannerController {
         return ResponseEntity.ok(isSuccess);
     }
 
+    // 내가 포함된, 작성한 플래너 목록
     @GetMapping("/inPlanners")
     public Page<PlannerResDto> getPlanners(
             @RequestParam String memberId,
             @RequestParam int page,
             @RequestParam int size) {
 
-        // 플래너 목록을 서비스에서 처리하여 반환
         return plannerService.getPlanners(memberId, page, size);
     }
 }

@@ -83,6 +83,8 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 
 
     Page<Planner> findByOwnerId(String memberId, Pageable pageable);
+    Page<Planner> findByOwnerIdAndIsPublicTrue(String memberId, Pageable pageable);
+
 
     @Query("SELECT p FROM Planner p " +
             "WHERE p.owner = :owner OR p.id IN (" +

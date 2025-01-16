@@ -34,6 +34,7 @@ public class PlannerService {
     private final BookMarkPlannerRepository bookMarkPlannerRepository;
 
     @Transactional
+    // 플래너 생성
     public Long makePlanner(PlannerReqDto plannerReqDto) {
         try {
             Member member = memberRepository.findById(plannerReqDto.getId())
@@ -52,6 +53,7 @@ public class PlannerService {
         }
     }
 
+    // 플래너 상세조회?
     public PlannerResDto findByPlannerId(Long id) {
         Planner planner = plannerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 Planner가 존재하지 않습니다."));
@@ -72,6 +74,7 @@ public class PlannerService {
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
     }
 
+    // 플래너 검색 및 조회하기
     public Page<PlannerResDto> getFilteredPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
                                                   String themeList, String searchQuery, String sortBy) {
 
@@ -119,7 +122,7 @@ public class PlannerService {
         return new PageImpl<>(paginatedList, pageable, sortedPlannerResDtos.size());
     }
 
-
+// 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
         List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
@@ -130,11 +133,14 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
     }
-
+// 내 소유 플래너 목록 가져오기
     public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
         return plannerRepository.findByOwnerId(memberId, pageable);
     }
-
+    // 특정 유저 플래너 목록 가져오기(비공개 안가져옴)
+    public Page<Planner> getPrivatePlannersByOwner(String memberId, Pageable pageable) {
+        return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, pageable);
+    }
     // 플래닝에 멤버 초대
     public boolean inviteMember(String memberId, Long plannerId) {
         Member member = memberRepository.findById(memberId)
@@ -196,7 +202,7 @@ public class PlannerService {
 
         return true;
     }
-
+// 내가 작성한, 포함된 플래너 목록 가져오기
     public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Member owner = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("User not found"));
