@@ -67,31 +67,6 @@ public class PlannerController {
         return ResponseEntity.ok(dto);
     }
 
-    // 내가 북마크한 플래너 리스트
-    @GetMapping("/myBookmarkPlanners")
-    public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
-            @RequestParam("memberId") String memberId,  // memberId를 받음
-            @RequestParam("page") int page,             // 페이지 번호
-            @RequestParam("size") int size) {           // 페이지 크기
-
-        // 북마크된 플래너 목록을 페이지네이션 처리하여 가져오기
-        Page<BookmarkPlanner> bookmarkedPlanners = bookmarkPlannerService.getBookmarkedPlanners(memberId, page, size);
-
-        // 페이지네이션된 결과 반환
-        return ResponseEntity.ok(bookmarkedPlanners);
-    }
-
-    // 북마크 갯수 상위 3개 플래너
-    @GetMapping("/plannersTop3")
-    public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
-        List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
-
-        if (topPlanners.size() > 3) {
-            topPlanners = topPlanners.subList(0, 3);
-        }
-        return ResponseEntity.ok(topPlanners);
-    }
-
     // 특정 유저가 작성한 플래너 리스트
     @GetMapping("/myPlanners")
     public Page<PlannerResDto> getPlannersByOwner(
