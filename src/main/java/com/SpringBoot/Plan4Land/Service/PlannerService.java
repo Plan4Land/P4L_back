@@ -120,40 +120,6 @@ public class PlannerService {
     }
 
 
-
-//    public Page<PlannerResDto> getFilterdPlanner(int currentPage, int pageSize, String areaCode, String subAreaCode,
-//                                                 String themeList, String searchQuery, String sortBy) {
-//
-//        String[] arr = themeList == null ? null : themeList.split(",");
-//        String theme1 = arr != null && arr.length > 0 ? arr[0] : null;
-//        String theme2 = arr != null && arr.length > 1 ? arr[1] : null;
-//        String theme3 = arr != null && arr.length > 2 ? arr[2] : null;
-//
-//        Sort sort = Sort.by(Sort.Direction.DESC, "regDate");
-//        if (sortBy.equalsIgnoreCase("LatestAsc")) {
-//            sort = Sort.by(Sort.Direction.ASC, "regDate");
-//        } else if (sortBy.equalsIgnoreCase("BookmarkDesc")) {
-//            sort = Sort.by(Sort.Direction.DESC, "bookmarkCount");
-//        } else if (sortBy.equalsIgnoreCase("BookmarkAsc")) {
-//            sort = Sort.by(Sort.Direction.ASC, "bookmarkCount");
-//        }
-//
-//        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
-//
-//        Page<Object[]> queryResults = plannerRepository.findFilteredPlanners(pageable, areaCode, subAreaCode, searchQuery, theme1, theme2, theme3);
-//
-//        List<PlannerResDto> result = queryResults.getContent().stream()
-//                .map(resultArray -> {
-//                    Planner planner = (Planner) resultArray[0];
-//                    Long bookmarkCount = (Long) resultArray[1];
-//                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
-//                })
-//                .collect(Collectors.toList());
-//
-//        return new PageImpl<>(result, pageable, queryResults.getTotalElements());
-//    }
-
-
     public List<PlannerResDto> getTop3BookmarkedPlanners() {
         List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
         List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);

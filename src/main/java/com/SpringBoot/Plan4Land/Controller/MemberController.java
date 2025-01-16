@@ -22,24 +22,28 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+
     // 전체 회원 조회
     @GetMapping("/list")
     public ResponseEntity<List<MemberResDto>> memberAllList() {
         List<MemberResDto> list = memberService.getMemberAllList();
         return ResponseEntity.ok(list);
     }
+
     // 회원 상세 조회
     @GetMapping("/{userId}")
     public ResponseEntity<MemberResDto> memberDetail(@PathVariable String userId) {
         MemberResDto memberResDto = memberService.getMemberDetail(userId);
         return ResponseEntity.ok(memberResDto);
     }
+
     // 회원 상세 조회 - 카카오ID로
     @GetMapping("/kakao/{kakaoId}")
     public ResponseEntity<MemberResDto> memberDetailByKakaoId(@PathVariable Long kakaoId) {
-        MemberResDto memberResDto =memberService.getMemberDetailByKakaoId(kakaoId);
+        MemberResDto memberResDto = memberService.getMemberDetailByKakaoId(kakaoId);
         return ResponseEntity.ok(memberResDto);
     }
+
     // 회원 검색
     @GetMapping("/search")
     public ResponseEntity<List<MemberResDto>> searchMember(@RequestParam String id, @RequestParam String nickname, @RequestParam Long plannerId) {
@@ -53,18 +57,21 @@ public class MemberController {
         boolean isSuccess = memberService.updateMember(memberReqDto);
         return ResponseEntity.ok(isSuccess);
     }
+
     // 회원 비밀번호 변경
     @PutMapping("/update/password")
     public ResponseEntity<Boolean> memberUpdatePassword(@RequestBody MemberReqDto memberReqDto) {
         boolean isSuccess = memberService.updateMemberPassword(memberReqDto);
         return ResponseEntity.ok(isSuccess);
     }
+
     // 회원 정보 삭제
     @DeleteMapping("/{userId}")
     public ResponseEntity<Boolean> memberDelete(@PathVariable String userId) {
         boolean isSuccess = memberService.deleteMember(userId);
         return ResponseEntity.ok(isSuccess);
     }
+
     // 회원 비밀번호 검증
     @PostMapping("/validate")
     public ResponseEntity<Boolean> memberValidate(@RequestBody Map<String, String> memberInfo) {
@@ -75,21 +82,25 @@ public class MemberController {
         boolean isValid = memberService.validateMember(id, password);
         return ResponseEntity.ok(isValid);
     }
+
     // 회원 아이디 중복 확인
     @PostMapping("/idExists/{id}")
     public boolean memberIdDulicate(@PathVariable String id) {
         return memberService.checkIdDuplicate(id);
     }
+
     // 회원 이메일 중복 확인
     @PostMapping("/emailExists/{email}")
     public boolean memberEmailDulicate(@PathVariable String email) {
         return memberService.checkEmailDuplicate(email);
     }
+
     // 회원 닉네임 중복 확인
     @PostMapping("/nicknameExists/{nickname}")
     public boolean memberNicknameDulicate(@PathVariable String nickname) {
         return memberService.checkNicknameDuplicate(nickname);
     }
+
     // 회원 아이디 찾기
     @PostMapping("/find-id")
     public ResponseEntity<String> findMemberId(@RequestBody MemberReqDto memberReqDto) {
@@ -101,6 +112,7 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+
     // 회원 비밀번호 찾기
     @PostMapping("/find-password")
     public String findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
