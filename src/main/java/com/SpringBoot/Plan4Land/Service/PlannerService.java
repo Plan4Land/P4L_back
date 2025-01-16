@@ -187,28 +187,18 @@ public class PlannerService {
 
     public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        Member owner = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 사용자가 소유한 플래너 목록 조회
-        Page<Planner> ownedPlanners = plannerRepository.findByOwnerId(memberId, pageable);
+        // Repository에서 플래너 조회
+        Page<Planner> planners = plannerRepository.findPlannersByOwnerOrMember(owner, pageable);
 
-        // 사용자가 포함된 플래너 목록 조회
-        Page<PlannerMembers> plannerMembers = plannerMembersRepository.findByMemberId(memberId, pageable);
-
-        // 소유한 플래너 목록을 Dto로 변환
-        List<PlannerResDto> ownedPlannerDtos = ownedPlanners.stream()
+        // Dto로 변환
+        List<PlannerResDto> plannerDtos = planners.getContent().stream()
                 .map(planner -> PlannerResDto.fromEntity(planner, null, 0L)) // bookmarkCount는 0으로 설정
                 .collect(Collectors.toList());
 
-        // 포함된 플래너 목록을 Dto로 변환
-        List<PlannerResDto> memberPlannersDtos = plannerMembers.stream()
-                .map(plannerMember -> PlannerResDto.fromEntity(plannerMember.getPlanner(), null, 0L)) // bookmarkCount는 0으로 설정
-                .collect(Collectors.toList());
-
-        // 두 리스트 결합
-        List<PlannerResDto> allPlanners = ownedPlannerDtos;
-        allPlanners.addAll(memberPlannersDtos);
-
         // 페이지네이션 처리된 결과 반환
-        return new PageImpl<>(allPlanners, pageable, ownedPlanners.getTotalElements());
+        return new PageImpl<>(plannerDtos, pageable, planners.getTotalElements());
     }
+
 }
