@@ -3,9 +3,11 @@ package com.SpringBoot.Plan4Land.Service;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
+import com.SpringBoot.Plan4Land.Entity.Follow;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
+import com.SpringBoot.Plan4Land.Repository.FollowRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
@@ -29,9 +31,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final PlannerService plannerService;
-    private final PlannerRepository plannerRepository;
     private final PlannerMembersRepository plannerMembersRepository;
+    private final FollowRepository followRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -48,9 +49,10 @@ public class MemberService {
 
     // 회원 상세 조회
     public MemberResDto getMemberDetail(String userId) {
-        Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
         return convertEntityToDto(member);
     }
+
     // 회원 상세 조회 - 카카오ID로
     public MemberResDto getMemberDetailByKakaoId(Long kakaoId) {
         Member member = memberRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
@@ -80,7 +82,7 @@ public class MemberService {
     public boolean updateMember(MemberReqDto memberReqDto) {
         try {
             Member member = memberRepository.findById(memberReqDto.getId())
-                    .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+                    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setEmail(memberReqDto.getEmail());
             member.setName(memberReqDto.getName());
             member.setNickname(memberReqDto.getNickname());
@@ -97,7 +99,7 @@ public class MemberService {
     public boolean updateMemberPassword(MemberReqDto memberReqDto) {
         try {
             Member member = memberRepository.findById(memberReqDto.getId())
-                    .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+                    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setPassword(memberReqDto.getPassword());
 
             // 비밀번호 암호화
@@ -115,7 +117,7 @@ public class MemberService {
     // 회원 삭제
     public boolean deleteMember(String userId) {
         try {
-            Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+            Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
             member.setSignOutDate(LocalDateTime.now());
             member.setActivate(false);
             memberRepository.save(member);
@@ -129,7 +131,7 @@ public class MemberService {
     // 회원 비밀번호 체크
     public boolean validateMember(String id, String password) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new RuntimeException("비밀번호가 같지 않습니다.");
         }
@@ -154,14 +156,14 @@ public class MemberService {
     // 회원 아이디 찾기
     public String findMemberId(String name, String email) {
         Member member = memberRepository.findByNameAndEmail(name, email)
-                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
         return member != null ? member.getId() : null;
     }
 
     // 회원 비밀번호 찾기
     public boolean findMemberPassword(String id, String email) {
         Member member = memberRepository.findByIdAndEmail(id, email)
-                .orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
         return member != null;
     }
     // 임시 비밀번호 생성 함수
@@ -193,6 +195,31 @@ public class MemberService {
         }
         return result.toString();
     }
+
+    // 팔로우/해제
+    public boolean followManagement(String follower, String followed, boolean isFollow) {
+        try {
+            if (isFollow) {
+                Member followerMember = memberRepository.findByIdAndActivate(follower, true)
+                        .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+                Member followedMember = memberRepository.findByIdAndActivate(followed, true)
+                        .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+
+                Follow follow = new Follow(followerMember, followedMember);
+
+                followRepository.save(follow);
+            }else {
+                Follow follow = followRepository.findByFollowerIdAndFollowedId(follower, followed);
+
+                followRepository.delete(follow);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
 
     // Member Entity => MemberResDto 변환
     private MemberResDto convertEntityToDto(Member member) {

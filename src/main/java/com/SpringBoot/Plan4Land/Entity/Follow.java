@@ -27,4 +27,10 @@ public class Follow {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed_id") // 명확성을 위해 이름 변경
     private Member followed;
+
+    @Builder
+    public Follow(Member follower, Member followed) {
+        this.follower = follower;
+        this.followed = followed;
+    }
 }
