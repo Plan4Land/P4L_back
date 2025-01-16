@@ -34,6 +34,12 @@ public class MemberController {
         MemberResDto memberResDto = memberService.getMemberDetail(userId);
         return ResponseEntity.ok(memberResDto);
     }
+    // 회원 상세 조회 - 카카오ID로
+    @GetMapping("/kakao/{kakaoId}")
+    public ResponseEntity<MemberResDto> memberDetailByKakaoId(@PathVariable Long kakaoId) {
+        MemberResDto memberResDto =memberService.getMemberDetailByKakaoId(kakaoId);
+        return ResponseEntity.ok(memberResDto);
+    }
     // 회원 검색
     @GetMapping("/search")
     public ResponseEntity<List<MemberResDto>> searchMember(@RequestParam String id, @RequestParam String nickname, @RequestParam Long plannerId) {
@@ -99,36 +105,7 @@ public class MemberController {
     @PostMapping("/find-password")
     public String findMemberPassword(@RequestBody MemberReqDto memberReqDto) {
         boolean isSuccess = memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
-        String password = generateTempPassword();
+        String password = memberService.generateTempPassword();
         return isSuccess ? password : null;
-    }
-    // 임시 비밀번호 생성 함수
-    public String generateTempPassword() {
-        SecureRandom random = new SecureRandom();
-        // 각 조건을 만족하는 문자 그룹
-        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        String digits = "0123456789";
-        String specialChars = "!@#$%^&*()";
-        // 결과 비밀번호를 구성할 리스트
-        List<Character> password = new ArrayList<>();
-        // 각 그룹에서 최소 1개의 문자를 추가
-        password.add(upperCase.charAt(random.nextInt(upperCase.length())));
-        password.add(lowerCase.charAt(random.nextInt(lowerCase.length())));
-        password.add(digits.charAt(random.nextInt(digits.length())));
-        password.add(specialChars.charAt(random.nextInt(specialChars.length())));
-        // 나머지 문자 채우기
-        String allChars = upperCase + lowerCase + digits + specialChars;
-        for (int i = 4; i < 8; i++) { // 총 8자리로 생성
-            password.add(allChars.charAt(random.nextInt(allChars.length())));
-        }
-        // 비밀번호를 랜덤하게 섞기
-        Collections.shuffle(password, random);
-        // 리스트를 문자열로 변환
-        StringBuilder result = new StringBuilder();
-        for (char c : password) {
-            result.append(c);
-        }
-        return result.toString();
     }
 }

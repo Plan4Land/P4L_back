@@ -10,6 +10,8 @@ import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +38,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder managerBuilder; // 인증을 담당하는 클래스
+    private final AuthenticationManager authenticationManager;
 
     // 회원 가입 여부
     public boolean isMember(String userId) {
@@ -53,40 +57,39 @@ public class AuthService {
 
     // 로그인
     public TokenDto login(MemberReqDto memberReqDto) {
-        Member member;
-        // 카카오 로그인
-        if (memberReqDto.getKakaoId() != null) {
-            member = memberRepository.findByKakaoId(memberReqDto.getKakaoId()).orElseThrow(() -> new RuntimeException("카카오 사용자를 찾을 수 없습니다."));
-
-            // 회원 상태 검증
-            if(!member.isActivate()) {
-                log.error("탈퇴한 회원입니다.");
-                throw new RuntimeException("탈퇴한 회원입니다.");
-            }
-
-
-        } else {
-            // ID로 사용자 검색
-            member = memberRepository.findById(memberReqDto.getId())
-                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-            // 회원 상태 검증
-            if(!member.isActivate()) {
-                log.error("탈퇴한 회원입니다.");
-                throw new RuntimeException("탈퇴한 회원입니다.");
-            }
-
-            // 비밀번호 검증
-            if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
-                log.error("비밀번호 불일치");
-                throw new BadCredentialsException("잘못된 자격 증명입니다.");
-            }
-            log.info("비밀번호 일치");
-        }
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
         try {
-            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
+            Member member;
+            // 카카오 로그인
+            if (memberReqDto.getKakaoId() != null) {
+                member = memberRepository.findByKakaoId(memberReqDto.getKakaoId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
+
+                // 회원 상태 검증
+                if(!member.isActivate()) {
+                    log.error("탈퇴한 회원입니다.");
+                    throw new RuntimeException("탈퇴한 회원입니다.");
+                }
+            } else {
+                // 일반 로그인
+                member = memberRepository.findById(memberReqDto.getId())
+                        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+                // 회원 상태 검증
+                if(!member.isActivate()) {
+                    log.error("탈퇴한 회원입니다.");
+                    throw new RuntimeException("탈퇴한 회원입니다.");
+                }
+
+                // 비밀번호 검증
+                if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
+                    log.error("비밀번호 불일치");
+                    throw new BadCredentialsException("잘못된 자격 증명입니다.");
+                }
+            }
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
+
+//            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
 
             // 토큰 생성

@@ -21,23 +21,9 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 
     Page<Planner> findAll(Pageable pageable);
 
-    //    @Query(value = """
-//            SELECT p
-//                FROM Planner p
-//                    WHERE (:areaCode IS NULL OR p.area = :areaCode)
-//                    AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
-//                    AND (COALESCE(:themeList, NULL) IS NULL OR p.theme IN :themeList)
-//                    AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
-//            """)
-//    Page<Planner> getFilteredPlanners(Pageable pageable,
-//                                      @Param("areaCode") String areaCode,
-//                                      @Param("subAreaCode") String subAreaCode,
-//                                      @Param("themeList") List<String> themeList,
-//                                      @Param("searchQuery") String searchQuery);
     @Query(value = """
-            SELECT p, COUNT(b.planner.id)
+            SELECT p
             FROM Planner p
-            LEFT JOIN BookmarkPlanner b ON p.id = b.planner.id
             WHERE (:areaCode IS NULL OR p.area = :areaCode)
               AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
               AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
@@ -47,30 +33,51 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
                      OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
                      )
               AND p.isPublic = true
-            GROUP BY p.id
-            """,
-    countQuery = """
-            SELECT COUNT(DISTINCT p.id)
-            FROM Planner p
-                        LEFT JOIN BookmarkPlanner b
-                        ON p.id = b.planner.id
-                        WHERE (:areaCode IS NULL OR p.area = :areaCode)
-                        AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
-                        AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
-                        AND (
-                                    (:theme1 IS NULL OR p.theme LIKE %:theme1%)
-                                    OR (:theme2 IS NOT NULL AND p.theme LIKE %:theme2%)
-                                    OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
-                             )
-                        AND p.isPublic = true
             """)
-    Page<Object[]> findFilteredPlanners(Pageable pageable,
-                                        @Param("areaCode") String areaCode,
-                                        @Param("subAreaCode") String subAreaCode,
-                                        @Param("searchQuery") String searchQuery,
-                                        @Param("theme1") String theme1,
-                                        @Param("theme2") String theme2,
-                                        @Param("theme3") String theme3);
+    List<Planner> getFilteredPlanners(
+                                      @Param("areaCode") String areaCode,
+                                      @Param("subAreaCode") String subAreaCode,
+                                      @Param("searchQuery") String searchQuery,
+                                      @Param("theme1") String theme1,
+                                      @Param("theme2") String theme2,
+                                      @Param("theme3") String theme3);
+//    @Query(value = """
+//            SELECT p, COUNT(b.planner.id)
+//            FROM Planner p
+//            LEFT JOIN BookmarkPlanner b ON p.id = b.planner.id
+//            WHERE (:areaCode IS NULL OR p.area = :areaCode)
+//              AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
+//              AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
+//              AND (
+//                     (:theme1 IS NULL OR p.theme LIKE %:theme1%)
+//                     OR (:theme2 IS NOT NULL AND p.theme LIKE %:theme2%)
+//                     OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
+//                     )
+//              AND p.isPublic = true
+//            GROUP BY p.id
+//            """,
+//    countQuery = """
+//            SELECT COUNT(DISTINCT p.id)
+//            FROM Planner p
+//                        LEFT JOIN BookmarkPlanner b
+//                        ON p.id = b.planner.id
+//                        WHERE (:areaCode IS NULL OR p.area = :areaCode)
+//                        AND (:subAreaCode IS NULL OR p.subArea = :subAreaCode)
+//                        AND (:searchQuery IS NULL OR p.title LIKE %:searchQuery%)
+//                        AND (
+//                                    (:theme1 IS NULL OR p.theme LIKE %:theme1%)
+//                                    OR (:theme2 IS NOT NULL AND p.theme LIKE %:theme2%)
+//                                    OR (:theme3 IS NOT NULL AND p.theme LIKE %:theme3%)
+//                             )
+//                        AND p.isPublic = true
+//            """)
+//    Page<Object[]> findFilteredPlanners(Pageable pageable,
+//                                        @Param("areaCode") String areaCode,
+//                                        @Param("subAreaCode") String subAreaCode,
+//                                        @Param("searchQuery") String searchQuery,
+//                                        @Param("theme1") String theme1,
+//                                        @Param("theme2") String theme2,
+//                                        @Param("theme3") String theme3);
 
 
 

@@ -57,10 +57,12 @@ public class PlannerController {
                                                               @RequestParam(defaultValue = "LatestDesc") String sortBy) {
 
         // 서비스 호출
-        Page<PlannerResDto> dto = plannerService.getFilterdPlanner(currentPage, pageSize,areaCode, subAreaCode, themeList, searchQuery,
+        Page<PlannerResDto> dto = plannerService.getFilteredPlanner(currentPage, pageSize, areaCode, subAreaCode, themeList, searchQuery,
                  sortBy);
 
         log.info(dto.getContent().toString());
+        log.info(sortBy);
+        log.info(dto.getSort().toString());
         log.info("dto.getTotalElements() : " + dto.getTotalElements());
         log.info("dto.getTotalPages() : " + dto.getTotalPages());
 
