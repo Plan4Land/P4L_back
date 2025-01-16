@@ -53,39 +53,40 @@ public class AuthService {
 
     // 로그인
     public TokenDto login(MemberReqDto memberReqDto) {
-        Member member;
-        // 카카오 로그인
-        if (memberReqDto.getKakaoId() != null) {
-            member = memberRepository.findByKakaoId(memberReqDto.getKakaoId()).orElseThrow(() -> new RuntimeException("카카오 사용자를 찾을 수 없습니다."));
-
-            // 회원 상태 검증
-            if(!member.isActivate()) {
-                log.error("탈퇴한 회원입니다.");
-                throw new RuntimeException("탈퇴한 회원입니다.");
-            }
-
-
-        } else {
-            // ID로 사용자 검색
-            member = memberRepository.findById(memberReqDto.getId())
-                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-            // 회원 상태 검증
-            if(!member.isActivate()) {
-                log.error("탈퇴한 회원입니다.");
-                throw new RuntimeException("탈퇴한 회원입니다.");
-            }
-
-            // 비밀번호 검증
-            if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
-                log.error("비밀번호 불일치");
-                throw new BadCredentialsException("잘못된 자격 증명입니다.");
-            }
-            log.info("비밀번호 일치");
-        }
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
         try {
+            Member member;
+            // 카카오 로그인
+            if (memberReqDto.getKakaoId() != null) {
+                member = memberRepository.findByKakaoId(memberReqDto.getKakaoId()).orElseThrow(() -> new RuntimeException("카카오 사용자를 찾을 수 없습니다."));
+
+                // 회원 상태 검증
+                if(!member.isActivate()) {
+                    log.error("탈퇴한 회원입니다.");
+                    throw new RuntimeException("탈퇴한 회원입니다.");
+                }
+
+
+            } else {
+                // 일반 로그인
+                member = memberRepository.findById(memberReqDto.getId())
+                        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+                // 회원 상태 검증
+                if(!member.isActivate()) {
+                    log.error("탈퇴한 회원입니다.");
+                    throw new RuntimeException("탈퇴한 회원입니다.");
+                }
+
+                // 비밀번호 검증
+                if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
+                    log.error("비밀번호 불일치");
+                    throw new BadCredentialsException("잘못된 자격 증명입니다.");
+                }
+                log.info("비밀번호 일치");
+            }
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
+
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
 
