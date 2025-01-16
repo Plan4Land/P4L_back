@@ -17,6 +17,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         log.warn("WebSocket 핸들러가 등록되었습니다.");
-        registry.addHandler(webSocketHandler, "ws/chat").setAllowedOrigins("*");
+        registry.addHandler(webSocketHandler, "ws/planner").setAllowedOrigins("*");
     }
 }

@@ -52,9 +52,6 @@ public class ChatService {
     }
 
     public ChatRoomResDto findRoomByPlannerId(Long plannerId) {
-//        log.info("내가 찾는 PlannerId : {}", plannerId);
-//        log.info("chatRoom이 대체 뭔데 : {}", chatRooms);
-//        log.info("내가 알아야하는 부분 : {}", chatRooms.get(plannerId));
         return chatRooms.get(plannerId);
     }
     // 방 개설하기
