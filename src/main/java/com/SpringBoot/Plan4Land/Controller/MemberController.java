@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -119,5 +116,30 @@ public class MemberController {
         boolean isSuccess = memberService.findMemberPassword(memberReqDto.getId(), memberReqDto.getEmail());
         String password = memberService.generateTempPassword();
         return isSuccess ? password : null;
+    }
+
+    // 팔로잉
+    @PostMapping("/follow")
+    public ResponseEntity<Boolean> followMember(@RequestParam String followerId,
+                                                @RequestParam String followedId,
+                                                @RequestParam boolean isFollow) {
+        boolean isSuccess = memberService.followManagement(followerId, followedId, isFollow);
+
+        log.info("followerId: {}, followedId: {} , {}", followerId, followedId, isFollow);
+        return ResponseEntity.ok(isSuccess);
+    }
+
+    // 팔로잉 정보
+    @GetMapping("/follow-info/{userId}")
+    public ResponseEntity<Map<String, List<MemberResDto>>> loadFollowMember(@PathVariable String userId){
+        List<MemberResDto> followingInfo = memberService.loadFollowInfo(userId, true);
+        List<MemberResDto> followerInfo = memberService.loadFollowInfo(userId, false);
+        Map<String, List<MemberResDto>> followInfo = new HashMap<>();
+        followInfo.put("followingInfo", followingInfo);
+        followInfo.put("followerInfo", followerInfo);
+
+        log.info("followInfo: {}", followInfo);
+
+        return ResponseEntity.ok(followInfo);
     }
 }

@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +47,7 @@ public class MemberService {
     // 회원 상세 조회
     public MemberResDto getMemberDetail(String userId) {
         Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+        log.info("Detail");
         return convertEntityToDto(member);
     }
 
@@ -166,6 +164,7 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
         return member != null;
     }
+
     // 임시 비밀번호 생성 함수
     public String generateTempPassword() {
         SecureRandom random = new SecureRandom();
@@ -208,7 +207,7 @@ public class MemberService {
                 Follow follow = new Follow(followerMember, followedMember);
 
                 followRepository.save(follow);
-            }else {
+            } else {
                 Follow follow = followRepository.findByFollowerIdAndFollowedId(follower, followed);
 
                 followRepository.delete(follow);
@@ -217,6 +216,32 @@ public class MemberService {
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
+        }
+    }
+
+    // 팔로우 정보 반환
+    public List<MemberResDto> loadFollowInfo(String userId, boolean following) {
+        try {
+            log.info("유저 아이디 : {}", userId);
+            Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원을 찾지 못했습니다"));
+            log.info("획득한 유저의 아이디 : {}", member.getId());
+            log.info("획득한 유저의 uid : {}", member.getUid());
+            List<Long> lst;
+            if (following) {
+                lst = followRepository.getFollowedIdBy(member.getUid());
+            } else {
+                lst = followRepository.getFollowerIdBy(member.getUid());
+            }
+
+            log.warn(lst.toString());
+            List<Member> members = memberRepository.findAllById(lst);
+
+            return members.stream()
+                    .map(this::convertEntityToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
         }
     }
 
