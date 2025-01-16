@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.DTO;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class MemberResDto {
     private String imgPath;
     private LocalDateTime regDate;
     private String state;
+    private Role role;
 
     public static MemberResDto of(Member member) {
         return MemberResDto.builder()
@@ -30,6 +32,7 @@ public class MemberResDto {
                 .nickname(member.getNickname())
                 .imgPath(member.getProfileImg())
                 .regDate(member.getSignUpDate())
+                .role(member.getRole())
                 .build();
     }
 
@@ -43,6 +46,7 @@ public class MemberResDto {
                 .imgPath(member.getProfileImg())
                 .regDate(member.getSignUpDate())
                 .state(state)
+                .role(member.getRole())
                 .build();
     }
 }

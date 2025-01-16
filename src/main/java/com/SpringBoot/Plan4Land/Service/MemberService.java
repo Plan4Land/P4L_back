@@ -204,6 +204,7 @@ public class MemberService {
         memberResDto.setNickname(member.getNickname());
         memberResDto.setImgPath(member.getProfileImg());
         memberResDto.setRegDate(member.getSignUpDate());
+        memberResDto.setRole(member.getRole());
         return memberResDto;
     }
 }
