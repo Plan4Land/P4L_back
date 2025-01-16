@@ -142,7 +142,6 @@ public class WebSocketService {
                 .plannerId(plannerId)
                 .data(updatedData) // 업데이트된 데이터를 포함
                 .build();
-
         WebSocketResDto room = plannerRooms.get(plannerId);
         if (room != null) {
             for (WebSocketSession session : room.getSessions()) {

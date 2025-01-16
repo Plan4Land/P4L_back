@@ -43,7 +43,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case PLANNER:
-                webSocketService.broadcastPlanner(plannerId, webSocketMsgDto.getData());
+                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             default:
                 log.error("Unknown message type: {}", webSocketMsgDto.getType());
