@@ -34,6 +34,12 @@ public class MemberController {
         MemberResDto memberResDto = memberService.getMemberDetail(userId);
         return ResponseEntity.ok(memberResDto);
     }
+    // 회원 상세 조회 - 카카오ID로
+    @GetMapping("/kakao/{kakaoId}")
+    public ResponseEntity<MemberResDto> memberDetailByKakaoId(@PathVariable Long kakaoId) {
+        MemberResDto memberResDto =memberService.getMemberDetailByKakaoId(kakaoId);
+        return ResponseEntity.ok(memberResDto);
+    }
     // 회원 검색
     @GetMapping("/search")
     public ResponseEntity<List<MemberResDto>> searchMember(@RequestParam String id, @RequestParam String nickname, @RequestParam Long plannerId) {

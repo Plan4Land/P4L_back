@@ -49,6 +49,11 @@ public class MemberService {
         Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원이 존재하지 않습니다."));
         return convertEntityToDto(member);
     }
+    // 회원 상세 조회 - 카카오ID로
+    public MemberResDto getMemberDetailByKakaoId(Long kakaoId) {
+        Member member = memberRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+        return convertEntityToDto(member);
+    }
 
     // 회원 검색
     public List<MemberResDto> searchMember(String id, String nickname, Long plannerId) {

@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.Service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -25,11 +26,22 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // 인증 실패 시 처리할 클래스
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler; // 인가 실패 시 처리할 클래스
-
+    private final CustomAuthenticationProvider customAuthenticationProvider; // 커스텀 인증 처리 클래스
 
     @Bean
+    @Lazy
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // BCrypt 암호화 객체를 Bean으로 등록
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+
+        // CustomAuthenticationProvider를 AuthenticationManager에 추가
+        authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
+
+        return authenticationManagerBuilder.build();
     }
 
     @Bean // SecurityFilterChain 객체를 Bean으로 등록
@@ -55,4 +67,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
+
+
 }
