@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.JWT;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
@@ -38,6 +39,12 @@ public class TokenProvider {
                 .filter(authority -> !authority.trim().isEmpty())
                 .collect(Collectors.joining(","));
 
+        // 사용자 역할(role) 클레임을 가져오기
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(authority -> Arrays.stream(Role.values()).map(Role::name).anyMatch(roleIs -> roleIs.equals(authority)))
+                .findFirst().orElse("");
+
         long now = (new Date()).getTime();
         Date accessTokenExpiresIn = new Date(now + 60 * 60 * 1000 * 24 * 7); // 7일
         Date refreshTokenExpiresIn = new Date(now + 60 * 60 * 1000 * 24 * 24); // 24일
@@ -45,6 +52,7 @@ public class TokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim("role", role)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -52,6 +60,7 @@ public class TokenProvider {
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim("role", role)
                 .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -81,6 +90,23 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
+    public Authentication getAdminAuthentication(String token) {
+        Claims claims = parseClaims(token);
+
+        if (claims.get(AUTHORITIES_KEY) == null || !claims.get("role").equals("ROLE_ADMIN")) {
+            throw new RuntimeException("권한 정보가 없습니다.");
+        }
+
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        User principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -98,4 +124,6 @@ public class TokenProvider {
             return e.getClaims();
         }
     }
+
+
 }
