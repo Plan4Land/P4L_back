@@ -2,7 +2,9 @@ package com.SpringBoot.Plan4Land.Controller;
 
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
+import com.SpringBoot.Plan4Land.DTO.ReportReqDto;
 import com.SpringBoot.Plan4Land.Service.MemberService;
+import com.SpringBoot.Plan4Land.Service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final ReportService reportService;
 
     // 전체 회원 조회
     @GetMapping("/list")
@@ -131,7 +134,7 @@ public class MemberController {
 
     // 팔로잉 정보
     @GetMapping("/follow-info/{userId}")
-    public ResponseEntity<Map<String, List<MemberResDto>>> loadFollowMember(@PathVariable String userId){
+    public ResponseEntity<Map<String, List<MemberResDto>>> loadFollowMember(@PathVariable String userId) {
         List<MemberResDto> followingInfo = memberService.loadFollowInfo(userId, true);
         List<MemberResDto> followerInfo = memberService.loadFollowInfo(userId, false);
         Map<String, List<MemberResDto>> followInfo = new HashMap<>();
@@ -141,5 +144,15 @@ public class MemberController {
         log.info("followInfo: {}", followInfo);
 
         return ResponseEntity.ok(followInfo);
+    }
+
+    // 신고하기
+    @PostMapping("/report")
+    public ResponseEntity<Boolean> reportMember(@RequestBody ReportReqDto reportReqDto) {
+
+        log.info("reportMember: {} \n reported : {} , \n content : {}", reportReqDto.getReporter(), reportReqDto.getReported(), reportReqDto.getContent());
+        boolean isSuccess = reportService.insertReport(reportReqDto);
+
+        return ResponseEntity.ok(isSuccess);
     }
 }

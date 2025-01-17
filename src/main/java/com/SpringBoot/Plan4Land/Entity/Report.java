@@ -41,4 +41,11 @@ public class Report {
     protected void onCreate() {
         this.state = State.WAIT;
     }
+
+    @Builder
+    public Report(Member reporter, Member reported, String content) {
+        this.reporter = reporter;
+        this.reported = reported;
+        this.content = content;
+    }
 }
