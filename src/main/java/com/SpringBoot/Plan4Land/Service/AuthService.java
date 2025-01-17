@@ -66,7 +66,7 @@ public class AuthService {
                 // 회원 상태 검증
                 if(!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
-                    throw new RuntimeException("탈퇴한 회원입니다.");
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
                 }
             } else {
                 // 일반 로그인
@@ -76,7 +76,7 @@ public class AuthService {
                 // 회원 상태 검증
                 if(!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
-                    throw new RuntimeException("탈퇴한 회원입니다.");
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
                 }
 
                 // 비밀번호 검증
@@ -120,9 +120,6 @@ public class AuthService {
 
         // 토큰 삭제
         List<Token> tokens = tokenRepository.findAllByMember(member);
-        if (tokens.isEmpty()) {
-            throw new RuntimeException("사용자의 리프레시 토큰을 찾을 수 없습니다.");
-        }
         tokenRepository.deleteAll(tokens);
 
         log.info("로그아웃 성공: 리프레시 토큰 삭제.");
