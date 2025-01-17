@@ -12,6 +12,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +36,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
             case ENTER:
                 sessionPlannerIdMap.put(session, webSocketMsgDto.getPlannerId());
                 webSocketService.addSessionAndHandleEnter(plannerId, session, webSocketMsgDto);
+
+                WebSocketMsgDto lastPlannerMessage = webSocketService.getLastPlannerMessage(plannerId);
+                if (lastPlannerMessage != null) {
+                    try {
+                        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(lastPlannerMessage)));
+                    } catch (IOException e) {
+                        log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
+                    }
+                }
+                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case CLOSE:
                 webSocketService.removeSessionAndHandleExit(plannerId, session, webSocketMsgDto);
@@ -43,6 +54,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case PLANNER:
+                webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             default:

@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,9 +34,13 @@ public class WebSocketService {
     private final MemberRepository memberRepository;
     private final ChatMsgRepository chatMsgRepository;
     private Map<Long, WebSocketResDto> plannerRooms;
+    private Map<Long, WebSocketMsgDto> lastPlannerMessages;
 
     @PostConstruct
-    private void init() {plannerRooms = new LinkedHashMap<>();}
+    private void init() {
+        plannerRooms = new LinkedHashMap<>();
+        lastPlannerMessages = new ConcurrentHashMap<>();
+    }
 
     // 최근 10개의 채팅 대화내용 가져오기
     public List<WebSocketMsgDto> getWebSocketMsgById(Long plannerId) {
@@ -117,6 +122,19 @@ public class WebSocketService {
         }
     }
 
+    // 마지막 PLANNER 메시지 저장
+    public void savePlannerMessage(Long plannerId, WebSocketMsgDto webSocketMsgDto) {
+        if (webSocketMsgDto.getType() == WebSocketMsgDto.MessageType.PLANNER) {
+            log.error(webSocketMsgDto.toString());
+            lastPlannerMessages.put(plannerId, webSocketMsgDto);
+        }
+    }
+
+    // 마지막 PLANNER 메시지 가져오기
+    public WebSocketMsgDto getLastPlannerMessage(Long plannerId) {
+        return lastPlannerMessages.get(plannerId);
+    }
+
     public void sendMessageToAll(Long plannerId, WebSocketMsgDto webSocketMsgDto) {
         saveMessageToDB(webSocketMsgDto);
 
@@ -133,22 +151,6 @@ public class WebSocketService {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(webSocketMsgDto)));
         } catch (IOException e) {
             log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
-        }
-    }
-
-    public void broadcastPlanner(Long plannerId, Map<String, Object> updatedData) {
-        WebSocketMsgDto updateMessage = WebSocketMsgDto.builder()
-                .type(WebSocketMsgDto.MessageType.PLANNER) // 메시지 타입: PLANNER
-                .plannerId(plannerId)
-                .data(updatedData) // 업데이트된 데이터를 포함
-                .build();
-        WebSocketResDto room = plannerRooms.get(plannerId);
-        if (room != null) {
-            for (WebSocketSession session : room.getSessions()) {
-                sendMessage(session, updateMessage);
-            }
-        } else {
-            log.error("플래너 ID {}에 해당하는 방이 없습니다. 브로드캐스트 중단.", plannerId);
         }
     }
 }
