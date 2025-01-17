@@ -81,9 +81,9 @@ public class PlannerService {
         String[] themes = themeList == null ? new String[0] : themeList.split(",");
 
         List<Planner> planners = plannerRepository.getFilteredPlanners(areaCode, subAreaCode, searchQuery,
-                themes.length > 0 ? themes[0] : null,
-                themes.length > 1 ? themes[1] : null,
-                themes.length > 2 ? themes[2] : null);
+                themes.length > 0 ? themes[0].trim() : null,
+                themes.length > 1 ? themes[1].trim() : null,
+                themes.length > 2 ? themes[2].trim() : null);
 
         List<PlannerResDto> plannerResDtos = planners.stream()
                 .map(planner -> {
