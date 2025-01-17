@@ -126,6 +126,9 @@ public class MemberController {
     public ResponseEntity<Boolean> followMember(@RequestParam String followerId,
                                                 @RequestParam String followedId,
                                                 @RequestParam boolean isFollow) {
+        if(followedId.equals(followerId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isFollow);
+        }
         boolean isSuccess = memberService.followManagement(followerId, followedId, isFollow);
 
         log.info("followerId: {}, followedId: {} , {}", followerId, followedId, isFollow);
