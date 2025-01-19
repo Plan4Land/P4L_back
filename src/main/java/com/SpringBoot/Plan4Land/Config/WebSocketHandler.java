@@ -48,6 +48,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case CLOSE:
+                webSocketService.removePlannerMessage(plannerId);
                 webSocketService.removeSessionAndHandleExit(plannerId, session, webSocketMsgDto);
                 break;
             case CHAT:

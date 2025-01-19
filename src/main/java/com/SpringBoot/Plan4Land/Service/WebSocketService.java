@@ -125,9 +125,12 @@ public class WebSocketService {
     // 마지막 PLANNER 메시지 저장
     public void savePlannerMessage(Long plannerId, WebSocketMsgDto webSocketMsgDto) {
         if (webSocketMsgDto.getType() == WebSocketMsgDto.MessageType.PLANNER) {
-            log.error(webSocketMsgDto.toString());
             lastPlannerMessages.put(plannerId, webSocketMsgDto);
         }
+    }
+    // 마지막 PLANNER 메시지 삭제
+    public void removePlannerMessage(Long plannerId) {
+        lastPlannerMessages.remove(plannerId);
     }
 
     // 마지막 PLANNER 메시지 가져오기

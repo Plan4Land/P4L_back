@@ -4,6 +4,7 @@ import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.BookmarkPlanner;
 import com.SpringBoot.Plan4Land.Entity.Member;
+import com.SpringBoot.Plan4Land.Entity.Plan;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import com.SpringBoot.Plan4Land.Service.BookmarkPlannerService;
@@ -33,17 +34,39 @@ public class PlannerController {
     // 플래너 생성
     @PostMapping("/insert")
     public ResponseEntity<Long> makePlanner(@RequestBody PlannerReqDto plannerReqDto) {
-        log.error(plannerReqDto.toString());
         Long isSuccess = plannerService.makePlanner(plannerReqDto);
-        log.info(isSuccess.toString());
         return ResponseEntity.ok(isSuccess);
     }
 
-    // 플래너 조회
+    // 플래너 수정
+    @PostMapping("/update")
+    public ResponseEntity<PlannerResDto > editPlannerInfo(@RequestParam Long plannerId, @RequestBody PlannerReqDto plannerReqDto) {
+        log.info(plannerReqDto.toString());
+        log.info("plannerId : {}", plannerId);
+        PlannerResDto isSuccess = plannerService.editPlannerInfo(plannerReqDto, plannerId);
+        return ResponseEntity.ok(isSuccess);
+    }
+
+    // 플래너  상세조회
     @GetMapping("/{plannerId}")
     public ResponseEntity<PlannerResDto> getPlanner(@PathVariable Long plannerId) {
         PlannerResDto plannerResDto = plannerService.findByPlannerId(plannerId);
         return ResponseEntity.ok(plannerResDto);
+    }
+
+    // Plan 조회
+    @GetMapping("/getPlan")
+    public ResponseEntity<List<Plan>> getPlans(@RequestParam Long plannerId) {
+        List<Plan> plans = plannerService.getPlans(plannerId);
+        return ResponseEntity.ok(plans);
+    }
+
+    // Plan 삭제 및 삽입
+    @PostMapping("/updatePlan")
+    public ResponseEntity<Boolean> deleteAndInsertPlans(@RequestParam Long plannerId, @RequestBody List<Plan> newPlans) {
+        log.error(newPlans.toString());
+        plannerService.deleteAndInsertPlans(plannerId, newPlans);
+        return ResponseEntity.ok(true);
     }
 
     // 플래너 목록 조회

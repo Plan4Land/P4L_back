@@ -2,6 +2,7 @@ package com.SpringBoot.Plan4Land.DTO;
 
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 public class PlannerReqDto {
     private String title;
     private String theme;
-    private String id;
+    private String id; // 사용자 id
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String area;

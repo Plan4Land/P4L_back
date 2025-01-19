@@ -5,12 +5,10 @@ import com.SpringBoot.Plan4Land.DTO.PlannerMembersResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
+import com.SpringBoot.Plan4Land.Entity.Plan;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
-import com.SpringBoot.Plan4Land.Repository.BookMarkPlannerRepository;
-import com.SpringBoot.Plan4Land.Repository.MemberRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.SpringBoot.Plan4Land.Repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -32,6 +30,7 @@ public class PlannerService {
     private final MemberRepository memberRepository;
     private final PlannerMembersRepository plannerMembersRepository;
     private final BookMarkPlannerRepository bookMarkPlannerRepository;
+    private final PlanRepository planRepository;
 
     @Transactional
     // 플래너 생성
@@ -53,7 +52,37 @@ public class PlannerService {
         }
     }
 
-    // 플래너 상세조회?
+    @Transactional
+    // 플래너 수정
+    public PlannerResDto editPlannerInfo(PlannerReqDto plannerReqDto, Long plannerId) {
+        try {
+            Member member = memberRepository.findById(plannerReqDto.getId())
+                    .orElseThrow(() -> new RuntimeException("Planner 수정 중 회원 조회 실패"));
+            // 플래너 조회
+            Planner planner = plannerRepository.findById(plannerId)
+                    .orElseThrow(() -> new RuntimeException("Planner 수정 중 플래너 조회 실패"));
+
+            planner.setTitle(plannerReqDto.getTitle());
+            planner.setTheme(plannerReqDto.getTheme());
+            planner.setStartDate(plannerReqDto.getStartDate());
+            planner.setEndDate(plannerReqDto.getEndDate());
+            planner.setArea(plannerReqDto.getArea());
+            planner.setSubArea(plannerReqDto.getSubArea());
+            planner.setThumbnail(plannerReqDto.getThumbnail());
+
+            // 변경 내용 저장
+            plannerRepository.save(planner);
+            return findByPlannerId(plannerId);
+        } catch (RuntimeException e) {
+            log.error("플래너 수정 중 오류 발생: {}", e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.error("플래너 수정 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // 플래너 상세조회
     public PlannerResDto findByPlannerId(Long id) {
         Planner planner = plannerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 Planner가 존재하지 않습니다."));
@@ -72,6 +101,25 @@ public class PlannerService {
                 .collect(Collectors.toList());
         Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
+    }
+
+    // Plan 조회
+    public List<Plan> getPlans(Long plannerId) {
+        return planRepository.findByPlannerId(plannerId);
+    }
+
+    // Plan 삭제 및 삽입
+    @Transactional
+    public void deleteAndInsertPlans(Long plannerId, List<Plan> newPlans) {
+        planRepository.deleteByPlannerId(plannerId);
+
+        Planner planner = plannerRepository.findById(plannerId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Planner ID"));
+
+        for (Plan newPlan : newPlans) {
+            newPlan.setPlanner(planner);
+            planRepository.save(newPlan);
+        }
     }
 
     // 플래너 검색 및 조회하기
