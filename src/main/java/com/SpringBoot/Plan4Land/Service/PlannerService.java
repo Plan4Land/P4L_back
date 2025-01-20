@@ -112,6 +112,7 @@ public class PlannerService {
     @Transactional
     public void deleteAndInsertPlans(Long plannerId, List<Plan> newPlans) {
         planRepository.deleteByPlannerId(plannerId);
+        log.info("plan 삭제 완료");
 
         Planner planner = plannerRepository.findById(plannerId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Planner ID"));
