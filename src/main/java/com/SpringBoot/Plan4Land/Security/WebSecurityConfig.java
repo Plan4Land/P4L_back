@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @RequiredArgsConstructor
@@ -27,6 +28,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // 인증 실패 시 처리할 클래스
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler; // 인가 실패 시 처리할 클래스
     private final CustomAuthenticationProvider customAuthenticationProvider; // 커스텀 인증 처리 클래스
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000")  // 프론트엔드의 URL
+                .allowedMethods("GET", "POST", "PUT", "DELETE")  // 허용할 HTTP 메서드
+                .allowedHeaders("*");  // 허용할 헤더
+    }
 
     @Bean
     @Lazy
@@ -57,7 +66,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             .accessDeniedHandler(jwtAccessDeniedHandler)
             .and()
             .authorizeRequests()
-                .antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/api/travelspots", "/member/idExists/**", "/member/emailExists/**", "/member/nicknameExists/**", "/member/find-id", "/member/find-password").permitAll()
+                .antMatchers("/", "/static/**", "/auth/**", "member/**", "/ws/**", "/api/travelspots", "/member/idExists/**", "/member/emailExists/**", "/member/nicknameExists/**", "/member/find-id", "/member/find-password").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/favicon.ico", "/manifest.json").permitAll()
