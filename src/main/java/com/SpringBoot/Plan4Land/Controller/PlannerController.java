@@ -41,8 +41,6 @@ public class PlannerController {
     // 플래너 수정
     @PostMapping("/update")
     public ResponseEntity<PlannerResDto > editPlannerInfo(@RequestParam Long plannerId, @RequestBody PlannerReqDto plannerReqDto) {
-        log.info(plannerReqDto.toString());
-        log.info("plannerId : {}", plannerId);
         PlannerResDto isSuccess = plannerService.editPlannerInfo(plannerReqDto, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
@@ -64,7 +62,7 @@ public class PlannerController {
     // Plan 삭제 및 삽입
     @PostMapping("/updatePlan")
     public ResponseEntity<Boolean> deleteAndInsertPlans(@RequestParam Long plannerId, @RequestBody List<Plan> newPlans) {
-        log.error(newPlans.toString());
+        log.warn(newPlans.toString());
         plannerService.deleteAndInsertPlans(plannerId, newPlans);
         return ResponseEntity.ok(true);
     }

@@ -45,7 +45,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                         log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
                     }
                 }
-                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
+//                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case CLOSE:
                 webSocketService.removePlannerMessage(plannerId);
@@ -55,7 +55,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case PLANNER:
-                webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
+                if ("편집완료".equals(webSocketMsgDto.getMessage())) {
+                    webSocketService.removePlannerMessage(plannerId);
+                } else {
+                    webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
+                }
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             default:

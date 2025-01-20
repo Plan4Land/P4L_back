@@ -20,4 +20,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     @Query("SELECT f.follower.uid FROM Follow f WHERE f.followed.uid = :follower AND f.follower.uid != :follower")
     List<Long> getFollowerIdBy(Long follower);
+
+    boolean existsByFollowedAndFollower(Member followed, Member follower);
 }
