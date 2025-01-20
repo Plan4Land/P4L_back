@@ -19,7 +19,7 @@ public class MemberReqDto {
     private String nickname;
     private String name;
     private String profileImg;
-    private Long kakaoId;
+    private Long socialId;
     private String sso;
 
     public Member toEntity(PasswordEncoder passwordEncoder) {
@@ -30,7 +30,7 @@ public class MemberReqDto {
                 .nickname(nickname)
                 .name(name)
                 .profileImg(profileImg)
-                .kakaoId(kakaoId)
+                .socialId(socialId)
                 .sso(sso)
                 .build();
     }

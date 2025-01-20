@@ -37,10 +37,10 @@ public class MemberController {
         return ResponseEntity.ok(memberResDto);
     }
 
-    // 회원 상세 조회 - 카카오ID로
-    @GetMapping("/kakao/{kakaoId}")
-    public ResponseEntity<MemberResDto> memberDetailByKakaoId(@PathVariable Long kakaoId) {
-        MemberResDto memberResDto = memberService.getMemberDetailByKakaoId(kakaoId);
+    // 회원 상세 조회 - 소셜ID로
+    @GetMapping("/social/{sso}/{socialId}")
+    public ResponseEntity<MemberResDto> memberDetailByKakaoId(@PathVariable String sso, @PathVariable Long socialId) {
+        MemberResDto memberResDto = memberService.getMemberDetailBySocialId(sso, socialId);
         return ResponseEntity.ok(memberResDto);
     }
 

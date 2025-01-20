@@ -43,7 +43,7 @@ public class Member {
     private String sso;
 
     // 카카오 아이디
-    private Long kakaoId;
+    private Long socialId;
 
     // 일반, 멤버십, 관리자
     @Enumerated(EnumType.STRING)
@@ -67,7 +67,7 @@ public class Member {
     }
 
     @Builder
-    public Member(String id, String email, String password, String nickname, String name, String profileImg, Role role, Long kakaoId, String sso) {
+    public Member(String id, String email, String password, String nickname, String name, String profileImg, Role role, Long socialId, String sso) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -75,7 +75,7 @@ public class Member {
         this.name = name;
         this.profileImg = profileImg;
         this.signUpDate = LocalDateTime.now();
-        this.kakaoId = kakaoId;
+        this.socialId = socialId;
         this.sso = sso;
     }
 }

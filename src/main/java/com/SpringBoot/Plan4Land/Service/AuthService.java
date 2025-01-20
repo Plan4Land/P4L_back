@@ -59,9 +59,9 @@ public class AuthService {
     public TokenDto login(MemberReqDto memberReqDto) {
         try {
             Member member;
-            // 카카오 로그인
-            if (memberReqDto.getKakaoId() != null) {
-                member = memberRepository.findByKakaoId(memberReqDto.getKakaoId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
+            // 소셜 로그인
+            if (memberReqDto.getSso() != null) {
+                member = memberRepository.findBySsoAndSocialId(memberReqDto.getSso(), memberReqDto.getSocialId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
 
                 // 회원 상태 검증
                 if(!member.isActivate()) {
@@ -88,7 +88,6 @@ public class AuthService {
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
 
-//            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
 

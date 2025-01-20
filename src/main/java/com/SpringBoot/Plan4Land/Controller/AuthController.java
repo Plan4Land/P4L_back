@@ -56,10 +56,4 @@ public class AuthController {
     public String isActivateByIdAndEmail(@RequestBody MemberReqDto memberReqDto) {
         return authService.isActivateByIdAndEmail(memberReqDto);
     }
-
-    // 카카오 로그인 처리
-    @PostMapping("/kakao")
-    public ResponseEntity<TokenDto> kakaoLogin(@RequestBody MemberReqDto memberReqDto) {
-        return ResponseEntity.ok(authService.login(memberReqDto));
-    }
 }

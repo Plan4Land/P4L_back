@@ -35,7 +35,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // 카카오 로그인 처리
         if (password == null || password.isEmpty()) {
             Member member = memberRepository.findById(username)
-                    .orElseThrow(() -> new RuntimeException("카카오 사용자를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new RuntimeException("소셜 사용자를 찾을 수 없습니다."));
 
             // 카카오 사용자 인증 성공
             return new UsernamePasswordAuthenticationToken(username, password, List.of(new SimpleGrantedAuthority("USER")));
