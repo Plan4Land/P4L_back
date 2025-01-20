@@ -206,6 +206,11 @@ public class MemberService {
 
                 Follow follow = new Follow(followerMember, followedMember);
 
+                if(followRepository.existsByFollowedAndFollower(followedMember, followerMember)){
+                    log.warn("이미 팔로우가 존재합니다.");
+                    return false;
+                }
+
                 followRepository.save(follow);
             } else {
                 Follow follow = followRepository.findByFollowerIdAndFollowedId(follower, followed);
@@ -228,8 +233,10 @@ public class MemberService {
             log.info("획득한 유저의 uid : {}", member.getUid());
             List<Long> lst;
             if (following) {
+                // 해당 유저가 팔로우 한 사람
                 lst = followRepository.getFollowedIdBy(member.getUid());
             } else {
+                // 해당 유저의 팔로워
                 lst = followRepository.getFollowerIdBy(member.getUid());
             }
 
