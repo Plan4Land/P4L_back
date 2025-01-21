@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.DTO.PlannerMembersResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
@@ -101,6 +102,23 @@ public class PlannerService {
                 .collect(Collectors.toList());
         Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
         return PlannerResDto.fromEntity(planner, participantDtos, bookmarkCount);
+    }
+
+    // 플래너 삭제
+    public boolean removePlannerInfo(Long plannerId, String userId) {
+        try{
+            Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원을 찾을 수 없습니다."));
+            Planner planner = plannerRepository.findById(plannerId).orElseThrow(()-> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
+
+            if(planner.getOwner().getId().equals(member.getId()) || member.getRole().equals(Role.ROLE_ADMIN)){
+                return plannerRepository.removePlannerById(plannerId);
+            }else {
+                return false;
+            }
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     // Plan 조회

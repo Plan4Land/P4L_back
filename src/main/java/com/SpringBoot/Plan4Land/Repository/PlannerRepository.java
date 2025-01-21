@@ -92,5 +92,5 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
     Page<Planner> findPlannersByOwnerOrMember(Member owner, Pageable pageable);
 
 
-
+    boolean removePlannerById(Long id);
 }
