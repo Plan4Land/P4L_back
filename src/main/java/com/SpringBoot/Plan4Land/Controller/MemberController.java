@@ -39,7 +39,7 @@ public class MemberController {
 
     // 회원 상세 조회 - 소셜ID로
     @GetMapping("/social/{sso}/{socialId}")
-    public ResponseEntity<MemberResDto> memberDetailBySocialId(@PathVariable String sso, @PathVariable Long socialId) {
+    public ResponseEntity<MemberResDto> memberDetailBySocialId(@PathVariable String sso, @PathVariable String socialId) {
         MemberResDto memberResDto = memberService.getMemberDetailBySocialId(sso, socialId);
         return ResponseEntity.ok(memberResDto);
     }

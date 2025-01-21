@@ -23,7 +23,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByIdAndEmail(String id, String email);
 
-    Optional<Member> findBySsoAndSocialId(String sso, Long socialId);
+    Optional<Member> findBySsoAndSocialId(String sso, String socialId);
 
     @Query("SELECT m FROM Member m WHERE m.id LIKE %:id% OR m.nickname LIKE %:nickname%")
     List<Member> findByIdOrNickname(@Param("id") String id, @Param("nickname") String nickname);

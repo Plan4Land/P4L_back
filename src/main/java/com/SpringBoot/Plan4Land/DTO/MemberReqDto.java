@@ -19,7 +19,7 @@ public class MemberReqDto {
     private String nickname;
     private String name;
     private String profileImg;
-    private Long socialId;
+    private String socialId;
     private String sso;
 
     public Member toEntity(PasswordEncoder passwordEncoder) {
