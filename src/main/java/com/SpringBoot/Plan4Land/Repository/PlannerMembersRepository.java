@@ -18,5 +18,8 @@ public interface PlannerMembersRepository extends JpaRepository<PlannerMembers, 
     Optional<PlannerMembers> findByMemberIdAndPlannerId(String memberId, Long plannerId);
     List<PlannerMembers> findByMemberIdAndState(String memberId, State state);
 
+    void deleteByPlannerId(Long plannerId);
+    void deleteByMemberIdAndPlannerId(String memberId, Long plannerId);
+
     Page<PlannerMembers> findByMemberId(String memberId, Pageable pageable);
 }

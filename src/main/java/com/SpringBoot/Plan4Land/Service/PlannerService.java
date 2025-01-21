@@ -32,6 +32,7 @@ public class PlannerService {
     private final PlannerMembersRepository plannerMembersRepository;
     private final BookMarkPlannerRepository bookMarkPlannerRepository;
     private final PlanRepository planRepository;
+    private final ChatMsgRepository chatMsgRepository;
 
     @Transactional
     // 플래너 생성
@@ -83,6 +84,22 @@ public class PlannerService {
         }
     }
 
+    // 플래너 공개여부 수정
+    @Transactional
+    public PlannerResDto updateIsPublic(Long plannerId, boolean isPublic) {
+        try {
+            Planner planner = plannerRepository.findById(plannerId)
+                    .orElseThrow(() -> new RuntimeException("해당하는 플래너가 존재하지 않습니다."));
+
+            planner.setPublic(isPublic);
+            plannerRepository.save(planner);
+            return findByPlannerId(plannerId);
+        } catch (Exception e) {
+            log.error("플래너 공개여부 수정 중 에러 : {}", e);
+            throw e;
+        }
+    }
+
     // 플래너 상세조회
     public PlannerResDto findByPlannerId(Long id) {
         Planner planner = plannerRepository.findById(id)
@@ -112,13 +129,35 @@ public class PlannerService {
             Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원을 찾을 수 없습니다."));
             Planner planner = plannerRepository.findById(plannerId).orElseThrow(()-> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
 
-            if(planner.getOwner().getId().equals(member.getId()) || member.getRole().equals(Role.ROLE_ADMIN)){
-                return plannerRepository.removePlannerById(plannerId);
+            if(planner.getOwner().getId().equals(member.getId()) || member.getRole() == Role.ROLE_ADMIN){
+                plannerMembersRepository.deleteByPlannerId(plannerId);
+                bookMarkPlannerRepository.deleteByPlannerId(plannerId);
+                chatMsgRepository.deleteByPlannerId(plannerId);
+                planRepository.deleteByPlannerId(plannerId);
+                plannerRepository.deleteById(plannerId);
+                return true;
             }else {
                 return false;
             }
         }catch (Exception e){
             log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    // 플래너 탈퇴
+    @Transactional
+    public boolean leavePlanner(Long plannerId, String userId) {
+        try {
+            Member member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+            Planner planner = plannerRepository.findById(plannerId)
+                    .orElseThrow(() -> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
+
+            plannerMembersRepository.deleteByMemberIdAndPlannerId(userId, plannerId);
+            return true;
+        } catch (Exception e) {
+            log.error("플래너 멤버 탈퇴 중 에러 : {}", e.getMessage());
             return false;
         }
     }

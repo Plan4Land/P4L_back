@@ -93,5 +93,5 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
 
 
     // integer
-    boolean removePlannerById(Long id);
+//    boolean removePlannerById(Long id);
 }

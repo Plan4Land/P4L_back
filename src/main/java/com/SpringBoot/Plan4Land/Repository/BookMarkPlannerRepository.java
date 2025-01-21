@@ -16,6 +16,7 @@ import java.util.List;
 public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner, Long> {
     boolean existsByMemberAndPlanner(Member member, Planner planner);
     BookmarkPlanner findByMemberAndPlanner(Member member, Planner planner);
+    void deleteByPlannerId(Long plannerId);
 
     @Query("SELECT COUNT(bp) FROM BookmarkPlanner bp WHERE bp.planner.id = :plannerId")
     Long countByPlannerId(@Param("plannerId") Long plannerId);

@@ -45,6 +45,13 @@ public class PlannerController {
         return ResponseEntity.ok(isSuccess);
     }
 
+    // 플래너 공개여부 수정
+    @PostMapping("/update/isPublic")
+    public ResponseEntity<PlannerResDto> updateIsPublic(@RequestParam Long plannerId, @RequestParam boolean isPublic) {
+        PlannerResDto updatedPlanner = plannerService.updateIsPublic(plannerId, isPublic);
+        return ResponseEntity.ok(updatedPlanner);
+    }
+
     // 플래너  상세조회
     @GetMapping("/fetchData/{plannerId}")
     public ResponseEntity<PlannerResDto> getPlanner(@PathVariable Long plannerId) {
@@ -54,8 +61,15 @@ public class PlannerController {
 
     // 플래너 삭제
     @DeleteMapping("/delete-planner")
-    public ResponseEntity<Boolean> removePlanner(@RequestBody Long plannerId, @RequestBody String userId) {
+    public ResponseEntity<Boolean> removePlanner(@RequestParam Long plannerId, @RequestParam String userId) {
         boolean isSuccess = plannerService.removePlannerInfo(plannerId, userId);
+        return ResponseEntity.ok(isSuccess);
+    }
+
+    // 플래너 멤버 탈퇴
+    @DeleteMapping("/delete-planner-member")
+    public ResponseEntity<Boolean> leavePlanner(@RequestParam Long plannerId, @RequestParam String userId) {
+        boolean isSuccess = plannerService.leavePlanner(plannerId, userId);
         return ResponseEntity.ok(isSuccess);
     }
 
