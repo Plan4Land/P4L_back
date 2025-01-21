@@ -36,5 +36,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByIdAndActivate(String id, boolean activate);
 
-    Optional<Member> findByUid(Long uid);
+    @Query(value = """
+            SELECT m FROM Member m WHERE m.id LIKE %:id% OR m.nickname LIKE %:nickname% OR m.name LIKE %:name% OR m.email LIKE %:email%
+            """)
+    List<Member> adminFindMember(String id, String nickname, String name, String email);
+
+    @Query(value = """
+        SELECT m FROM Member m
+        WHERE
+        CASE WHEN :select = 'id' THEN m.id
+             WHEN :select = 'nickname' THEN m.nickname
+             WHEN :select = 'name' THEN m.name
+             WHEN :select = 'email' THEN m.email
+        END LIKE %:keyword%"""
+    )
+    List<Member> adminFindFilterMember(@Param("select") String select, @Param("keyword") String keyword);
+
 }

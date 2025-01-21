@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
+import com.SpringBoot.Plan4Land.Repository.BanRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.ReportRepository;
 import lombok.AllArgsConstructor;
@@ -16,14 +17,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @AllArgsConstructor
+@Slf4j
 public class AdminService {
     private MemberRepository memberRepository;
     private ReportRepository reportRepository;
+    private BanRepository banRepository;
+    private MemberService memberService;
     private TokenProvider tokenProvider;
     private AuthenticationManager authenticationManager;
 
@@ -56,18 +59,40 @@ public class AdminService {
         }
     }
 
-    public List<MemberResDto> adminGetAllMembers() {
+    public List<MemberResDto> adminSearchMember(String keyword, String select) {
         try {
-            List<Member> members = memberRepository.findAll();
-            // Dto 새로 생성 or ResDto 수정... 새로 하나 만드는게 나을듯
-            //
+            log.warn("{}, {}", keyword, select);
+            List<Member> lst;
+            // id, nickname, name, email
+            if(select == null || select.isEmpty()){
+                lst = memberRepository.adminFindMember(keyword, keyword, keyword, keyword);
+            }else {
+                lst = memberRepository.adminFindFilterMember(select, keyword);
+            }
 
-            return null;
+            return lst.stream()
+                    .map(this::convertEntityToDto)
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;
         }
 
+    }
+
+    // Member Entity => MemberResDto 변환
+    public MemberResDto convertEntityToDto(Member member) {
+        MemberResDto memberResDto = new MemberResDto();
+        memberResDto.setUid(member.getUid());
+        memberResDto.setId(member.getId());
+        memberResDto.setEmail(member.getEmail());
+        memberResDto.setName(member.getName());
+        memberResDto.setNickname(member.getNickname());
+        memberResDto.setImgPath(member.getProfileImg());
+        memberResDto.setRegDate(member.getSignUpDate());
+        memberResDto.setRole(member.getRole());
+        return memberResDto;
     }
 
 }
