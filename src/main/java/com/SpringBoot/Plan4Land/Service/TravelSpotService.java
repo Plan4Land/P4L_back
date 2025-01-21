@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto;
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Entity.TravelSpot;
 import com.SpringBoot.Plan4Land.Repository.BookMarkSpotRepository;
@@ -64,7 +65,15 @@ public class TravelSpotService {
             return dto;
         }).collect(Collectors.toList());
     }
-
+    // 특정 좌표와 반경 내의 장소 5개 조회
+    public List<TravelSpotResDto> getNearbySpots(double mapX, double mapY, double radius) {
+        List<TravelSpot> nearbySpots = travelSpotRepository.findNearbySpots(mapX, mapY, radius);
+        return nearbySpots.stream()
+                .limit(5) // 최대 5개로 제한
+                .map(this::convertToDTO
+                )
+                .collect(Collectors.toList());
+    }
 
     private TravelSpotResDto convertToDTO(TravelSpot travelSpot) {
         TravelSpotResDto dto = new TravelSpotResDto();

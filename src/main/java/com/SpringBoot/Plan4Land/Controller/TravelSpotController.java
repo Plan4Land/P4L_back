@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Controller;
 
+import com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto;
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Service.TravelSpotService;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,14 @@ public class TravelSpotController {
             top5Spots = top5Spots.subList(0, 5);
         }
         return ResponseEntity.ok(top5Spots);
+    }
+    @GetMapping("/nearby")
+    public ResponseEntity<List<TravelSpotResDto>> getNearbySpots(
+            @RequestParam double mapX,
+            @RequestParam double mapY,
+            @RequestParam(defaultValue = "5") double radius // 기본 반경 5km
+    ) {
+        List<TravelSpotResDto> nearbySpots = travelSpotService.getNearbySpots(mapX, mapY, radius);
+        return ResponseEntity.ok(nearbySpots);
     }
 }
