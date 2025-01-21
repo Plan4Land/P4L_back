@@ -50,7 +50,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 requestUri.startsWith("/member/emailExists/**") ||
                 requestUri.startsWith("/member/nicknameExists/**") ||
                 requestUri.startsWith("/member/find-id") ||
-                requestUri.startsWith("/member/find-password");
+                requestUri.startsWith("/member/find-password") ||
+                requestUri.startsWith("/planner/fetchData/**") ||
+                requestUri.startsWith("/bookmarkPlanner/plannersTop3");
     }
 
     // Authorization 헤더에서 토큰 추출

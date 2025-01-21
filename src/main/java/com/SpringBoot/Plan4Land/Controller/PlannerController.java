@@ -46,7 +46,7 @@ public class PlannerController {
     }
 
     // 플래너  상세조회
-    @GetMapping("/{plannerId}")
+    @GetMapping("/fetchData/{plannerId}")
     public ResponseEntity<PlannerResDto> getPlanner(@PathVariable Long plannerId) {
         PlannerResDto plannerResDto = plannerService.findByPlannerId(plannerId);
         return ResponseEntity.ok(plannerResDto);
@@ -60,7 +60,7 @@ public class PlannerController {
     }
 
     // Plan 조회
-    @GetMapping("/getPlan")
+    @GetMapping("/fetchData/getPlan")
     public ResponseEntity<List<Plan>> getPlans(@RequestParam Long plannerId) {
         List<Plan> plans = plannerService.getPlans(plannerId);
         return ResponseEntity.ok(plans);
