@@ -6,8 +6,10 @@ import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
@@ -36,6 +38,53 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         return ResponseEntity.ok(authService.login(memberReqDto));
+    }
+
+    // 네이버 로그인
+    private static final String NAVER_OAUTH_URL = "https://nid.naver.com/oauth2.0/token";
+    @PostMapping("/naver/token")
+    public ResponseEntity<String> getNaverToken(@RequestBody Map<String, String> requestBody) {
+        String code = requestBody.get("code");
+        String state = requestBody.get("state");
+
+        String clientId = "fkmRtBoM0k0qYhHJIVRE";
+        String clientSecret = "Ip5wT2637u";
+
+        // 요청 파라미터 설정
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(NAVER_OAUTH_URL)
+                .queryParam("grant_type", "authorization_code")
+                .queryParam("client_id", clientId)
+                .queryParam("client_secret", clientSecret)
+                .queryParam("code", code)
+                .queryParam("state", state);
+
+        // RestTemplate을 사용하여 Naver API 요청
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(uriBuilder.toUriString(), HttpMethod.POST, entity, String.class);
+        return ResponseEntity.ok(response.getBody());
+    }
+    @PostMapping("/naver/userinfo")
+    public ResponseEntity<String> getNaverUserInfo(@RequestBody Map<String, String> requestBody) {
+        String accessToken = requestBody.get("access_token");
+
+        // 네이버 API 요청
+        String naverApiUrl = "https://openapi.naver.com/v1/nid/me";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    naverApiUrl, HttpMethod.GET, entity, String.class
+            );
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("네이버 사용자 정보 조회 실패");
+        }
     }
 
     // 로그아웃

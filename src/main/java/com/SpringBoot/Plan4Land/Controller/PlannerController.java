@@ -52,12 +52,21 @@ public class PlannerController {
         return ResponseEntity.ok(plannerResDto);
     }
 
+    // 플래너 삭제
+    @DeleteMapping("/delete-planner")
+    public ResponseEntity<Boolean> removePlanner(@RequestBody Long plannerId, @RequestBody String userId) {
+        boolean isSuccess = plannerService.removePlannerInfo(plannerId, userId);
+        return ResponseEntity.ok(isSuccess);
+    }
+
     // Plan 조회
     @GetMapping("/getPlan")
     public ResponseEntity<List<Plan>> getPlans(@RequestParam Long plannerId) {
         List<Plan> plans = plannerService.getPlans(plannerId);
         return ResponseEntity.ok(plans);
     }
+
+
 
     // Plan 삭제 및 삽입
     @PostMapping("/updatePlan")
