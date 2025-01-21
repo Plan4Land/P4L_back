@@ -49,6 +49,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 break;
             case CLOSE:
                 webSocketService.removePlannerMessage(plannerId);
+                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 webSocketService.removeSessionAndHandleExit(plannerId, session, webSocketMsgDto);
                 break;
             case CHAT:
@@ -60,6 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 } else {
                     webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
                 }
+//                webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             default:
