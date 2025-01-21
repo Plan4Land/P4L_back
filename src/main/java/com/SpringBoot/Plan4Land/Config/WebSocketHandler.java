@@ -48,7 +48,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 //                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case CLOSE:
-                webSocketService.removePlannerMessage(plannerId);
+//                webSocketService.removePlannerMessage(plannerId);
+                WebSocketMsgDto lastPlannerSender = webSocketService.getLastPlannerMessage(plannerId);
+
+                // PLANNER 타입의 sender와 CLOSE 타입의 sender 비교
+                if (lastPlannerSender != null
+                        && lastPlannerSender.getSender().equals(webSocketMsgDto.getSender())) {
+                    webSocketService.removePlannerMessage(plannerId);
+                }
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 webSocketService.removeSessionAndHandleExit(plannerId, session, webSocketMsgDto);
                 break;
