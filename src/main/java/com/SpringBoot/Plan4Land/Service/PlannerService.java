@@ -105,8 +105,10 @@ public class PlannerService {
     }
 
     // 플래너 삭제
+    @Transactional
     public boolean removePlannerInfo(Long plannerId, String userId) {
         try{
+            log.warn("{} : {}", userId, plannerId);
             Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원을 찾을 수 없습니다."));
             Planner planner = plannerRepository.findById(plannerId).orElseThrow(()-> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
 

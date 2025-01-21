@@ -18,8 +18,10 @@ public class PlannerServiceTest {
     private PlannerService plannerService;
 
     @Test
-    @DisplayName("플래너 넣기")
+    @DisplayName("플래너 삭제")
     public void test() {
+        boolean p = plannerService.removePlannerInfo(19L, "testid1");
 
+        log.info("{}",p);
     }
 }
