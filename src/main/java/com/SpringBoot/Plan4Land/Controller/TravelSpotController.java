@@ -64,9 +64,12 @@ public class TravelSpotController {
     public ResponseEntity<List<TravelSpotResDto>> getNearbySpots(
             @RequestParam double mapX,
             @RequestParam double mapY,
-            @RequestParam(defaultValue = "5") double radius // 기본 반경 5km
+            @RequestParam(defaultValue = "5") double radius, // 기본 반경 5km
+            @RequestParam Long spotId // 제외할 관광지 ID
     ) {
-        List<TravelSpotResDto> nearbySpots = travelSpotService.getNearbySpots(mapX, mapY, radius);
+        List<TravelSpotResDto> nearbySpots = travelSpotService.getNearbySpotsExcludingId(mapX, mapY, radius, spotId);
         return ResponseEntity.ok(nearbySpots);
     }
+
+
 }

@@ -55,6 +55,8 @@ public interface TravelSpotRepository extends JpaRepository<TravelSpot, Long> {
     Optional<TravelSpot> findById(Long spotId);
 
     @Query("SELECT t FROM TravelSpot t WHERE " +
-            "(6371 * acos(cos(radians(:mapY)) * cos(radians(t.mapY)) * cos(radians(t.mapX) - radians(:mapX)) + sin(radians(:mapY)) * sin(radians(t.mapY)))) < :radius")
-    List<TravelSpot> findNearbySpots(@Param("mapX") double mapX, @Param("mapY") double mapY, @Param("radius") double radius);
+            "(6371 * acos(cos(radians(:mapY)) * cos(radians(t.mapY)) * cos(radians(t.mapX) - radians(:mapX)) + sin(radians(:mapY)) * sin(radians(t.mapY)))) < :radius " +
+            "AND t.id <> :spotId") // spotId로 변경
+    List<TravelSpot> findNearbySpotsExcludingId(@Param("mapX") double mapX, @Param("mapY") double mapY, @Param("radius") double radius, @Param("spotId") Long spotId);
+
 }

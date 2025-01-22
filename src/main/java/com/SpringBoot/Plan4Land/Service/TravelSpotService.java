@@ -66,14 +66,15 @@ public class TravelSpotService {
         }).collect(Collectors.toList());
     }
     // 특정 좌표와 반경 내의 장소 5개 조회
-    public List<TravelSpotResDto> getNearbySpots(double mapX, double mapY, double radius) {
-        List<TravelSpot> nearbySpots = travelSpotRepository.findNearbySpots(mapX, mapY, radius);
+    public List<TravelSpotResDto> getNearbySpotsExcludingId(double mapX, double mapY, double radius, Long spotId) {
+        List<TravelSpot> nearbySpots = travelSpotRepository.findNearbySpotsExcludingId(mapX, mapY, radius, spotId);
         return nearbySpots.stream()
                 .limit(5) // 최대 5개로 제한
-                .map(this::convertToDTO
-                )
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
 
     private TravelSpotResDto convertToDTO(TravelSpot travelSpot) {
         TravelSpotResDto dto = new TravelSpotResDto();
