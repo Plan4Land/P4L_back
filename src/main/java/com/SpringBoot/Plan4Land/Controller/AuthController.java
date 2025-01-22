@@ -4,6 +4,7 @@ import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Service.AuthService;
+import com.SpringBoot.Plan4Land.Service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final TokenService tokenService;
 
     // 유저 존재 확인
     @GetMapping("/exists/{userId}")
@@ -104,5 +106,23 @@ public class AuthController {
     @PostMapping("/isActivate/byIdAndEmail")
     public String isActivateByIdAndEmail(@RequestBody MemberReqDto memberReqDto) {
         return authService.isActivateByIdAndEmail(memberReqDto);
+    }
+
+    // 액세스 토큰 재발급
+    @PostMapping("/token/refresh")
+    public ResponseEntity<TokenDto> refreshToken(@RequestBody String refreshToken) {
+        try {
+            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok(newTokenDto);
+        } catch (Exception e) {
+            TokenDto errorResponse = TokenDto.builder()
+                    .grantType("Error")
+                    .accessToken("")
+                    .refreshToken("")
+                    .accessTokenExpiresIn(0L)
+                    .refreshTokenExpiresIn(0L)
+                    .build();
+            return ResponseEntity.status(400).body(errorResponse);
+        }
     }
 }

@@ -22,8 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,10 +96,14 @@ public class AuthService {
             // 토큰 생성
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
+            // 리프레시 토큰 만료 시간 추출
+            long refreshTokenExpirationTime = tokenDto.getRefreshTokenExpiresIn();
+
             // 리프레시 토큰 저장
             String refreshToken = tokenDto.getRefreshToken();
             LocalDateTime issuedAt = LocalDateTime.now();
-            LocalDateTime expiration = issuedAt.plusDays(7); // 7일후 만료
+            LocalDateTime expiration = LocalDateTime.ofInstant(Instant.ofEpochMilli(refreshTokenExpirationTime), ZoneId.systemDefault());
+
             Token token = new Token(member, refreshToken, issuedAt, expiration);
             tokenRepository.save(token);
 
