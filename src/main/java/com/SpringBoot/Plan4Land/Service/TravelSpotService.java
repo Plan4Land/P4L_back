@@ -69,7 +69,7 @@ public class TravelSpotService {
     public List<TravelSpotResDto> getNearbySpotsExcludingId(double mapX, double mapY, double radius, Long spotId) {
         List<TravelSpot> nearbySpots = travelSpotRepository.findNearbySpotsExcludingId(mapX, mapY, radius, spotId);
         return nearbySpots.stream()
-                .limit(5) // 최대 5개로 제한
+                .limit(10) // 최대 5개로 제한
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
