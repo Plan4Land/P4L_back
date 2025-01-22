@@ -69,9 +69,9 @@ public class AdminService {
             log.warn("{}, {}", keyword, select);
             List<Member> lst;
             // id, nickname, name, email
-            if (select != null && keyword != null) {
+            if (!select.isEmpty() && !keyword.isEmpty()) {
                 lst = memberRepository.adminFindFilterMember(select, keyword);
-            } else if (select == null && keyword != null) {
+            } else if (select.isEmpty() && !keyword.isEmpty()) {
                 lst = memberRepository.adminFindMember(keyword, keyword, keyword, keyword);
             } else {
                 lst = memberRepository.findAll();
