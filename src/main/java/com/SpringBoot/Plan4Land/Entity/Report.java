@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.Constant.State;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Table(name = "Report")
 @Entity
@@ -29,6 +30,8 @@ public class Report {
     @JoinColumn(name = "reported_id")
     private Member reported;
 
+    private LocalDateTime reportDate;
+
     // 신고내용
     @Lob
     private String content;
@@ -40,6 +43,7 @@ public class Report {
     @PrePersist
     protected void onCreate() {
         this.state = State.WAIT;
+        this.reportDate = LocalDateTime.now();
     }
 
     @Builder

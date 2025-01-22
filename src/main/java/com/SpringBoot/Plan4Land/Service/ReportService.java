@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.DTO.ReportReqDto;
+import com.SpringBoot.Plan4Land.DTO.ReportResDto;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Report;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
@@ -8,6 +9,11 @@ import com.SpringBoot.Plan4Land.Repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,4 +40,13 @@ public class ReportService {
             return false;
         }
     }
+
+    public List<ReportResDto> getReports() {
+        List<Report> lst =reportRepository.findAllOrderByStateAndReportDate();
+
+        return lst.stream().map(ReportResDto::of).collect(Collectors.toList());
+    }
+
+
+
 }
