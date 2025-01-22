@@ -26,4 +26,12 @@ public class Ban {
     private LocalDateTime endDate;
 
     private boolean isEnd;
+
+    @Builder
+    public Ban(Member member, LocalDateTime startDate, LocalDateTime endDate) {
+        this.member = member;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isEnd = false;
+    }
 }

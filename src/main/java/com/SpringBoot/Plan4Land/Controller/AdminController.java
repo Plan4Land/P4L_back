@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
@@ -50,5 +51,27 @@ public class AdminController {
         Integer i = reportService.reportCount(userId);
 
         return ResponseEntity.ok(i);
+    }
+
+    @PostMapping("/report-manage")
+    @Transactional
+    public ResponseEntity<Boolean> reportManage(@RequestParam Long reportId,
+                                                @RequestParam boolean isAccept,
+                                                @RequestParam(required = false) String userId,
+                                                @RequestParam(required = false) Integer day){
+        boolean isSuccess = adminService.reportProcess(reportId, isAccept);
+        if(userId != null){
+            adminService.memberBan(userId, day);
+        }
+
+        return ResponseEntity.ok(isSuccess);
+    }
+
+    @PostMapping("/member-ban")
+    public ResponseEntity<Boolean> banManage(@RequestParam String userId,
+                                             @RequestParam int day){
+        boolean isSuccess = adminService.memberBan(userId, day);
+
+        return ResponseEntity.ok(isSuccess);
     }
 }

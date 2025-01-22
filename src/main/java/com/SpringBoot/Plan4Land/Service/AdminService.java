@@ -1,9 +1,12 @@
 package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.Constant.Role;
+import com.SpringBoot.Plan4Land.Constant.State;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
+import com.SpringBoot.Plan4Land.Entity.Ban;
 import com.SpringBoot.Plan4Land.Entity.Member;
+import com.SpringBoot.Plan4Land.Entity.Report;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
 import com.SpringBoot.Plan4Land.Repository.BanRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
@@ -15,7 +18,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,6 +87,49 @@ public class AdminService {
             return null;
         }
 
+    }
+
+    public boolean reportProcess(Long reportId, boolean status) {
+        try {
+            Report report = reportRepository.findById(reportId).
+                    orElseThrow(() -> new RuntimeException("해당 신고가 존재하지 않음"));
+            if (status) {
+                report.setState(State.ACCEPT);
+                reportRepository.save(report);
+                return true;
+            } else {
+                report.setState(State.REJECT);
+                reportRepository.save(report);
+                return false;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean memberBan(String userId, int day) {
+        try {
+            Member member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없음"));
+
+            Ban ban = Ban.builder()
+                    .member(member)
+                    .startDate(LocalDateTime.now())
+                    .endDate(LocalDateTime.now().plusDays(day))
+                    .build();
+
+            member.setRole(Role.ROLE_BANNED);
+
+            banRepository.save(ban);
+            memberRepository.save(member);
+
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     // Member Entity => MemberResDto 변환
