@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReportResDto {
+    private Long id;
     private Member reporter;
     private LocalDateTime reportDate;
     private Member reported;
@@ -22,6 +23,7 @@ public class ReportResDto {
 
     public static ReportResDto of(Report report) {
         return ReportResDto.builder()
+                .id(report.getId())
                 .reporter(report.getReporter())
                 .reportDate(report.getReportDate())
                 .reported(report.getReported())
