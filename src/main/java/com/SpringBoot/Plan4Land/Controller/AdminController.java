@@ -34,8 +34,6 @@ public class AdminController {
                                                            @RequestParam(required = false) String keyword){
         List<MemberResDto> lst = adminService.adminSearchMember(keyword, select);
 
-        log.info(lst.toString());
-
         return ResponseEntity.ok(lst);
     }
 
