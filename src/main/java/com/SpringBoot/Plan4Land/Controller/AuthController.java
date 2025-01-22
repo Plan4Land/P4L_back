@@ -3,6 +3,7 @@ package com.SpringBoot.Plan4Land.Controller;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
+import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.Service.AuthService;
 import com.SpringBoot.Plan4Land.Service.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Slf4j
@@ -110,9 +112,19 @@ public class AuthController {
 
     // 액세스 토큰 재발급
     @PostMapping("/token/refresh")
-    public ResponseEntity<TokenDto> refreshToken(@RequestBody String refreshToken) {
+    public ResponseEntity<TokenDto> refreshToken(@RequestBody String refreshToken, HttpServletRequest request) {
         try {
-            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken);
+            if (tokenService.isExcludedPath(request.getRequestURI())) {
+                return ResponseEntity.status(400).body(TokenDto.builder()
+                        .grantType("Error")
+                        .accessToken("")
+                        .refreshToken("")
+                        .accessTokenExpiresIn(0L)
+                        .refreshTokenExpiresIn(0L)
+                        .build());
+            }
+
+            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken, request.getRequestURI());
             return ResponseEntity.ok(newTokenDto);
         } catch (Exception e) {
             TokenDto errorResponse = TokenDto.builder()
