@@ -30,8 +30,10 @@ public class AdminController {
 
     @GetMapping("/member-search")
     public ResponseEntity<List<MemberResDto>> memberSearch(@RequestParam(required = false) String select,
-                                                           @RequestParam String keyword){
+                                                           @RequestParam(required = false) String keyword){
         List<MemberResDto> lst = adminService.adminSearchMember(keyword, select);
+
+        log.info(lst.toString());
 
         return ResponseEntity.ok(lst);
     }
@@ -41,5 +43,12 @@ public class AdminController {
         List<ReportResDto> lst = reportService.getReports();
 
         return ResponseEntity.ok(lst);
+    }
+
+    @GetMapping("/report-count")
+    public ResponseEntity<Integer> reportCount(@RequestParam String userId){
+        Integer i = reportService.reportCount(userId);
+
+        return ResponseEntity.ok(i);
     }
 }

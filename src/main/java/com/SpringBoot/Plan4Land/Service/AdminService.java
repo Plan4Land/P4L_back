@@ -49,7 +49,7 @@ public class AdminService {
     }
 
     public boolean adminLogin(String userId, String password) {
-        try{
+        try {
             Member member = memberRepository.findByIdAndPassword(userId, password)
                     .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
 
@@ -64,11 +64,14 @@ public class AdminService {
             log.warn("{}, {}", keyword, select);
             List<Member> lst;
             // id, nickname, name, email
-            if(select == null || select.isEmpty()){
-                lst = memberRepository.adminFindMember(keyword, keyword, keyword, keyword);
-            }else {
+            if (select != null && keyword != null) {
                 lst = memberRepository.adminFindFilterMember(select, keyword);
+            } else if (select == null && keyword != null) {
+                lst = memberRepository.adminFindMember(keyword, keyword, keyword, keyword);
+            } else {
+                lst = memberRepository.findAll();
             }
+
 
             return lst.stream()
                     .map(this::convertEntityToDto)
