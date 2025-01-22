@@ -46,8 +46,8 @@ public class TokenProvider {
                 .findFirst().orElse("");
 
         long now = (new Date()).getTime();
-        Date accessTokenExpiresIn = new Date(now + 60 * 1000); // 7일
-        Date refreshTokenExpiresIn = new Date(now + 3 * 60 * 1000); // 24일
+        Date accessTokenExpiresIn = new Date(now + 60 * 60 * 1000 * 24 * 4); // 7일
+        Date refreshTokenExpiresIn = new Date(now + 60 * 60 * 1000 * 24 * 24); // 24일
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
