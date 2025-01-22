@@ -95,13 +95,12 @@ public class AdminService {
                     orElseThrow(() -> new RuntimeException("해당 신고가 존재하지 않음"));
             if (status) {
                 report.setState(State.ACCEPT);
-                reportRepository.save(report);
-                return true;
             } else {
                 report.setState(State.REJECT);
-                reportRepository.save(report);
-                return false;
+
             }
+            reportRepository.save(report);
+            return true;
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;

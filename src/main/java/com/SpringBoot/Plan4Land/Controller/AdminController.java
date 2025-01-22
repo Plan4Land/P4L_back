@@ -56,10 +56,10 @@ public class AdminController {
     @PostMapping("/report-manage")
     @Transactional
     public ResponseEntity<Boolean> reportManage(@RequestParam Long reportId,
-                                                @RequestParam boolean isAccept,
+                                                @RequestParam boolean status,
                                                 @RequestParam(required = false) String userId,
                                                 @RequestParam(required = false) Integer day){
-        boolean isSuccess = adminService.reportProcess(reportId, isAccept);
+        boolean isSuccess = adminService.reportProcess(reportId, status);
         if(userId != null){
             adminService.memberBan(userId, day);
         }
