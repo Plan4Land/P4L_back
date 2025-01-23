@@ -22,10 +22,10 @@ public class TokenService {
         log.info("서비스 refreshToken: {}", refreshToken);
         log.info("DB에 저장된 토큰: {}", tokenRepository.findByRefreshToken(refreshToken));
         log.info("토큰있는지: {}", tokenRepository.existsByRefreshToken(refreshToken));
-        // 토큰 있는지 확인
-        if (tokenRepository.existsByRefreshToken(refreshToken) < 1) {
-            throw new RuntimeException("리프레시 토큰이 존재하지 않습니다.");
-        }
+//        // 토큰 있는지 확인
+//        if (!tokenRepository.existsByRefreshToken(refreshToken)) {
+//            throw new RuntimeException("리프레시 토큰이 존재하지 않습니다.");
+//        }
 
         // 토큰 검증
         if (!tokenProvider.validateToken(refreshToken)) {
@@ -36,8 +36,8 @@ public class TokenService {
         try {
             return tokenProvider.generateTokenDto(tokenProvider.getAuthentication(refreshToken));
         } catch (RuntimeException e) {
-            log.error("토큰 생성 실패: {}", e.getMessage());
-            throw new RuntimeException("토큰 생성에 실패했습니다.");
+            log.error("토큰 생성 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("토큰 생성에 실패했습니다.", e);
         }
     }
 
