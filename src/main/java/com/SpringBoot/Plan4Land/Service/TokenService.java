@@ -6,9 +6,11 @@ import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
 import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
@@ -16,23 +18,27 @@ public class TokenService {
     private final TokenRepository tokenRepository;
 
     // 리프레시 토큰을 사용하여 액세스 토큰 재발급
-    public TokenDto refreshAccessToken(String refreshToken, String requestUri) {
-
-        if (isExcludedPath(requestUri)) {
-            return null;
+    public TokenDto refreshAccessToken(String refreshToken) {
+        log.info("서비스 refreshToken: {}", refreshToken);
+        log.info("DB에 저장된 토큰: {}", tokenRepository.findByRefreshToken(refreshToken));
+        log.info("토큰있는지: {}", tokenRepository.existsByRefreshToken(refreshToken));
+        // 토큰 있는지 확인
+        if (tokenRepository.existsByRefreshToken(refreshToken) < 1) {
+            throw new RuntimeException("리프레시 토큰이 존재하지 않습니다.");
         }
 
-        // 리프레시 토큰 검증
+        // 토큰 검증
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new RuntimeException("리프레시 토큰이 유효하지 않습니다.");
         }
 
-        // 리프레시 토큰 확인
-        Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new IllegalArgumentException("해당하는 리프레시 토큰이 없습니다."));
-
-        // 리프레시 토큰으로 새로운 액세스 토큰 생성
-        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        return tokenProvider.generateTokenDto(authentication);
+        // 새 토큰 생성
+        try {
+            return tokenProvider.generateTokenDto(tokenProvider.getAuthentication(refreshToken));
+        } catch (RuntimeException e) {
+            log.error("토큰 생성 실패: {}", e.getMessage());
+            throw new RuntimeException("토큰 생성에 실패했습니다.");
+        }
     }
 
     // 인증이 필요 없는 경로인지 확인

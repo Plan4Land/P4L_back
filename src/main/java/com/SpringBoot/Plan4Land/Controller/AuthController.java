@@ -6,6 +6,7 @@ import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.Service.AuthService;
 import com.SpringBoot.Plan4Land.Service.TokenService;
+import io.swagger.models.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -112,29 +113,20 @@ public class AuthController {
 
     // 액세스 토큰 재발급
     @PostMapping("/token/refresh")
-    public ResponseEntity<TokenDto> refreshToken(@RequestBody String refreshToken, HttpServletRequest request) {
-        try {
-            if (tokenService.isExcludedPath(request.getRequestURI())) {
-                return ResponseEntity.status(400).body(TokenDto.builder()
-                        .grantType("Error")
-                        .accessToken("")
-                        .refreshToken("")
-                        .accessTokenExpiresIn(0L)
-                        .refreshTokenExpiresIn(0L)
-                        .build());
-            }
+    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+        log.info("컨트롤러 refreshToken: {}", refreshToken);
 
-            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken, request.getRequestURI());
+        // 리프레시 토큰 검증
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리프레시 토큰이 비어있습니다.");
+        }
+
+        try {
+            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken);
             return ResponseEntity.ok(newTokenDto);
-        } catch (Exception e) {
-            TokenDto errorResponse = TokenDto.builder()
-                    .grantType("Error")
-                    .accessToken("")
-                    .refreshToken("")
-                    .accessTokenExpiresIn(0L)
-                    .refreshTokenExpiresIn(0L)
-                    .build();
-            return ResponseEntity.status(400).body(errorResponse);
+        } catch (RuntimeException e) {
+            log.error("토큰 재발급 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 재발급 실패: " + e.getMessage());
         }
     }
 }
