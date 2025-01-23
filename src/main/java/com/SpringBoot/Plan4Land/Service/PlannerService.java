@@ -247,13 +247,18 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
     }
-// 내 소유 플래너 목록 가져오기
+    // 내 소유 플래너 목록 가져오기 (최신순으로 정렬)
     public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
-        return plannerRepository.findByOwnerId(memberId, pageable);
+        // 최신순 정렬 추가
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Order.desc("regDate")));
+        return plannerRepository.findByOwnerId(memberId, sortedPageable);
     }
-    // 특정 유저 플래너 목록 가져오기(비공개 안가져옴)
+
+    // 특정 유저의 공개 플래너 목록 가져오기 (최신순으로 정렬)
     public Page<Planner> getPrivatePlannersByOwner(String memberId, Pageable pageable) {
-        return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, pageable);
+        // 최신순 정렬 추가
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Order.desc("regDate")));
+        return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, sortedPageable);
     }
     // 플래닝에 멤버 초대
     public boolean inviteMember(String memberId, Long plannerId) {
