@@ -3,10 +3,12 @@ package com.SpringBoot.Plan4Land.Controller;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.ReportResDto;
+import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Service.AdminService;
 import com.SpringBoot.Plan4Land.Service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,8 @@ public class AdminController {
     private final ReportService reportService;
 
     @PostMapping("/admin-login")
-    public ResponseEntity<Boolean> adminLogin(@RequestBody MemberReqDto memberReqDto) {
-        boolean isAdmin = adminService.adminLogin(memberReqDto.getId(), memberReqDto.getPassword());
+    public ResponseEntity<TokenDto> adminLogin(@RequestBody MemberReqDto memberReqDto) {
+        TokenDto isAdmin = adminService.adminLoginWithToken(memberReqDto.getId(), memberReqDto.getPassword());
 
         return ResponseEntity.ok(isAdmin);
     }
@@ -57,12 +59,16 @@ public class AdminController {
                                                 @RequestParam boolean status,
                                                 @RequestParam(required = false) String userId,
                                                 @RequestParam(required = false) Integer day){
-        boolean isSuccess = adminService.reportProcess(reportId, status);
-        if(userId != null){
-            adminService.memberBan(userId, day);
+        try{
+            boolean isSuccess = adminService.reportProcess(reportId, status);
+            if (userId != null) {
+                adminService.memberBan(userId, day);
+            }
+            return ResponseEntity.ok(isSuccess);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
 
-        return ResponseEntity.ok(isSuccess);
     }
 
     @PostMapping("/member-ban")
