@@ -233,12 +233,9 @@ public class PlannerService {
 
 // 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTopBookmarkedPlanners() {
-//        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
-//        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
         Pageable pageable = PageRequest.of(0, 4);
 
         List<Planner> topPlanners = bookMarkPlannerRepository.findTopPlanners(pageable);
-        log.warn(topPlanners.toString());
 
         return topPlanners.stream()
                 .map(planner -> {
@@ -325,11 +322,9 @@ public class PlannerService {
     public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Member owner = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("User not found"));
-        log.info("owner : {}", owner.toString());
 
         // Repository에서 플래너 조회
         Page<Planner> planners = plannerRepository.findPlannersByOwnerOrMember(owner, pageable);
-        log.info(planners.toString());
 
         // Dto로 변환
         List<PlannerResDto> plannerDtos = planners.getContent().stream()

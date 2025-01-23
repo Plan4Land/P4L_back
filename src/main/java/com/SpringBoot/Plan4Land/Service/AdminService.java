@@ -7,10 +7,12 @@ import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Entity.Ban;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Report;
+import com.SpringBoot.Plan4Land.Entity.Token;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
 import com.SpringBoot.Plan4Land.Repository.BanRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.ReportRepository;
+import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class AdminService {
+    private final TokenRepository tokenRepository;
     private MemberRepository memberRepository;
     private ReportRepository reportRepository;
     private BanRepository banRepository;
@@ -40,13 +45,28 @@ public class AdminService {
             Member member = memberRepository.findByIdAndPassword(userId, password)
                     .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword());
+            if (member.getRole().equals(Role.ROLE_ADMIN)) {
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword());
 
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+                Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-            TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+                TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
+                LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(tokenDto.getRefreshTokenExpiresIn()), ZoneId.systemDefault());
+
+                Token token = new Token();
+                String encodedToken = token.getRefreshToken();
+                token.setRefreshToken(encodedToken);
+                token.setExpiration(time);
+                token.setIssuedAt(LocalDateTime.now());
+                token.setMember(member);
+
+                tokenRepository.save(token);
+
+                return tokenDto;
+            }
             return null;
+
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;
@@ -66,7 +86,7 @@ public class AdminService {
 
     public List<MemberResDto> adminSearchMember(String keyword, String select) {
         try {
-            if(select == null) {
+            if (select == null) {
                 select = "";
             } else if (keyword == null) {
                 keyword = "";
