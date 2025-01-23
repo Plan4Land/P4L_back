@@ -233,12 +233,9 @@ public class PlannerService {
 
 // 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTopBookmarkedPlanners() {
-//        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
-//        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
         Pageable pageable = PageRequest.of(0, 4);
 
         List<Planner> topPlanners = bookMarkPlannerRepository.findTopPlanners(pageable);
-        log.warn(topPlanners.toString());
 
         return topPlanners.stream()
                 .map(planner -> {
@@ -247,13 +244,18 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
     }
-// 내 소유 플래너 목록 가져오기
+    // 내 소유 플래너 목록 가져오기 (최신순으로 정렬)
     public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
-        return plannerRepository.findByOwnerId(memberId, pageable);
+        // 최신순 정렬 추가
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Order.desc("regDate")));
+        return plannerRepository.findByOwnerId(memberId, sortedPageable);
     }
-    // 특정 유저 플래너 목록 가져오기(비공개 안가져옴)
+
+    // 특정 유저의 공개 플래너 목록 가져오기 (최신순으로 정렬)
     public Page<Planner> getPrivatePlannersByOwner(String memberId, Pageable pageable) {
-        return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, pageable);
+        // 최신순 정렬 추가
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Order.desc("regDate")));
+        return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, sortedPageable);
     }
     // 플래닝에 멤버 초대
     public boolean inviteMember(String memberId, Long plannerId) {
@@ -320,11 +322,9 @@ public class PlannerService {
     public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Member owner = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("User not found"));
-        log.info("owner : {}", owner.toString());
 
         // Repository에서 플래너 조회
         Page<Planner> planners = plannerRepository.findPlannersByOwnerOrMember(owner, pageable);
-        log.info(planners.toString());
 
         // Dto로 변환
         List<PlannerResDto> plannerDtos = planners.getContent().stream()
