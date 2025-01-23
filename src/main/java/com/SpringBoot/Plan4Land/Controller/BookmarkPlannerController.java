@@ -62,8 +62,8 @@ public class BookmarkPlannerController {
     public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
         List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
 
-        if (topPlanners.size() > 3) {
-            topPlanners = topPlanners.subList(0, 3);
+        if (topPlanners.size() > 4) {
+            topPlanners = topPlanners.subList(0, 4);
         }
         return ResponseEntity.ok(topPlanners);
     }
