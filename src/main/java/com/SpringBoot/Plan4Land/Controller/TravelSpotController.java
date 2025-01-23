@@ -60,6 +60,8 @@ public class TravelSpotController {
         }
         return ResponseEntity.ok(top5Spots);
     }
+
+
     @GetMapping("/nearby")
     public ResponseEntity<List<TravelSpotResDto>> getNearbySpots(
             @RequestParam double mapX,
