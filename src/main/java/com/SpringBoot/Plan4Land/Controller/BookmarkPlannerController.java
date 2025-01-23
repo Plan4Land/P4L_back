@@ -59,12 +59,9 @@ public class BookmarkPlannerController {
 
     // 북마크 갯수 상위 3개 플래너
     @GetMapping("/plannersTop3")
-    public ResponseEntity<List<PlannerResDto>> getTop3BookmarkedPlanners() {
-        List<PlannerResDto> topPlanners = plannerService.getTop3BookmarkedPlanners();
+    public ResponseEntity<List<PlannerResDto>> getTopBookmarkedPlanners() {
+        List<PlannerResDto> topPlanners = plannerService.getTopBookmarkedPlanners();
 
-        if (topPlanners.size() > 4) {
-            topPlanners = topPlanners.subList(0, 4);
-        }
         return ResponseEntity.ok(topPlanners);
     }
 }

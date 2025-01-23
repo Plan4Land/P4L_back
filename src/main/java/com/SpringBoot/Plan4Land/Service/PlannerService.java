@@ -232,9 +232,14 @@ public class PlannerService {
     }
 
 // 북마크 상위 3개 플래너 가져오기
-    public List<PlannerResDto> getTop3BookmarkedPlanners() {
-        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
-        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
+    public List<PlannerResDto> getTopBookmarkedPlanners() {
+//        List<Long> topPlannerIds = bookMarkPlannerRepository.findTop3PlannerIdsByBookmarkCount();
+//        List<Planner> topPlanners = plannerRepository.findAllById(topPlannerIds);
+        Pageable pageable = PageRequest.of(0, 4);
+
+        List<Planner> topPlanners = bookMarkPlannerRepository.findTopPlanners(pageable);
+        log.warn(topPlanners.toString());
+
         return topPlanners.stream()
                 .map(planner -> {
                     Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
