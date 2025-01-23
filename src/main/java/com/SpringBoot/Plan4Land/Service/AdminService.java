@@ -66,6 +66,11 @@ public class AdminService {
 
     public List<MemberResDto> adminSearchMember(String keyword, String select) {
         try {
+            if(select == null) {
+                select = "";
+            } else if (keyword == null) {
+                keyword = "";
+            }
             log.warn("{}, {}", keyword, select);
             List<Member> lst;
             // id, nickname, name, email
