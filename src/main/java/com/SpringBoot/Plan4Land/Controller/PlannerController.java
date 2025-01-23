@@ -84,10 +84,10 @@ public class PlannerController {
 
     // Plan 삭제 및 삽입
     @PostMapping("/updatePlan")
-    public ResponseEntity<Boolean> deleteAndInsertPlans(@RequestParam Long plannerId, @RequestBody List<Plan> newPlans) {
+    public ResponseEntity<List<Plan>> deleteAndInsertPlans(@RequestParam Long plannerId, @RequestBody List<Plan> newPlans) {
         log.warn(newPlans.toString());
-        plannerService.deleteAndInsertPlans(plannerId, newPlans);
-        return ResponseEntity.ok(true);
+        List<Plan> plans = plannerService.deleteAndInsertPlans(plannerId, newPlans);
+        return ResponseEntity.ok(plans);
     }
 
     // 플래너 목록 조회

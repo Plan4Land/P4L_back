@@ -169,7 +169,7 @@ public class PlannerService {
 
     // Plan 삭제 및 삽입
     @Transactional
-    public void deleteAndInsertPlans(Long plannerId, List<Plan> newPlans) {
+    public List<Plan> deleteAndInsertPlans(Long plannerId, List<Plan> newPlans) {
         planRepository.deleteByPlannerId(plannerId);
         log.info("plan 삭제 완료");
 
@@ -180,6 +180,7 @@ public class PlannerService {
             newPlan.setPlanner(planner);
             planRepository.save(newPlan);
         }
+        return planRepository.findByPlannerId(plannerId);
     }
 
     // 플래너 검색 및 조회하기
