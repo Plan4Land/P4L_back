@@ -233,7 +233,7 @@ public class PlannerService {
 
 // 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTopBookmarkedPlanners() {
-        Pageable pageable = PageRequest.of(0, 4);
+        Pageable pageable = PageRequest.of(0, 5);
 
         List<Planner> topPlanners = bookMarkPlannerRepository.findTopPlanners(pageable);
 
