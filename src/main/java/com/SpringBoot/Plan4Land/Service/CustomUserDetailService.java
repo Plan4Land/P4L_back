@@ -3,6 +3,8 @@ package com.SpringBoot.Plan4Land.Service;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
@@ -24,7 +27,14 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         Member member = memberRepository.findById(id).orElseThrow(()
                 -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id));
-        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(member.getRole().name()));
-        return new User(member.getEmail(), member.getPassword(), authorities);
+        return createUserDetail(member);
+    }
+
+    private UserDetails createUserDetail(Member member) {
+        String role = member.getRole() != null ? member.getRole().toString() : "ROLE_GENERAL";
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
+        log.warn(role);
+
+        return new User(member.getId(), member.getPassword(), Collections.singleton(grantedAuthority));
     }
 }

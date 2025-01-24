@@ -2,6 +2,8 @@ package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.Constant.State;
+import com.SpringBoot.Plan4Land.DTO.AccessTokenDto;
+import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import com.SpringBoot.Plan4Land.Entity.Ban;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminService {
     private final TokenRepository tokenRepository;
+    private final AuthenticationManagerBuilder managerBuilder; // 인증 담당 클래스
     private MemberRepository memberRepository;
     private ReportRepository reportRepository;
     private BanRepository banRepository;
@@ -40,32 +44,31 @@ public class AdminService {
     private TokenProvider tokenProvider;
     private AuthenticationManager authenticationManager;
 
-    public TokenDto adminLoginWithToken(String userId, String password) {
+    public TokenDto adminLoginWithToken(MemberReqDto memberReqDto) {
         try {
-            Member member = memberRepository.findByIdAndPassword(userId, password)
-                    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+            UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
 
-            if (member.getRole().equals(Role.ROLE_ADMIN)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword());
+            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
 
-                Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-                TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+            Member member = memberRepository.findByIdAndPassword(memberReqDto.getId(), memberReqDto.getPassword())
+                    .orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다."));
 
-                LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(tokenDto.getRefreshTokenExpiresIn()), ZoneId.systemDefault());
-
-                Token token = new Token();
-                String encodedToken = token.getRefreshToken();
-                token.setRefreshToken(encodedToken);
-                token.setExpiration(time);
-                token.setIssuedAt(LocalDateTime.now());
-                token.setMember(member);
-
-                tokenRepository.save(token);
-
-                return tokenDto;
+            if(tokenRepository.existsByMember(member)) {
+                tokenRepository.deleteByMember(member);
             }
-            return null;
+
+            Token token = new Token();
+            String encodedToken = tokenDto.getRefreshToken();
+            token.setRefreshToken(encodedToken);
+            token.setExpiration(tokenDto.getRefreshTokenExpiresIn());
+            token.setIssuedAt(LocalDateTime.now());
+            token.setMember(member);
+
+            tokenRepository.save(token);
+
+            return tokenDto;
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -73,15 +76,18 @@ public class AdminService {
         }
     }
 
-    public boolean adminLogin(String userId, String password) {
-        try {
-            Member member = memberRepository.findByIdAndPassword(userId, password)
-                    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-
-            return member.getRole().equals(Role.ROLE_ADMIN);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    // 액세스 토큰 재발급
+    public AccessTokenDto accessTokenAgain(String refreshToken) {
+        try{
+        if(tokenRepository.existsByRefreshToken(refreshToken)) {
+            if (tokenProvider.validateToken(refreshToken)) {
+                return tokenProvider.generateAccessTokenDto(tokenProvider.getAuthentication(refreshToken));
+            }
         }
+        }catch(Exception e){
+            log.error(e.getMessage());
+        }
+        return null;
     }
 
     public List<MemberResDto> adminSearchMember(String keyword, String select) {

@@ -16,6 +16,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -88,7 +90,13 @@ public class AuthService {
                 }
             }
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword());
+            // 권한 설정
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().toString()));
+
+            log.info("---{}---",authorities.toString());
+
+            // 권한을 포함하여 UsernamePasswordAuthenticationToken 생성
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword(), authorities);
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
@@ -102,9 +110,8 @@ public class AuthService {
             // 리프레시 토큰 저장
             String refreshToken = tokenDto.getRefreshToken();
             LocalDateTime issuedAt = LocalDateTime.now();
-            LocalDateTime expiration = LocalDateTime.ofInstant(Instant.ofEpochMilli(refreshTokenExpirationTime), ZoneId.systemDefault());
 
-            Token token = new Token(member, refreshToken, issuedAt, expiration);
+            Token token = new Token(member, refreshToken, issuedAt, refreshTokenExpirationTime);
             tokenRepository.save(token);
 
             return tokenDto;
@@ -119,6 +126,7 @@ public class AuthService {
 
     // 로그아웃
     public void logout(MemberReqDto memberReqDto) {
+        log.warn(memberReqDto.toString());
         // ID로 사용자 검색
         Member member = memberRepository.findById(memberReqDto.getId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

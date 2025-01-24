@@ -14,6 +14,12 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     List<Token> findAllByMember(Member member);
     Optional<Token> findByRefreshToken(String refreshToken);
 
-    @Query(value = "SELECT COUNT(*) FROM token WHERE refresh_token = :refreshToken", nativeQuery = true)
-    int existsByRefreshToken(@Param("refreshToken") String refreshToken);
+    boolean existsByRefreshToken(String refreshToken);
+
+    boolean existsByMember(Member member);
+
+    void deleteByMember(Member member);
+
+//    @Query(value = "SELECT COUNT(*) FROM token WHERE refresh_token = :refreshToken", nativeQuery = true)
+//    int existsByRefreshToken(@Param("refreshToken") String refreshToken);
 }

@@ -28,12 +28,12 @@ public class Token {
     private LocalDateTime issuedAt; // 토큰 발급 시간
 
     @Column(nullable = false)
-    private LocalDateTime expiration; // 토큰 만료 시간
+    private Long expiration; // 토큰 만료 시간
 
     @Column(nullable = false)
     private Boolean isActive = true; // 토큰의 활성화 상태 (Optional)
 
-    public Token(Member member, String refreshToken, LocalDateTime issuedAt, LocalDateTime expiration) {
+    public Token(Member member, String refreshToken, LocalDateTime issuedAt, Long expiration) {
         this.member = member;
         this.refreshToken = refreshToken;
         this.issuedAt = issuedAt;
