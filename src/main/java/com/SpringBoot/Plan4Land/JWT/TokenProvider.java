@@ -3,10 +3,7 @@ package com.SpringBoot.Plan4Land.JWT;
 import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
 import io.github.cdimascio.dotenv.Dotenv;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -76,6 +73,7 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
+        log.info("JWT Claims: {}", claims);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없습니다.");
@@ -109,12 +107,17 @@ public class TokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            // 토큰을 파싱하고 검증
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            log.info("JWT 검증 실패: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 토큰: {}", token);
+            // 만약 만료된 토큰일 경우, 재발급 처리를 하거나 false 반환
+            return false;  // 만료된 토큰은 유효하지 않음
+        } catch (JwtException e) {
+            log.error("JWT 파싱 오류: {}", e.getMessage());
+            return false;  // JWT 파싱 오류 발생 시 처리
         }
-        return false;
     }
 
     private Claims parseClaims(String token) {
@@ -122,6 +125,9 @@ public class TokenProvider {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        } catch (JwtException e) {
+            log.error("JWT 파싱 오류: {}", e.getMessage());
+            throw new RuntimeException("JWT 파싱 실패");
         }
     }
 

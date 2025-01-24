@@ -1,11 +1,9 @@
 package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
-import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Token;
 import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.JWT.TokenProvider;
-import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,16 +16,13 @@ import org.springframework.stereotype.Service;
 public class TokenService {
     private final TokenProvider tokenProvider;
     private final TokenRepository tokenRepository;
-    private final MemberRepository memberRepository;
 
     // 리프레시 토큰을 사용하여 액세스 토큰 재발급
     public TokenDto refreshAccessToken(String refreshToken) {
-        Member member = memberRepository.findById("testid1").orElseThrow();
         log.info("서비스 refreshToken: {}", refreshToken);
         log.info("DB에 저장된 토큰: {}", tokenRepository.findByRefreshToken(refreshToken));
-        log.info("유저의 리프레시 토큰 : {}", tokenRepository.findByMember(member));
         log.info("토큰있는지: {}", tokenRepository.existsByRefreshToken(refreshToken));
-        // 토큰 있는지 확인
+//        // 토큰 있는지 확인
 //        if (!tokenRepository.existsByRefreshToken(refreshToken)) {
 //            throw new RuntimeException("리프레시 토큰이 존재하지 않습니다.");
 //        }
@@ -41,8 +36,8 @@ public class TokenService {
         try {
             return tokenProvider.generateTokenDto(tokenProvider.getAuthentication(refreshToken));
         } catch (RuntimeException e) {
-            log.error("토큰 생성 실패: {}", e.getMessage());
-            throw new RuntimeException("토큰 생성에 실패했습니다.");
+            log.error("토큰 생성 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("토큰 생성에 실패했습니다.", e);
         }
     }
 

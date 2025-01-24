@@ -115,18 +115,6 @@ public class AuthController {
     @PostMapping("/token/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
         log.info("컨트롤러 refreshToken: {}", refreshToken);
-
-        // 리프레시 토큰 검증
-        if (refreshToken == null || refreshToken.trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("리프레시 토큰이 비어있습니다.");
-        }
-
-        try {
-            TokenDto newTokenDto = tokenService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(newTokenDto);
-        } catch (RuntimeException e) {
-            log.error("토큰 재발급 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 재발급 실패: " + e.getMessage());
-        }
+        return ResponseEntity.ok(tokenService.refreshAccessToken(refreshToken));
     }
 }
