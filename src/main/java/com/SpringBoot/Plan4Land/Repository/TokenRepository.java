@@ -13,7 +13,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     Optional<Token> findByMember(Member member);
     List<Token> findAllByMember(Member member);
     Optional<Token> findByRefreshToken(String refreshToken);
-
     boolean existsByRefreshToken(String refreshToken);
 
     boolean existsByMember(Member member);

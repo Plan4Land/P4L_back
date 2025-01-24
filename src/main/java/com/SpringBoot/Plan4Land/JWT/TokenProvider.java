@@ -108,6 +108,7 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
+        log.info("JWT Claims: {}", claims);
 
         if (claims.get(AUTHORITIES_KEY) == null || claims.get(ROLE) == null) {
             throw new RuntimeException("권한 정보가 없습니다.");
@@ -150,6 +151,7 @@ public class TokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            // 토큰을 파싱하고 검증
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
@@ -160,6 +162,8 @@ public class TokenProvider {
             log.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
+        } catch (JwtException e) {
+            log.error("JWT 파싱 오류: {}", e.getMessage());
         }
         return false;
     }
@@ -169,6 +173,9 @@ public class TokenProvider {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        } catch (JwtException e) {
+            log.error("JWT 파싱 오류: {}", e.getMessage());
+            throw new RuntimeException("JWT 파싱 실패");
         }
     }
 
