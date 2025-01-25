@@ -39,13 +39,10 @@ import java.util.stream.Collectors;
 public class AdminService {
     private final TokenRepository tokenRepository;
     private final AuthenticationManagerBuilder managerBuilder; // 인증 담당 클래스
-    private final PasswordEncoder passwordEncoder;
     private MemberRepository memberRepository;
     private ReportRepository reportRepository;
     private BanRepository banRepository;
-    private MemberService memberService;
     private TokenProvider tokenProvider;
-    private AuthenticationManager authenticationManager;
 
     @Transactional
     public TokenDto adminLoginWithToken(MemberReqDto memberReqDto) {
@@ -53,11 +50,11 @@ public class AdminService {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다."));
 
-            // 여기서 CustomAuthenticationProvider의 authenticate 실행 (이 안에서 비밀번호도 검증)
+            // 해당 메소드 설정에 따라 정보를 담은 토큰 생성(여기선 아이디와 비밀번호)
             UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
             log.info("UsernamePasswordAuthenticationToken: {}", authenticationToken);
 
-            // 여기서 CustomUserDetailService 실행
+            // 여기서 CustomAuthenticationProvider의 authenticate 실행 (이 안에서 비밀번호도 검증)
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("Authentication 객체: {}", authentication);
 

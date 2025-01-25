@@ -39,7 +39,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = (String) authentication.getPrincipal();
         String password = (String) authentication.getCredentials();
 
-        // userdetail을 통해 유저 정보 획득
+        // customUserDetailService 통해 유저 정보 획득
         UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
 
         // 카카오 로그인 처리
@@ -55,10 +55,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid username or password");
         }
 
-        log.warn("접근한 사용자의 아이디와 ROLE : {} {}", userDetails.getUsername(), userDetails.getAuthorities());
         // 정지 유저 접근 불가
-        if ((userDetails.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_BANNED")))) {
+        boolean isBanned = userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_BANNED"));
+
+        if (isBanned) {
             throw new LockedException("접근이 금지된 계정입니다.");
         }
 
