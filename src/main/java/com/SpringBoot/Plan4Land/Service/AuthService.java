@@ -82,36 +82,29 @@ public class AuthService {
                     log.error("탈퇴한 회원입니다.");
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
                 }
-
-                // 비밀번호 검증
-                if (!passwordEncoder.matches(memberReqDto.getPassword(), member.getPassword())) {
-                    log.error("비밀번호 불일치");
-                    throw new BadCredentialsException("잘못된 자격 증명입니다.");
-                }
             }
 
-            // 권한 설정
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().toString()));
-
-            log.info("---{}---",authorities.toString());
-
             // 권한을 포함하여 UsernamePasswordAuthenticationToken 생성
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), memberReqDto.getPassword(), authorities);
+            UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
 
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
 
             // 토큰 생성
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
             // 리프레시 토큰 만료 시간 추출
-            long refreshTokenExpirationTime = tokenDto.getRefreshTokenExpiresIn();
+            if (tokenRepository.existsByMember(member)) {
+                tokenRepository.deleteByMember(member);
+            }
 
-            // 리프레시 토큰 저장
-            String refreshToken = tokenDto.getRefreshToken();
-            LocalDateTime issuedAt = LocalDateTime.now();
+            Token token = new Token();
+            String encodedToken = tokenDto.getRefreshToken();
+            token.setRefreshToken(encodedToken);
+            token.setExpiration(tokenDto.getRefreshTokenExpiresIn());
+            token.setIssuedAt(LocalDateTime.now());
+            token.setMember(member);
 
-            Token token = new Token(member, refreshToken, issuedAt, refreshTokenExpirationTime);
             tokenRepository.save(token);
 
             return tokenDto;

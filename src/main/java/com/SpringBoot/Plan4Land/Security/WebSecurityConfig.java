@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // 인증 실패 시 처리할 클래스
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler; // 인가 실패 시 처리할 클래스
     private final CustomAuthenticationProvider customAuthenticationProvider; // 커스텀 인증 처리 클래스
+    private final CustomUserDetailService customUserDetailService;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -43,12 +45,17 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return new BCryptPasswordEncoder(); // BCrypt 암호화 객체를 Bean으로 등록
     }
 
+
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
         // CustomAuthenticationProvider를 AuthenticationManager에 추가
         authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
+
+        // CustomUserDetailService를 설정
+        authenticationManagerBuilder.userDetailsService(customUserDetailService);
 
         return authenticationManagerBuilder.build();
     }
@@ -67,7 +74,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             .and()
             .authorizeRequests()
                 .antMatchers("/", "/static/**", "/auth/**", "member/**", "/ws/**", "/api/travelspots", "/member/idExists/**", "/member/emailExists/**", "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
-                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/plannersTop3", "/admin/**").permitAll()
+                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/plannersTop3", "/admin/admin-login").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/favicon.ico", "/manifest.json").permitAll()

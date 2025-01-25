@@ -19,9 +19,11 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 public class AdminService {
     private final TokenRepository tokenRepository;
     private final AuthenticationManagerBuilder managerBuilder; // 인증 담당 클래스
+    private final PasswordEncoder passwordEncoder;
     private MemberRepository memberRepository;
     private ReportRepository reportRepository;
     private BanRepository banRepository;
@@ -44,18 +47,27 @@ public class AdminService {
     private TokenProvider tokenProvider;
     private AuthenticationManager authenticationManager;
 
+    @Transactional
     public TokenDto adminLoginWithToken(MemberReqDto memberReqDto) {
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
+            Member member = memberRepository.findById(memberReqDto.getId())
+                    .orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다."));
 
+            // 여기서 CustomAuthenticationProvider의 authenticate 실행 (이 안에서 비밀번호도 검증)
+            UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
+            log.info("UsernamePasswordAuthenticationToken: {}", authenticationToken);
+
+            // 여기서 CustomUserDetailService 실행
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
+            log.info("Authentication 객체: {}", authentication);
+
+            // Authentication 객체의 권한 출력
+            log.info("Authentication 권한: {}", authentication.getAuthorities());
 
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-            Member member = memberRepository.findByIdAndPassword(memberReqDto.getId(), memberReqDto.getPassword())
-                    .orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다."));
 
-            if(tokenRepository.existsByMember(member)) {
+            if (tokenRepository.existsByMember(member)) {
                 tokenRepository.deleteByMember(member);
             }
 
@@ -69,7 +81,6 @@ public class AdminService {
             tokenRepository.save(token);
 
             return tokenDto;
-
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;
@@ -78,13 +89,13 @@ public class AdminService {
 
     // 액세스 토큰 재발급
     public AccessTokenDto accessTokenAgain(String refreshToken) {
-        try{
-        if(tokenRepository.existsByRefreshToken(refreshToken)) {
-            if (tokenProvider.validateToken(refreshToken)) {
-                return tokenProvider.generateAccessTokenDto(tokenProvider.getAuthentication(refreshToken));
+        try {
+            if (tokenRepository.existsByRefreshToken(refreshToken)) {
+                if (tokenProvider.validateToken(refreshToken)) {
+                    return tokenProvider.generateAccessTokenDto(tokenProvider.getAuthentication(refreshToken));
+                }
             }
-        }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return null;
@@ -94,10 +105,10 @@ public class AdminService {
         try {
             if (select == null) {
                 select = "";
-            } else if (keyword == null) {
+            }
+            if (keyword == null) {
                 keyword = "";
             }
-            log.warn("{}, {}", keyword, select);
             List<Member> lst;
             // id, nickname, name, email
             if (!select.isEmpty() && !keyword.isEmpty()) {

@@ -24,6 +24,7 @@ public class AdminController {
     @PostMapping("/admin-login")
     public ResponseEntity<TokenDto> adminLogin(@RequestBody MemberReqDto memberReqDto) {
         try {
+            log.info("Admin Login Request: {}", memberReqDto);
             TokenDto tokenDto = adminService.adminLoginWithToken(memberReqDto);
             if (tokenDto == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

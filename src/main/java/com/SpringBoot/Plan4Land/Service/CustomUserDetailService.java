@@ -32,8 +32,8 @@ public class CustomUserDetailService implements UserDetailsService {
 
     private UserDetails createUserDetail(Member member) {
         String role = member.getRole() != null ? member.getRole().toString() : "ROLE_GENERAL";
+        log.warn("역할 : {} ", role);
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
-        log.warn(role);
 
         return new User(member.getId(), member.getPassword(), Collections.singleton(grantedAuthority));
     }

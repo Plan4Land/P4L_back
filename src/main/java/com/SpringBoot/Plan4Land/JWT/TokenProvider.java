@@ -42,7 +42,7 @@ public class TokenProvider {
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority.startsWith("ROLE_"))
-                .findFirst().orElse("ROLE_GENERAL"); // 기본값 설정
+                .findFirst().orElseThrow(()-> new RuntimeException("사용자 역할을 찾을 수 없습니다"));
 
         log.info("사용자 역할 클레임 : {}", role);
 
