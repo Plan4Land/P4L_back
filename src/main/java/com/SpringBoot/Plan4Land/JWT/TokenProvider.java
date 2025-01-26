@@ -32,12 +32,8 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
+    // 새 토큰 생성
     public TokenDto generateTokenDto(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(authority -> !authority.trim().isEmpty())
-                .collect(Collectors.joining(","));
-
         // 사용자 역할(role) 클레임을 가져오기
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -52,7 +48,6 @@ public class TokenProvider {
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
                 .claim(ROLE, role)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -60,7 +55,6 @@ public class TokenProvider {
 
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
                 .claim(ROLE, role)
                 .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -75,12 +69,8 @@ public class TokenProvider {
                 .build();
     }
 
+    // 액세스 토큰 생성
     public AccessTokenDto generateAccessTokenDto(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(authority -> !authority.trim().isEmpty())
-                .collect(Collectors.joining(","));
-
         // 사용자 역할(role) 클레임을 가져오기
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -93,7 +83,6 @@ public class TokenProvider {
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
                 .claim(ROLE, role)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -110,20 +99,13 @@ public class TokenProvider {
         Claims claims = parseClaims(token);
         log.info("JWT Claims: {}", claims);
 
-        if (claims.get(AUTHORITIES_KEY) == null || claims.get(ROLE) == null) {
+        if (claims.get(ROLE) == null) {
             throw new RuntimeException("권한 정보가 없습니다.");
         }
 
-        log.warn(claims.get(AUTHORITIES_KEY).toString());
-        log.warn(claims.get(ROLE).toString());
-
-        List<String> rolesAndAuthorities = new ArrayList<>(Arrays.asList(claims.get(AUTHORITIES_KEY).toString().split(",")));
-        rolesAndAuthorities.add(claims.get(ROLE).toString());
-
-        Collection<? extends GrantedAuthority> authorities =
-                rolesAndAuthorities.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+        List<GrantedAuthority> authorities = Arrays.stream(new String[]{claims.get(ROLE).toString()})
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);

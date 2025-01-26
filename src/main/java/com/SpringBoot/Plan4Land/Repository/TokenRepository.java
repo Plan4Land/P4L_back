@@ -14,8 +14,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     List<Token> findAllByMember(Member member);
     Optional<Token> findByRefreshToken(String refreshToken);
     boolean existsByRefreshToken(String refreshToken);
-
     boolean existsByMember(Member member);
-
     void deleteByMember(Member member);
 }

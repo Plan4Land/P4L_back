@@ -17,8 +17,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -46,7 +50,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     }
 
 
-
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -63,24 +66,26 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean // SecurityFilterChain 객체를 Bean으로 등록
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .httpBasic()
-            .and()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-            .accessDeniedHandler(jwtAccessDeniedHandler)
-            .and()
-            .authorizeRequests()
-                .antMatchers("/", "/static/**", "/auth/**", "member/**", "/ws/**", "/api/travelspots", "/member/idExists/**", "/member/emailExists/**", "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
-                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/plannersTop3", "/admin/admin-login").permitAll()
-                .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
+                .cors(cors -> cors
+                        .configurationSource(request -> {
+                            CorsConfiguration config = new CorsConfiguration();
+                            config.setAllowCredentials(true);
+                            config.setAllowedOrigins(List.of("http://localhost:3000"));
+                            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+                            config.setMaxAge(3600L);
+                            return config;
+                        })
+                )
+                .csrf().disable() // csrf 보호 비활성화 RESTful API 서버에선 일반적으로 불필요
+                .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/favicon.ico", "/manifest.json").permitAll()
+                .antMatchers("/", "/static/**", "/auth/**", "/member/**", "/ws/**", "/api/travelspots", "/member/idExists/**", "/member/emailExists/**", "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
+                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/plannersTop3", "/admin/admin-login").permitAll()
+                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
-            .and()
-            .apply(new JwtSecurityConfig(tokenProvider));
+                .and()
+                .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }
