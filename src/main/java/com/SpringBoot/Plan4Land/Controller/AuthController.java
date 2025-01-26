@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Controller;
 
+import com.SpringBoot.Plan4Land.DTO.AccessTokenDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
@@ -113,8 +114,7 @@ public class AuthController {
 
     // 액세스 토큰 재발급
     @PostMapping("/token/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
-        log.info("컨트롤러 refreshToken: {}", refreshToken);
+    public ResponseEntity<AccessTokenDto> refreshToken(@RequestBody String refreshToken) {
         return ResponseEntity.ok(tokenService.refreshAccessToken(refreshToken));
     }
 }

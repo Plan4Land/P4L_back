@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final ReportService reportService;
+
 
     @PostMapping("/admin-login")
     public ResponseEntity<TokenDto> adminLogin(@RequestBody MemberReqDto memberReqDto) {
@@ -49,6 +51,7 @@ public class AdminController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/member-search")
     public ResponseEntity<List<MemberResDto>> memberSearch(@RequestParam(required = false) String select,
                                                            @RequestParam(required = false) String keyword) {
@@ -57,6 +60,7 @@ public class AdminController {
         return ResponseEntity.ok(lst);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/report-list")
     public ResponseEntity<List<ReportResDto>> reportList() {
         List<ReportResDto> lst = reportService.getReports();
@@ -64,6 +68,7 @@ public class AdminController {
         return ResponseEntity.ok(lst);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/report-count")
     public ResponseEntity<Integer> reportCount(@RequestParam String userId) {
         Integer i = reportService.reportCount(userId);
@@ -71,6 +76,7 @@ public class AdminController {
         return ResponseEntity.ok(i);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/report-manage")
     @Transactional
     public ResponseEntity<Boolean> reportManage(@RequestParam Long reportId,
@@ -89,6 +95,7 @@ public class AdminController {
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/member-ban")
     public ResponseEntity<Boolean> banManage(@RequestParam String userId,
                                              @RequestParam int day) {

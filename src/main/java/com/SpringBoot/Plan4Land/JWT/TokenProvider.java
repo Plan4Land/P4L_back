@@ -24,7 +24,7 @@ public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String ROLE = "role";
     private final Key key;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 ; // 1일  * 24 * 7
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1시간  * 60 * 24 * 7
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7L; // 7일
 
     public TokenProvider(Dotenv dotenv) {
@@ -158,6 +158,7 @@ public class TokenProvider {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
+            return false;  // 만료된 토큰의 경우 false 반환
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
@@ -167,6 +168,7 @@ public class TokenProvider {
         }
         return false;
     }
+
 
     private Claims parseClaims(String token) {
         try {
