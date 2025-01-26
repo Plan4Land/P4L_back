@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -152,10 +153,12 @@ public class AdminService {
             Member member = memberRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없음"));
 
+            LocalDateTime endDate = LocalDateTime.now().plusDays(day).with(LocalTime.of(0, 0));
+
             Ban ban = Ban.builder()
                     .member(member)
                     .startDate(LocalDateTime.now())
-                    .endDate(LocalDateTime.now().plusDays(day))
+                    .endDate(endDate)
                     .build();
 
             member.setRole(Role.ROLE_BANNED);

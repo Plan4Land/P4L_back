@@ -1,16 +1,11 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.DTO.BanResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
-import com.SpringBoot.Plan4Land.Entity.Follow;
-import com.SpringBoot.Plan4Land.Entity.Member;
-import com.SpringBoot.Plan4Land.Entity.Planner;
-import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
-import com.SpringBoot.Plan4Land.Repository.FollowRepository;
-import com.SpringBoot.Plan4Land.Repository.MemberRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerMembersRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.SpringBoot.Plan4Land.Entity.*;
+import com.SpringBoot.Plan4Land.Repository.*;
 import com.sun.tools.jconsole.JConsoleContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,9 +26,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PlannerMembersRepository plannerMembersRepository;
     private final FollowRepository followRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
+    private BanRepository banRepository;
 
     // 회원 전체 조회
     public List<MemberResDto> getMemberAllList() {
@@ -251,6 +246,28 @@ public class MemberService {
             return null;
         }
     }
+
+    public BanResDto banDays(String userId){
+        try{
+            Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
+
+            Ban ban = banRepository.findByMember(member);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+
+            String endDate = ban.getEndDate().format(formatter);
+
+            return BanResDto.builder()
+                    .userId(userId)
+                    .endDate(endDate)
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
 
     // Member Entity => MemberResDto 변환

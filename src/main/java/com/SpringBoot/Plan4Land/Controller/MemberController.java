@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Controller;
 
+import com.SpringBoot.Plan4Land.DTO.BanResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.ReportReqDto;
@@ -120,6 +121,14 @@ public class MemberController {
         String password = memberService.generateTempPassword();
         return isSuccess ? password : null;
     }
+
+    // 정지 유저 정지일 반환
+    @GetMapping("/bandays")
+    public ResponseEntity<BanResDto> getBandays(String userId) {
+        // userId(문자열), endDate(년-월-일 문자열)
+        return ResponseEntity.ok(memberService.banDays(userId));
+    }
+
 
     // 팔로잉
     @PostMapping("/follow")

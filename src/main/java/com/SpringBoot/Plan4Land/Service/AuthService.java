@@ -90,6 +90,10 @@ public class AuthService {
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
             log.info("로그인 성공: {}", authentication);
 
+            if (authentication == null) {
+                return null;
+            }
+
             // 토큰 생성
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 

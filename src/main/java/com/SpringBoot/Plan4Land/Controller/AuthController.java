@@ -1,9 +1,6 @@
 package com.SpringBoot.Plan4Land.Controller;
 
-import com.SpringBoot.Plan4Land.DTO.AccessTokenDto;
-import com.SpringBoot.Plan4Land.DTO.MemberResDto;
-import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
-import com.SpringBoot.Plan4Land.DTO.TokenDto;
+import com.SpringBoot.Plan4Land.DTO.*;
 import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.Service.AuthService;
 import com.SpringBoot.Plan4Land.Service.TokenService;
@@ -43,8 +40,15 @@ public class AuthController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
-        return ResponseEntity.ok(authService.login(memberReqDto));
+        TokenDto tokenDto = authService.login(memberReqDto);
+
+        if (tokenDto == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.ok(tokenDto);
     }
+
 
     // 네이버 로그인
     private static final String NAVER_OAUTH_URL = "https://nid.naver.com/oauth2.0/token";
@@ -72,6 +76,7 @@ public class AuthController {
         ResponseEntity<String> response = restTemplate.exchange(uriBuilder.toUriString(), HttpMethod.POST, entity, String.class);
         return ResponseEntity.ok(response.getBody());
     }
+
     @PostMapping("/naver/userinfo")
     public ResponseEntity<String> getNaverUserInfo(@RequestBody Map<String, String> requestBody) {
         String accessToken = requestBody.get("access_token");
