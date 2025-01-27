@@ -51,6 +51,10 @@ public class AdminService {
             Member member = memberRepository.findById(memberReqDto.getId())
                     .orElseThrow(() -> new RuntimeException("해당 관리자를 찾을 수 없습니다."));
 
+            if(!member.getRole().equals(Role.ROLE_ADMIN)){
+                return null;
+            }
+
             // 해당 메소드 설정에 따라 정보를 담은 토큰 생성(여기선 아이디와 비밀번호)
             UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
             log.info("UsernamePasswordAuthenticationToken: {}", authenticationToken);
