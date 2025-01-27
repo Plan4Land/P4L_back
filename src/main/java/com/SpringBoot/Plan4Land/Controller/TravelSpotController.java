@@ -16,6 +16,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/spots")
 public class TravelSpotController {
 
     private final TravelSpotService travelSpotService;
@@ -32,10 +33,9 @@ public class TravelSpotController {
                                                                  @RequestParam(required = false) String bottomTheme,
                                                                  @RequestParam(required = false) String category,
                                                                  @RequestParam(required = false) String searchQuery) {
-        log.info("{}, {}, {}, {}, \n{}, {}, {}, {} {}",currentPage, pageSize, areaCode, subAreaCode, topTheme, middleTheme, bottomTheme, category, searchQuery);
 
         List<String> bottomThemeList = (bottomTheme != null && !bottomTheme.isEmpty()) ? List.of(bottomTheme.split(",")) : List.of();
-        log.error("bottomThemes : {}", bottomThemeList);
+
 
         Page<TravelSpotResDto> travelSpotResDtos = travelSpotService.getFilteredTravelSpots(currentPage, pageSize, areaCode, subAreaCode,
                 topTheme, middleTheme, bottomThemeList, category, searchQuery);
