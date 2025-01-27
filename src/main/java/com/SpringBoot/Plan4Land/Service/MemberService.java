@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.DTO.BanResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
@@ -42,8 +43,14 @@ public class MemberService {
     // 회원 상세 조회
     public MemberResDto getMemberDetail(String userId) {
         Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-        log.info("Detail");
-        return convertEntityToDto(member);
+
+        MemberResDto memberResDto = convertEntityToDto(member);
+
+        if(!member.isActivate() || member.getRole().equals(Role.ROLE_BANNED)){
+            memberResDto.setState("F");
+        }
+
+        return memberResDto;
     }
 
     // 회원 상세 조회 - 소셜 ID로
