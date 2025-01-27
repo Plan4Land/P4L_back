@@ -83,8 +83,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/", "/static/**", "/auth/**", "/member/**", "/ws/**",
                         "/api/travelspots", "/member/idExists/**", "/member/emailExists/**",
                         "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
-                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/plannersTop3",
-                        "/admin/admin-login").permitAll()
+                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/**",
+                        "/admin/admin-login", "/chat/**", "/holidays/**", "/api/travelspotTop5").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
                 .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
