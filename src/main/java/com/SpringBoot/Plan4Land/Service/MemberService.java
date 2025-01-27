@@ -236,7 +236,7 @@ public class MemberService {
             }
 
             log.warn(lst.toString());
-            List<Member> members = memberRepository.findAllById(lst);
+            List<Member> members = memberRepository.findAllByIdAndActivate(lst);
 
             return members.stream()
                     .map(this::convertEntityToDto)

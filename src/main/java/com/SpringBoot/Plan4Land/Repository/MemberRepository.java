@@ -52,4 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     )
     List<Member> adminFindFilterMember(@Param("select") String select, @Param("keyword") String keyword);
 
+    @Query(value = "SELECT m FROM Member m WHERE m.uid IN :ids AND m.activate = true AND m.role != 'ROLE_BANNED'")
+    List<Member> findAllByIdAndActivate(List<Long> ids);
+
 }
