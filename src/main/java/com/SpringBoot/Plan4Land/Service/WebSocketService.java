@@ -19,6 +19,7 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,21 +85,46 @@ public class WebSocketService {
         // 방이 없으면 생성
         if (room == null) {
             room = createRoom(webSocketMsgDto.getPlannerId());
+        } else {
+            room.getSessions().add(session);
+            if (webSocketMsgDto.getSender() != null) {
+                log.error("sender : {}", webSocketMsgDto.getSender());
+                webSocketMsgDto.setMessage(webSocketMsgDto.getSender() + "님이 입장했습니다.");
+                sendMessageToAll(plannerId, webSocketMsgDto);
+            }
+            log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
         }
-
-        room.getSessions().add(session);
-        log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
     }
 
     // 플래너 퇴장한 세션 제거
-    public void removeSessionAndHandleExit(Long plannerId, WebSocketSession session, WebSocketMsgDto webSocketMsgDto) {
+    public void removeSessionAndHandleExit(Long plannerId, String sender, WebSocketSession session, WebSocketMsgDto webSocketMsgDto) {
         WebSocketResDto room = plannerRooms.get(plannerId);
         if (room != null) {
             room.getSessions().remove(session);
             log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
+            webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
+            webSocketMsgDto.setPlannerId(plannerId);
+            webSocketMsgDto.setSender(sender);
+            Map<String, Object> data = new HashMap<>();
+            data.put("plannerInfo", null);
+            data.put("plans", null);
+            data.put("isEditting", false);
+            webSocketMsgDto.setData(data);
+
+            sendMessageToAll(plannerId, webSocketMsgDto);
+
+            removePlannerMessage(plannerId);
+            WebSocketMsgDto lastPlannerSender = getLastPlannerMessage(plannerId);
+            if (lastPlannerSender != null
+                    && lastPlannerSender.getSender().equals(webSocketMsgDto.getSender())) {
+                removePlannerMessage(plannerId);
+            }
+
             if (room.isSessionEmpty()) {
                 removeRoom(plannerId); // 세션이 남아있지 않으면 방 삭제
                 log.error("세션 남아있지 않아서 방 삭제");
+            } else {
+                log.info("Planner ID {}에서 남아있는 세션 수: {}", plannerId, room.getSessions().size());
             }
         }
     }

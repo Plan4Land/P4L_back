@@ -9,6 +9,7 @@ import com.SpringBoot.Plan4Land.Repository.ChatMsgRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.jconsole.JConsoleContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,10 +104,11 @@ public class ChatService {
         ChatRoomResDto room = chatRooms.get(plannerId);
         if (room != null) {
             room.getSessions().remove(session); // 채팅방에서 퇴장한 세션 제거
+            log.error("퇴장한 사용자 : ", chatMessage.getSender());
             if (chatMessage.getSender() != null) { // 채팅방에서 퇴장한 사용자가 있으면
                 chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장하였습니다.");
                 // 채팅방에 퇴장 메시지 전송 코드 추가
-                sendMessageToAll(chatMessage.getPlannerId(), chatMessage);
+                sendMessageToAll(plannerId, chatMessage);
             }
             log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
             if (room.isSessionEmpty()) {
@@ -141,7 +143,9 @@ public class ChatService {
     public void sendMessageToAll(Long plannerId, ChatMsgDto message) {
         saveMessageToDB(message); // 메시지 저장
 //        ChatRoomResDto room = findRoomById(roomId);
+        log.error("여긴 오는거지??? 와야되는데??");
         ChatRoomResDto room = chatRooms.get(plannerId);
+        log.error(room.toString());
         if (room != null) {
             for (WebSocketSession session : room.getSessions()) {
                 // 해당 세션에 메시지 발송
