@@ -117,7 +117,7 @@ public class WebSocketService {
 
             sendMessageToAll(plannerId, webSocketMsgDto);
 
-            removePlannerMessage(plannerId);
+//            removePlannerMessage(plannerId);
             WebSocketMsgDto lastPlannerSender = getLastPlannerMessage(plannerId);
             if (lastPlannerSender != null
                     && lastPlannerSender.getSender().equals(webSocketMsgDto.getSender())) {
