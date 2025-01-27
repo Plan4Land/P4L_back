@@ -123,12 +123,11 @@ public class MemberController {
     }
 
     // 정지 유저 정지일 반환
-    @GetMapping("/bandays")
-    public ResponseEntity<BanResDto> getBandays(String userId) {
+    @GetMapping("/bandata/{userId}")
+    public ResponseEntity<BanResDto> getBandays(@PathVariable String userId) {
         // userId(문자열), endDate(년-월-일 문자열)
         return ResponseEntity.ok(memberService.banDays(userId));
     }
-
 
     // 팔로잉
     @PostMapping("/follow")
