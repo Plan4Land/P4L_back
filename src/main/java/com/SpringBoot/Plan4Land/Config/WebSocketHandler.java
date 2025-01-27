@@ -24,8 +24,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final WebSocketService webSocketService;
 
 //    private final Map<WebSocketSession, Long> sessionPlannerIdMap = new ConcurrentHashMap<>();
-// WebSocketSession과 sender를 매핑
-private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHashMap<>();
+    // WebSocketSession과 sender를 매핑
+    private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHashMap<>();
 
     // WebSocketSession과 plannerId를 매핑
     private final Map<WebSocketSession, Long> sessionPlannerIdMap = new ConcurrentHashMap<>();
@@ -40,7 +40,7 @@ private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHas
 
         switch (webSocketMsgDto.getType()) {
             case ENTER:
-                sessionPlannerIdMap.put(session, webSocketMsgDto.getPlannerId());
+                sessionPlannerIdMap.put(session, plannerId);
                 sessionSenderMap.put(session, sender);
                 webSocketService.addSessionAndHandleEnter(plannerId, session, webSocketMsgDto);
 
@@ -52,7 +52,7 @@ private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHas
                         log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
                     }
                 }
-//                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
+                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
 //            case CLOSE:
 ////                webSocketService.removePlannerMessage(plannerId);
@@ -70,13 +70,12 @@ private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHas
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case PLANNER:
-                if ("편집완료".equals(webSocketMsgDto.getMessage())) {
-                    webSocketService.removePlannerMessage(plannerId);
-                } else {
-                    webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
-                }
-//                webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
-                log.error("여기서 보내야되는데.. 안보내??");
+//                if ("편집완료".equals(webSocketMsgDto.getMessage())) {
+//                    webSocketService.removePlannerMessage(plannerId);
+//                } else {
+//                    webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
+//                }
+                webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             default:
