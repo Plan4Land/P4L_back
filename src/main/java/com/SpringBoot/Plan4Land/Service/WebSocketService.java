@@ -84,11 +84,15 @@ public class WebSocketService {
         WebSocketResDto room = findRoomByPlannerId(plannerId);
         // 방이 없으면 생성
         if (room == null) {
+//            log.error("방을 새로 생성함..");
             room = createRoom(webSocketMsgDto.getPlannerId());
+            room.getSessions().add(session);
+            log.info("Planner ID {}에 새로운 세션 생성: {}", plannerId, session.getId());
         } else {
+//            log.error("있는 방에 세션만 추가함...");
+//            log.error("방에 있는 세션들 : {}", room.getSessions());
             room.getSessions().add(session);
             if (webSocketMsgDto.getSender() != null) {
-                log.error("sender : {}", webSocketMsgDto.getSender());
                 webSocketMsgDto.setMessage(webSocketMsgDto.getSender() + "님이 입장했습니다.");
                 sendMessageToAll(plannerId, webSocketMsgDto);
             }
@@ -102,9 +106,9 @@ public class WebSocketService {
         if (room != null) {
             room.getSessions().remove(session);
             log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
-            webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
+//            webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
             webSocketMsgDto.setPlannerId(plannerId);
-            webSocketMsgDto.setSender(sender);
+//            webSocketMsgDto.setSender(sender);
             Map<String, Object> data = new HashMap<>();
             data.put("plannerInfo", null);
             data.put("plans", null);
