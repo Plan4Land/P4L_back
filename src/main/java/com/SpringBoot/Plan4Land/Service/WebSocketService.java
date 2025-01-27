@@ -101,11 +101,17 @@ public class WebSocketService {
     }
 
     // 플래너 퇴장한 세션 제거
-    public void removeSessionAndHandleExit(Long plannerId, String sender, WebSocketSession session, WebSocketMsgDto webSocketMsgDto) {
+    public void removeSessionAndHandleExit(Long plannerId, String sender,
+                                           WebSocketSession session,
+                                           WebSocketMsgDto webSocketMsgDto,
+                                           Map<WebSocketSession, String> sessionSenderMap,
+                                           Map<WebSocketSession, Long> sessionPlannerIdMap) {
         WebSocketResDto room = plannerRooms.get(plannerId);
         if (room != null) {
             room.getSessions().remove(session);
             log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
+            sessionPlannerIdMap.remove(session);
+            sessionSenderMap.remove(session);
 //            webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
             webSocketMsgDto.setPlannerId(plannerId);
 //            webSocketMsgDto.setSender(sender);

@@ -92,7 +92,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             WebSocketMsgDto webSocketMsgDto = new WebSocketMsgDto();
             webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
             webSocketMsgDto.setSender(sender);
-            webSocketService.removeSessionAndHandleExit(plannerId, sender, session, webSocketMsgDto);
+            webSocketService.removeSessionAndHandleExit(plannerId, sender, session, webSocketMsgDto, sessionSenderMap, sessionPlannerIdMap);
         }
     }
 }
