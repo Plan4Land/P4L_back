@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
@@ -65,10 +66,11 @@ public class AuthService {
             Member member;
             // 소셜 로그인
             if (memberReqDto.getSso() != null) {
-                member = memberRepository.findBySsoAndSocialId(memberReqDto.getSso(), memberReqDto.getSocialId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
+                member = memberRepository.findBySsoAndSocialId(memberReqDto.getSso(), memberReqDto.getSocialId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
 
                 // 회원 상태 검증
-                if(!member.isActivate()) {
+                if (!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
                 }
@@ -78,7 +80,7 @@ public class AuthService {
                         .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
                 // 회원 상태 검증
-                if(!member.isActivate()) {
+                if (!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
                 }
@@ -88,11 +90,6 @@ public class AuthService {
             UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
 
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-            log.info("로그인 성공: {}", authentication);
-
-            if (authentication == null) {
-                return null;
-            }
 
             // 토큰 생성
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
@@ -114,10 +111,13 @@ public class AuthService {
             return tokenDto;
         } catch (BadCredentialsException e) {
             log.error("Bad credentials provided: ", e);
-            throw new RuntimeException("Authentication failed due to bad credentials", e);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        } catch (ResponseStatusException e) {
+            log.error("Response status exception: ", e);
+            throw e;
         } catch (Exception e) {
             log.error("Authentication failed: ", e);
-            throw new RuntimeException("Authentication failed", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "로그인 중 문제가 발생했습니다.");
         }
     }
 
@@ -142,7 +142,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 회원 상태 검증
-        if(!member.isActivate()) {
+        if (!member.isActivate()) {
             return "탈퇴한 회원입니다.";
         } else {
             return "활성 회원입니다.";
@@ -156,7 +156,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         // 회원 상태 검증
-        if(!member.isActivate()) {
+        if (!member.isActivate()) {
             return "탈퇴한 회원입니다.";
         } else {
             return "활성 회원입니다.";

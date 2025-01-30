@@ -6,6 +6,7 @@ import com.SpringBoot.Plan4Land.Service.CustomUserDetailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -16,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_BANNED"));
 
         if (isBanned) {
-            throw new LockedException("접근이 금지된 계정입니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "정지된 회원입니다.");
         }
 
             // 일반 사용자 인증 성공

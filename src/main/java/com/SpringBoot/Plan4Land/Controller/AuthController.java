@@ -42,10 +42,6 @@ public class AuthController {
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         TokenDto tokenDto = authService.login(memberReqDto);
 
-        if (tokenDto == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         return ResponseEntity.ok(tokenDto);
     }
 
