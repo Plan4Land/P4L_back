@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BanRepository extends JpaRepository<Ban, Long> {
     Ban findFirstByMemberOrderByIdDesc(Member member);
+
+    Ban findByMember(Member member);
 }

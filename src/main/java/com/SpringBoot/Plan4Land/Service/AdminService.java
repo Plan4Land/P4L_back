@@ -157,7 +157,17 @@ public class AdminService {
             Member member = memberRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없음"));
 
-            LocalDateTime endDate = LocalDateTime.now().plusDays(day).with(LocalTime.of(0, 0));
+            Ban alreadyBanned = banRepository.findFirstByMemberOrderByIdDesc(member);
+
+            LocalDateTime endDate;
+
+            if (alreadyBanned == null) {
+                endDate = LocalDateTime.now().plusDays(day).with(LocalTime.of(0, 0));
+                member.setRole(Role.ROLE_BANNED);
+                memberRepository.save(member);
+            }else {
+                endDate = alreadyBanned.getEndDate().plusDays(day).with(LocalTime.of(0, 0));
+            }
 
             Ban ban = Ban.builder()
                     .member(member)
@@ -165,11 +175,8 @@ public class AdminService {
                     .endDate(endDate)
                     .reason(reason)
                     .build();
-
-            member.setRole(Role.ROLE_BANNED);
-
+            
             banRepository.save(ban);
-            memberRepository.save(member);
 
             return true;
         } catch (Exception e) {
