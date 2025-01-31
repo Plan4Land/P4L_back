@@ -116,6 +116,8 @@ public class AuthController {
     // 액세스 토큰 재발급
     @PostMapping("/token/refresh")
     public ResponseEntity<AccessTokenDto> refreshToken(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(tokenService.refreshAccessToken(refreshToken));
+        AccessTokenDto accessTokenDto = tokenService.refreshAccessToken(refreshToken);
+
+        return ResponseEntity.ok(accessTokenDto);
     }
 }
