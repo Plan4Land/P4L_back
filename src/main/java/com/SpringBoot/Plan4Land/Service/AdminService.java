@@ -152,7 +152,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean memberBan(String userId, int day) {
+    public boolean memberBan(String userId, int day, String reason) {
         try {
             Member member = memberRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없음"));
@@ -163,6 +163,7 @@ public class AdminService {
                     .member(member)
                     .startDate(LocalDateTime.now())
                     .endDate(endDate)
+                    .reason(reason)
                     .build();
 
             member.setRole(Role.ROLE_BANNED);

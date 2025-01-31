@@ -258,7 +258,7 @@ public class MemberService {
         try{
             Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자"));
 
-            Ban ban = banRepository.findByMember(member);
+            Ban ban = banRepository.findFirstByMemberOrderByIdDesc(member);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
@@ -267,6 +267,7 @@ public class MemberService {
             return BanResDto.builder()
                     .userId(userId)
                     .endDate(endDate)
+                    .reason(ban.getReason())
                     .build();
         } catch (Exception e) {
             log.error(e.getMessage());

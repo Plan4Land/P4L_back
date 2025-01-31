@@ -11,4 +11,5 @@ import lombok.*;
 public class BanResDto {
     public String userId;
     public String endDate;
+    public String reason;
 }

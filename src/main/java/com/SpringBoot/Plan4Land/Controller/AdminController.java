@@ -80,11 +80,12 @@ public class AdminController {
     public ResponseEntity<Boolean> reportManage(@RequestParam Long reportId,
                                                 @RequestParam boolean status,
                                                 @RequestParam(required = false) String userId,
-                                                @RequestParam(required = false) Integer day) {
+                                                @RequestParam(required = false) Integer day,
+                                                @RequestParam(required = false) String reason) {
         try {
             boolean isSuccess = adminService.reportProcess(reportId, status);
             if (userId != null) {
-                adminService.memberBan(userId, day);
+                adminService.memberBan(userId, day, reason);
             }
             return ResponseEntity.ok(isSuccess);
         } catch (Exception e) {
@@ -95,8 +96,9 @@ public class AdminController {
 
     @PostMapping("/member-ban")
     public ResponseEntity<Boolean> banManage(@RequestParam String userId,
-                                             @RequestParam int day) {
-        boolean isSuccess = adminService.memberBan(userId, day);
+                                             @RequestParam int day,
+                                             @RequestParam String reason) {
+        boolean isSuccess = adminService.memberBan(userId, day, reason);
 
         return ResponseEntity.ok(isSuccess);
     }
