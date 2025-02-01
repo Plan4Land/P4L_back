@@ -104,12 +104,6 @@ public class PlannerController {
         Page<PlannerResDto> dto = plannerService.getFilteredPlanner(currentPage, pageSize, areaCode, subAreaCode, themeList, searchQuery,
                  sortBy);
 
-        log.info(dto.getContent().toString());
-        log.info(sortBy);
-        log.info(dto.getSort().toString());
-        log.info("dto.getTotalElements() : " + dto.getTotalElements());
-        log.info("dto.getTotalPages() : " + dto.getTotalPages());
-
         return ResponseEntity.ok(dto);
     }
 

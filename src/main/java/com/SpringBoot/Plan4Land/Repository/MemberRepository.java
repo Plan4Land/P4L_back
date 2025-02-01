@@ -1,6 +1,8 @@
 package com.SpringBoot.Plan4Land.Repository;
 
 import com.SpringBoot.Plan4Land.Entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,7 +41,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = """
             SELECT m FROM Member m WHERE m.id LIKE %:id% OR m.nickname LIKE %:nickname% OR m.name LIKE %:name% OR m.email LIKE %:email%
             """)
-    List<Member> adminFindMember(String id, String nickname, String name, String email);
+    Page<Member> adminFindMember(Pageable pageable, String id, String nickname, String name, String email);
 
     @Query(value = """
         SELECT m FROM Member m
@@ -50,7 +52,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
              WHEN :select = 'email' THEN m.email
         END LIKE %:keyword%"""
     )
-    List<Member> adminFindFilterMember(@Param("select") String select, @Param("keyword") String keyword);
+    Page<Member> adminFindFilterMember(Pageable pageable, @Param("select") String select, @Param("keyword") String keyword);
 
     @Query(value = "SELECT m FROM Member m WHERE m.uid IN :ids AND m.activate = true AND m.role != 'ROLE_BANNED'")
     List<Member> findAllByIdAndActivate(List<Long> ids);

@@ -41,7 +41,7 @@ public class ReportService {
         }
     }
 
-    public List<ReportResDto> getReports() {
+    public List<ReportResDto> getReports(int currentPage, int pageSize, String keyword, String select) {
         List<Report> lst = reportRepository.findAllOrderByStateAndReportDate();
 
         return lst.stream().map(ReportResDto::of).collect(Collectors.toList());

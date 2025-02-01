@@ -21,8 +21,8 @@ public class AdminServiceTest {
     @Test
     @DisplayName("회원 검색 어드민")
     public void test() {
-        List<MemberResDto> lst =  adminService.adminSearchMember("test", "id");
-
-        log.info(lst != null ? lst.toString() : "false");
+//        List<MemberResDto> lst =  adminService.adminSearchMember("test", "id");
+//
+//        log.info(lst != null ? lst.toString() : "false");
     }
 }

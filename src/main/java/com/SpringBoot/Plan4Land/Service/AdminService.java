@@ -18,6 +18,9 @@ import com.SpringBoot.Plan4Land.Repository.TokenRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -103,7 +106,7 @@ public class AdminService {
         return null;
     }
 
-    public List<MemberResDto> adminSearchMember(String keyword, String select) {
+    public Page<MemberResDto> adminSearchMember(int currentPage, int size, String keyword, String select) {
         try {
             if (select == null) {
                 select = "";
@@ -111,21 +114,19 @@ public class AdminService {
             if (keyword == null) {
                 keyword = "";
             }
-            List<Member> lst;
+            Page<Member> page;
+            Pageable pageable = PageRequest.of(currentPage, size);
+
             // id, nickname, name, email
             if (!select.isEmpty() && !keyword.isEmpty()) {
-                lst = memberRepository.adminFindFilterMember(select, keyword);
+                page = memberRepository.adminFindFilterMember(pageable ,select, keyword);
             } else if (select.isEmpty() && !keyword.isEmpty()) {
-                lst = memberRepository.adminFindMember(keyword, keyword, keyword, keyword);
+                page = memberRepository.adminFindMember(pageable, keyword, keyword, keyword, keyword);
             } else {
-                lst = memberRepository.findAll();
+                page = memberRepository.findAll(pageable);
             }
 
-
-            return lst.stream()
-                    .map(this::convertEntityToDto)
-                    .collect(Collectors.toList());
-
+            return page.map(this::convertEntityToDto);
         } catch (Exception e) {
             log.error(e.getMessage());
             return null;

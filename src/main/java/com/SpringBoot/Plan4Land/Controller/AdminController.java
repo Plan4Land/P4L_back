@@ -5,6 +5,7 @@ import com.SpringBoot.Plan4Land.Service.AdminService;
 import com.SpringBoot.Plan4Land.Service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class AdminController {
     private final ReportService reportService;
 
 
+    // 관리자 로그인
     @PostMapping("/admin-login")
     public ResponseEntity<TokenDto> adminLogin(@RequestBody MemberReqDto memberReqDto) {
         try {
@@ -38,6 +40,7 @@ public class AdminController {
         }
     }
 
+    // 관리자 토큰 리프레시
     @PostMapping("/token-refresh")
     public ResponseEntity<AccessTokenDto> newAccessToken(@RequestBody String refreshToken) {
         try {
@@ -52,22 +55,31 @@ public class AdminController {
     }
 
 
+    // 관리자 멤버 검색
     @GetMapping("/member-search")
-    public ResponseEntity<List<MemberResDto>> memberSearch(@RequestParam(required = false) String select,
+    public ResponseEntity<Page<MemberResDto>> memberSearch(@RequestParam(defaultValue = "0") int currentPage,
+                                                           @RequestParam(defaultValue = "20") int pageSize,
+                                                           @RequestParam(required = false) String select,
                                                            @RequestParam(required = false) String keyword) {
-        List<MemberResDto> lst = adminService.adminSearchMember(keyword, select);
+        log.info("MemberSearch Request: {}", keyword);
+        Page<MemberResDto> page = adminService.adminSearchMember(currentPage, pageSize, keyword, select);
 
-        return ResponseEntity.ok(lst);
+        return ResponseEntity.ok(page);
     }
 
 
+    // 관리자 신고 목록 검색
     @GetMapping("/report-list")
-    public ResponseEntity<List<ReportResDto>> reportList() {
-        List<ReportResDto> lst = reportService.getReports();
+    public ResponseEntity<List<ReportResDto>> reportList(@RequestParam(defaultValue = "0") int currentPage,
+                                                         @RequestParam(defaultValue = "20") int pageSize,
+                                                         @RequestParam(required = false) String select,
+                                                         @RequestParam(required = false) String keyword) {
+        List<ReportResDto> lst = reportService.getReports(currentPage, pageSize, keyword, select);
 
         return ResponseEntity.ok(lst);
     }
 
+    // 신고당한 횟수
     @GetMapping("/report-count")
     public ResponseEntity<Integer> reportCount(@RequestParam String userId) {
         Integer i = reportService.reportCount(userId);
@@ -75,6 +87,7 @@ public class AdminController {
         return ResponseEntity.ok(i);
     }
 
+    // 신고 관리
     @PostMapping("/report-manage")
     @Transactional
     public ResponseEntity<Boolean> reportManage(@RequestParam Long reportId,
@@ -94,6 +107,7 @@ public class AdminController {
 
     }
 
+    // 유저 정지
     @PostMapping("/member-ban")
     public ResponseEntity<Boolean> banManage(@RequestParam String userId,
                                              @RequestParam int day,
