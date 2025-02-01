@@ -70,11 +70,11 @@ public class AdminController {
 
     // 관리자 신고 목록 검색
     @GetMapping("/report-list")
-    public ResponseEntity<List<ReportResDto>> reportList(@RequestParam(defaultValue = "0") int currentPage,
+    public ResponseEntity<Page<ReportResDto>> reportList(@RequestParam(defaultValue = "0") int currentPage,
                                                          @RequestParam(defaultValue = "20") int pageSize,
                                                          @RequestParam(required = false) String select,
                                                          @RequestParam(required = false) String keyword) {
-        List<ReportResDto> lst = reportService.getReports(currentPage, pageSize, keyword, select);
+        Page<ReportResDto> lst = reportService.getReports(currentPage, pageSize, keyword, select);
 
         return ResponseEntity.ok(lst);
     }
