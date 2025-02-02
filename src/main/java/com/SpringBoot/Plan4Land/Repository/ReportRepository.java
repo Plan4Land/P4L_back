@@ -95,4 +95,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Page<Report> findReportByState(Pageable pageable, State state);
 
     int countReportByReported(Member reported);
+
+    int countReportByReportedAndStateIsNot(Member reported, State state);
 }

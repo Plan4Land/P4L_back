@@ -85,9 +85,8 @@ public class ReportService {
 
     public int reportCount(String userId) {
         Member user = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
-        int cnt = reportRepository.countReportByReported(user);
 
-        return cnt;
+        return reportRepository.countReportByReportedAndStateIsNot(user, State.REJECT);
     }
 
 
