@@ -42,6 +42,7 @@ public class MemberController {
     @GetMapping("/social/{sso}/{socialId}")
     public ResponseEntity<MemberResDto> memberDetailBySocialId(@PathVariable String sso, @PathVariable String socialId) {
         MemberResDto memberResDto = memberService.getMemberDetailBySocialId(sso, socialId);
+        log.info(memberResDto.toString());
         return ResponseEntity.ok(memberResDto);
     }
 
@@ -134,7 +135,7 @@ public class MemberController {
     public ResponseEntity<Boolean> followMember(@RequestParam String followerId,
                                                 @RequestParam String followedId,
                                                 @RequestParam boolean isFollow) {
-        if(followedId.equals(followerId)) {
+        if (followedId.equals(followerId)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(isFollow);
         }
         boolean isSuccess = memberService.followManagement(followerId, followedId, isFollow);

@@ -42,6 +42,7 @@ public class AuthController {
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         TokenDto tokenDto = authService.login(memberReqDto);
 
+        log.info("login token: {}", tokenDto);
         return ResponseEntity.ok(tokenDto);
     }
 

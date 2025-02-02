@@ -69,6 +69,8 @@ public class AuthService {
                 member = memberRepository.findBySsoAndSocialId(memberReqDto.getSso(), memberReqDto.getSocialId())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
 
+                memberReqDto.setId(member.getId());
+
                 // 회원 상태 검증
                 if (!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
