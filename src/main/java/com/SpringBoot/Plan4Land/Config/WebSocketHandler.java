@@ -52,7 +52,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                         log.error("메시지 전송 실패 - 세션 ID: {} - 에러: {}", session.getId(), e.getMessage());
                     }
                 }
-                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
 //            case CLOSE:
 ////                webSocketService.removePlannerMessage(plannerId);
