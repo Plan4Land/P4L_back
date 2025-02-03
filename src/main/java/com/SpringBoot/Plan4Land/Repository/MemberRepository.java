@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findBySsoAndSocialId(String sso, String socialId);
 
-    @Query("SELECT m FROM Member m WHERE (m.id LIKE %:id% OR m.nickname LIKE %:nickname%) AND m.activate = true")
+    @Query("SELECT m FROM Member m WHERE (m.id LIKE %:id% OR m.nickname LIKE %:nickname%) AND m.activate = true AND m.role = 'ROLE_GENERAL'")
     List<Member> findByIdOrNickname(@Param("id") String id, @Param("nickname") String nickname);
 
     boolean existsById(String userId);
