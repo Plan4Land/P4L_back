@@ -80,7 +80,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .csrf().disable() // csrf 보호 비활성화 RESTful API 서버에선 일반적으로 불필요
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/", "/static/**", "/auth/**", "/member/**", "/ws/**",
+                .antMatchers("/", "/static/**", "/plan4landicon.ico", "/auth/**", "/member/**", "/ws/**",
                         "/spots/**", "/member/idExists/**", "/member/emailExists/**",
                         "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
                         "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/**",
