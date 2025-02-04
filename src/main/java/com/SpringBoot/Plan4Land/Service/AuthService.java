@@ -74,7 +74,7 @@ public class AuthService {
                 // 회원 상태 검증
                 if (!member.isActivate()) {
                     log.error("탈퇴한 회원입니다.");
-                    throw new ResponseStatusException(HttpStatus.GONE, "탈퇴한 회원입니다.");
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "탈퇴한 회원입니다.");
                 }
             } else {
                 // 일반 로그인
