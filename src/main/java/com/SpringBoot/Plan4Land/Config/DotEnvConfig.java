@@ -15,7 +15,6 @@ public class DotEnvConfig {
         Dotenv dotenv = Dotenv.configure().directory("./")
                 .ignoreIfMissing() // .env 파일이 없어도 에러 발생 안함
                 .load();
-        log.warn("key : {}", dotenv.get("JWT_SECRET"));
         return dotenv;
     }
 }

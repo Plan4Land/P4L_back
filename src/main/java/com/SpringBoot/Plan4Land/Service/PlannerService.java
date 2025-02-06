@@ -124,22 +124,21 @@ public class PlannerService {
     // 플래너 삭제
     @Transactional
     public boolean removePlannerInfo(Long plannerId, String userId) {
-        try{
-            log.warn("{} : {}", userId, plannerId);
-            Member member = memberRepository.findById(userId).orElseThrow(()->new RuntimeException("해당 회원을 찾을 수 없습니다."));
-            Planner planner = plannerRepository.findById(plannerId).orElseThrow(()-> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
+        try {
+            Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+            Planner planner = plannerRepository.findById(plannerId).orElseThrow(() -> new RuntimeException("해당 플래너를 찾을 수 없습니다."));
 
-            if(planner.getOwner().getId().equals(member.getId()) || member.getRole() == Role.ROLE_ADMIN){
+            if (planner.getOwner().getId().equals(member.getId()) || member.getRole() == Role.ROLE_ADMIN) {
                 plannerMembersRepository.deleteByPlannerId(plannerId);
                 bookMarkPlannerRepository.deleteByPlannerId(plannerId);
                 chatMsgRepository.deleteByPlannerId(plannerId);
                 planRepository.deleteByPlannerId(plannerId);
                 plannerRepository.deleteById(plannerId);
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw e;
         }
@@ -171,7 +170,6 @@ public class PlannerService {
     @Transactional
     public List<Plan> deleteAndInsertPlans(Long plannerId, List<Plan> newPlans) {
         planRepository.deleteByPlannerId(plannerId);
-        log.info("plan 삭제 완료");
 
         Planner planner = plannerRepository.findById(plannerId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Planner ID"));
@@ -231,7 +229,7 @@ public class PlannerService {
         return new PageImpl<>(paginatedList, pageable, sortedPlannerResDtos.size());
     }
 
-// 북마크 상위 3개 플래너 가져오기
+    // 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTopBookmarkedPlanners() {
         Pageable pageable = PageRequest.of(0, 5);
 
@@ -244,6 +242,7 @@ public class PlannerService {
                 })
                 .collect(Collectors.toList());
     }
+
     // 내 소유 플래너 목록 가져오기 (최신순으로 정렬)
     public Page<Planner> getPlannersByOwner(String memberId, Pageable pageable) {
         // 최신순 정렬 추가
@@ -257,6 +256,7 @@ public class PlannerService {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Order.desc("regDate")));
         return plannerRepository.findByOwnerIdAndIsPublicTrue(memberId, sortedPageable);
     }
+
     // 플래닝에 멤버 초대
     public boolean inviteMember(String memberId, Long plannerId) {
         Member member = memberRepository.findById(memberId)
@@ -318,7 +318,8 @@ public class PlannerService {
 
         return true;
     }
-// 내가 작성한, 포함된 플래너 목록 가져오기
+
+    // 내가 작성한, 포함된 플래너 목록 가져오기
     public Page<PlannerResDto> getPlanners(String memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Member owner = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -333,6 +334,10 @@ public class PlannerService {
 
         // 페이지네이션 처리된 결과 반환
         return new PageImpl<>(plannerDtos, pageable, planners.getTotalElements());
+    }
+
+    public Long getLastPlannerId() {
+        return plannerRepository.findLastId() + 1;
     }
 
 }

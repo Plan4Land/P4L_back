@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/planner")
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class PlannerController {
 
     // 플래너 수정
     @PostMapping("/update")
-    public ResponseEntity<PlannerResDto > editPlannerInfo(@RequestParam Long plannerId, @RequestBody PlannerReqDto plannerReqDto) {
+    public ResponseEntity<PlannerResDto> editPlannerInfo(@RequestParam Long plannerId, @RequestBody PlannerReqDto plannerReqDto) {
         PlannerResDto isSuccess = plannerService.editPlannerInfo(plannerReqDto, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
@@ -81,11 +80,9 @@ public class PlannerController {
     }
 
 
-
     // Plan 삭제 및 삽입
     @PostMapping("/updatePlan")
     public ResponseEntity<List<Plan>> deleteAndInsertPlans(@RequestParam Long plannerId, @RequestBody List<Plan> newPlans) {
-        log.warn(newPlans.toString());
         List<Plan> plans = plannerService.deleteAndInsertPlans(plannerId, newPlans);
         return ResponseEntity.ok(plans);
     }
@@ -102,7 +99,7 @@ public class PlannerController {
 
         // 서비스 호출
         Page<PlannerResDto> dto = plannerService.getFilteredPlanner(currentPage, pageSize, areaCode, subAreaCode, themeList, searchQuery,
-                 sortBy);
+                sortBy);
 
         return ResponseEntity.ok(dto);
     }
@@ -119,7 +116,8 @@ public class PlannerController {
         Page<Planner> planners = plannerService.getPlannersByOwner(memberId, pageable);
         return planners.map(planner -> PlannerResDto.fromEntity(planner, null, null));
     }
-// 특정 유저가 작성한 플래너 리스트 중 공개 정보만
+
+    // 특정 유저가 작성한 플래너 리스트 중 공개 정보만
     @GetMapping("/userPlanners")
     public Page<PlannerResDto> getPrivatePlannersByOwner(
             @RequestParam String memberId,
@@ -167,5 +165,10 @@ public class PlannerController {
             @RequestParam int size) {
 
         return plannerService.getPlanners(memberId, page, size);
+    }
+
+    @GetMapping("/last-planner")
+    public ResponseEntity<Long> getLastPlanners() {
+        return ResponseEntity.ok(plannerService.getLastPlannerId());
     }
 }

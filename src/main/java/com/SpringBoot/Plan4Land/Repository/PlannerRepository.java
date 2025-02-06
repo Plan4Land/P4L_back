@@ -35,12 +35,12 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
               AND p.isPublic = true
             """)
     List<Planner> getFilteredPlanners(
-                                      @Param("areaCode") String areaCode,
-                                      @Param("subAreaCode") String subAreaCode,
-                                      @Param("searchQuery") String searchQuery,
-                                      @Param("theme1") String theme1,
-                                      @Param("theme2") String theme2,
-                                      @Param("theme3") String theme3);
+            @Param("areaCode") String areaCode,
+            @Param("subAreaCode") String subAreaCode,
+            @Param("searchQuery") String searchQuery,
+            @Param("theme1") String theme1,
+            @Param("theme2") String theme2,
+            @Param("theme3") String theme3);
 //    @Query(value = """
 //            SELECT p, COUNT(b.planner.id)
 //            FROM Planner p
@@ -90,6 +90,9 @@ public interface PlannerRepository extends JpaRepository<Planner, Long> {
             "WHERE p.owner = :owner OR p.id IN (" +
             "SELECT pm.planner FROM PlannerMembers pm WHERE pm.member = :owner AND pm.state = 'ACCEPT')")
     Page<Planner> findPlannersByOwnerOrMember(Member owner, Pageable pageable);
+
+    @Query("SELECT MAX(p.id) FROM Planner p")
+    Long findLastId();
 
 
     // integer
