@@ -15,7 +15,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/bookmarkPlanner")
-@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class BookmarkPlannerController {
     private final BookmarkPlannerService bookmarkPlannerService;
@@ -38,7 +37,6 @@ public class BookmarkPlannerController {
     // 북마크 삭제
     @DeleteMapping()
     public ResponseEntity<Boolean> deleteBookmarked(@RequestParam String memberId, @RequestParam Long plannerId) {
-        log.info("받은 데이터 : memberId = {}, plannerId = {}", memberId, plannerId);
         boolean isSuccess = bookmarkPlannerService.deleteBookmarked(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }

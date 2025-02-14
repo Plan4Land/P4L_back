@@ -54,8 +54,6 @@ public class ReportService {
             if (keyword == null) {
                 keyword = "";
             }
-            log.info("키워드 : {}", keyword);
-            log.info("셀렉트 : {}", select);
             State state;
             Page<Report> page;
             Pageable pageable = PageRequest.of(currentPage, size);

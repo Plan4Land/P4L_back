@@ -1,5 +1,8 @@
 package com.SpringBoot.Plan4Land.Security;
 
+import com.SpringBoot.Plan4Land.Constant.Role;
+import com.SpringBoot.Plan4Land.CustomException.BanUserException;
+import com.SpringBoot.Plan4Land.CustomException.PasswordNotMatchException;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
 import com.SpringBoot.Plan4Land.Service.CustomUserDetailService;
@@ -49,12 +52,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             Member member = memberRepository.findById(username)
                     .orElseThrow(() -> new RuntimeException("소셜 사용자를 찾을 수 없습니다."));
 
+            if(member.getRole().equals(Role.ROLE_BANNED)) {
+                throw new BanUserException(HttpStatus.FORBIDDEN, "정지된 회원입니다.");
+            }
+
             // 카카오 사용자 인증 성공
             return new UsernamePasswordAuthenticationToken(username, password, List.of(new SimpleGrantedAuthority("ROLE_GENERAL")));
         }
 
         if (userDetails == null || !passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new PasswordNotMatchException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
         // 정지 유저 접근 불가
@@ -62,7 +69,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_BANNED"));
 
         if (isBanned) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "정지된 회원입니다.");
+            throw new BanUserException(HttpStatus.FORBIDDEN, "정지된 회원입니다.");
         }
 
             // 일반 사용자 인증 성공

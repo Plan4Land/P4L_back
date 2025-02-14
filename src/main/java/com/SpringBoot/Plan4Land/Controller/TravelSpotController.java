@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -47,7 +46,6 @@ public class TravelSpotController {
     // 여행지 상세 정보 조회
     @GetMapping("/api/travelspotInfo/{spotId}")
     public TravelSpotResDto getSpotDetail(@PathVariable Long spotId) {
-        log.info("여기 찍기 : {}", spotId);
         return travelSpotService.getSpotDetail(spotId); // 서비스 메서드 호출
     }
 

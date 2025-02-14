@@ -38,7 +38,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")  // 프론트엔드의 URL
+                .allowedOrigins("http://localhost:8111")  // 프론트엔드의 URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // 허용할 HTTP 메서드
                 .allowedHeaders("*");  // 허용할 헤더
     }
@@ -70,7 +70,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .configurationSource(request -> {
                             CorsConfiguration config = new CorsConfiguration();
                             config.setAllowCredentials(true);
-                            config.setAllowedOrigins(List.of("http://localhost:3000"));
+                            config.setAllowedOrigins(List.of("http://localhost:8111"));
                             config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                             config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
                             config.setMaxAge(3600L);
@@ -78,21 +78,23 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         })
                 )
                 .csrf().disable() // csrf 보호 비활성화 RESTful API 서버에선 일반적으로 불필요
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/", "/static/**", "/plan4landicon.ico", "/auth/**", "/member/**", "/ws/**",
-                        "/spots/**", "/member/idExists/**", "/member/emailExists/**",
-                        "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
-                        "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/**",
-                        "/admin/admin-login", "/chat/**", "/holidays/**", "/planner/userPlanners").permitAll()
-                .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
-                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                .anyRequest().authenticated()
-                .and()
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .antMatchers("/", "/static/**", "/auth/**", "/member/**", "/ws/**",
+                                "/spots/**", "/member/idExists/**", "/member/emailExists/**",
+                                "/member/nicknameExists/**", "/member/find-id", "/member/find-password",
+                                "/planner/planners", "/planner/fetchData/**", "/bookmarkPlanner/**",
+                                "/admin/admin-login", "/chat/**", "/holidays/**", "/planner/userPlanners").permitAll()
+                        .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
+                        .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }
+
 
 
 }

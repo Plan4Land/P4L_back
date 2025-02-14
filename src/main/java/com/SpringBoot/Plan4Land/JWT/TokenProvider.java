@@ -40,7 +40,6 @@ public class TokenProvider {
                 .filter(authority -> authority.startsWith("ROLE_"))
                 .findFirst().orElseThrow(()-> new RuntimeException("사용자 역할을 찾을 수 없습니다"));
 
-        log.info("사용자 역할 클레임 : {}", role);
 
         long now = (new Date()).getTime();
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME); // 1분
@@ -97,7 +96,6 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
-        log.info("JWT Claims: {}", claims);
 
         if (claims.get(ROLE) == null) {
             throw new RuntimeException("권한 정보가 없습니다.");

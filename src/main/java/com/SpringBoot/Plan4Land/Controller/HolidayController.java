@@ -14,7 +14,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class HolidayController {
     private final HolidayService holidayService;
 

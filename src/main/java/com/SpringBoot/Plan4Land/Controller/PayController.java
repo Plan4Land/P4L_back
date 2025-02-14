@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/payment")
 @RequiredArgsConstructor
 public class PayController {

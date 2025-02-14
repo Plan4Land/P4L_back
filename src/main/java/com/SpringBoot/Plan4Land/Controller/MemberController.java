@@ -17,7 +17,6 @@ import java.util.*;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
@@ -42,7 +41,6 @@ public class MemberController {
     @GetMapping("/social/{sso}/{socialId}")
     public ResponseEntity<MemberResDto> memberDetailBySocialId(@PathVariable String sso, @PathVariable String socialId) {
         MemberResDto memberResDto = memberService.getMemberDetailBySocialId(sso, socialId);
-        log.info(memberResDto.toString());
         return ResponseEntity.ok(memberResDto);
     }
 
@@ -64,13 +62,6 @@ public class MemberController {
     @PutMapping("/update/password")
     public ResponseEntity<Boolean> memberUpdatePassword(@RequestBody MemberReqDto memberReqDto) {
         boolean isSuccess = memberService.updateMemberPassword(memberReqDto);
-        return ResponseEntity.ok(isSuccess);
-    }
-
-    // 회원 정보 삭제
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Boolean> memberDelete(@PathVariable String userId) {
-        boolean isSuccess = memberService.deleteMember(userId);
         return ResponseEntity.ok(isSuccess);
     }
 
@@ -140,7 +131,6 @@ public class MemberController {
         }
         boolean isSuccess = memberService.followManagement(followerId, followedId, isFollow);
 
-        log.info("followerId: {}, followedId: {} , {}", followerId, followedId, isFollow);
         return ResponseEntity.ok(isSuccess);
     }
 
@@ -160,8 +150,6 @@ public class MemberController {
     // 신고하기
     @PostMapping("/report")
     public ResponseEntity<Boolean> reportMember(@RequestBody ReportReqDto reportReqDto) {
-
-        log.info("reportMember: {} \n reported : {} , \n content : {}", reportReqDto.getReporter(), reportReqDto.getReported(), reportReqDto.getContent());
         boolean isSuccess = reportService.insertReport(reportReqDto);
 
         return ResponseEntity.ok(isSuccess);

@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name="planner")
 @Entity
@@ -76,4 +78,16 @@ public class Planner {
         this.thumbnail = thumbnail;
         this.isPublic = isPublic;
     }
+
+    @OneToMany(mappedBy = "planner", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Plan> plans = new ArrayList<>();
+
+    @OneToMany(mappedBy = "planner", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ChatMsg> chatMsgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "planner", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PlannerMembers> plannerMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "planner", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookmarkPlanner> bookmarkPlanners = new ArrayList<>();
 }
