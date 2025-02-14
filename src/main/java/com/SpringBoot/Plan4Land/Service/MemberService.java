@@ -289,6 +289,8 @@ public class MemberService {
         memberResDto.setImgPath(member.getProfileImg());
         memberResDto.setRegDate(member.getSignUpDate());
         memberResDto.setRole(member.getRole());
+        memberResDto.setSocialId(member.getSocialId());
+        memberResDto.setSso(member.getSso());
         return memberResDto;
     }
 }

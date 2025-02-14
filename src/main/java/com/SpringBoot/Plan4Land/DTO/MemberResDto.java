@@ -22,6 +22,8 @@ public class MemberResDto {
     private LocalDateTime regDate;
     private String state;
     private Role role;
+    private String socialId;
+    private String sso;
 
     public static MemberResDto of(Member member) {
         return MemberResDto.builder()
@@ -33,6 +35,8 @@ public class MemberResDto {
                 .imgPath(member.getProfileImg())
                 .regDate(member.getSignUpDate())
                 .role(member.getRole())
+                .socialId(member.getSocialId())
+                .sso(member.getSso())
                 .build();
     }
 
