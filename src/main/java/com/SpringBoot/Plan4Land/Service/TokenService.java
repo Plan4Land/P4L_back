@@ -41,7 +41,6 @@ public class TokenService {
         // 새 액세스 토큰 생성
         try {
             Authentication authentication = tokenProvider.getAuthentication(trimmedToken);
-            log.info("액세스 토큰 재발급");
             return tokenProvider.generateAccessTokenDto(authentication);
         } catch (RuntimeException e) {
             log.error("토큰 생성 실패: {}", e.getMessage(), e);

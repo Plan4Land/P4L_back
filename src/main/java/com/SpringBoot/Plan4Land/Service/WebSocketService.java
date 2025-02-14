@@ -84,19 +84,14 @@ public class WebSocketService {
         WebSocketResDto room = findRoomByPlannerId(plannerId);
         // 방이 없으면 생성
         if (room == null) {
-//            log.error("방을 새로 생성함..");
             room = createRoom(webSocketMsgDto.getPlannerId());
             room.getSessions().add(session);
-            log.info("Planner ID {}에 새로운 세션 생성: {}", plannerId, session.getId());
         } else {
-//            log.error("있는 방에 세션만 추가함...");
-//            log.error("방에 있는 세션들 : {}", room.getSessions());
             room.getSessions().add(session);
             if (webSocketMsgDto.getSender() != null) {
                 webSocketMsgDto.setMessage(webSocketMsgDto.getSender() + "님이 입장했습니다.");
                 sendMessageToAll(plannerId, webSocketMsgDto);
             }
-            log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
         }
     }
 
@@ -109,7 +104,7 @@ public class WebSocketService {
         WebSocketResDto room = plannerRooms.get(plannerId);
         if (room != null) {
             room.getSessions().remove(session);
-            log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
+//            log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
             sessionPlannerIdMap.remove(session);
             sessionSenderMap.remove(session);
 //            webSocketMsgDto.setType(WebSocketMsgDto.MessageType.CLOSE);
@@ -132,9 +127,9 @@ public class WebSocketService {
 
             if (room.isSessionEmpty()) {
                 removeRoom(plannerId); // 세션이 남아있지 않으면 방 삭제
-                log.error("세션 남아있지 않아서 방 삭제");
+//                log.error("세션 남아있지 않아서 방 삭제");
             } else {
-                log.info("Planner ID {}에서 남아있는 세션 수: {}", plannerId, room.getSessions().size());
+//                log.info("Planner ID {}에서 남아있는 세션 수: {}", plannerId, room.getSessions().size());
             }
         }
     }

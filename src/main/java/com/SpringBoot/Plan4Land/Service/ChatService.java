@@ -57,8 +57,6 @@ public class ChatService {
     }
     // 방 개설하기
     public ChatRoomResDto createRoom(Long plannerId) {
-//        String randomId = UUID.randomUUID().toString();
-//        log.info("UUID : {}", randomId);
         ChatRoomResDto chatRoom = ChatRoomResDto.builder()
 //                .roomId(randomId)
                 .plannerId(plannerId)
@@ -93,7 +91,7 @@ public class ChatService {
 //                // 채팅방에 입장 메시지 전송 코드 추가
 //                sendMessageToAll(plannerId, chatMessage);
 //            }
-            log.info("Planner ID {}에 새로운 세션 추가: {}", plannerId, session.getId());
+
         }
     }
 
@@ -104,16 +102,13 @@ public class ChatService {
         ChatRoomResDto room = chatRooms.get(plannerId);
         if (room != null) {
             room.getSessions().remove(session); // 채팅방에서 퇴장한 세션 제거
-            log.error("퇴장한 사용자 : ", chatMessage.getSender());
             if (chatMessage.getSender() != null) { // 채팅방에서 퇴장한 사용자가 있으면
                 chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장하였습니다.");
                 // 채팅방에 퇴장 메시지 전송 코드 추가
                 sendMessageToAll(plannerId, chatMessage);
             }
-            log.error("Planner ID {}에서 세션 제거: {}", plannerId, session.getId());
             if (room.isSessionEmpty()) {
                 removeRoom(plannerId); // 세션이 남아있지 않으면 방 삭제
-                log.error("세션 남아있지 않아서 방 삭제");
             }
         }
     }
@@ -143,9 +138,7 @@ public class ChatService {
     public void sendMessageToAll(Long plannerId, ChatMsgDto message) {
         saveMessageToDB(message); // 메시지 저장
 //        ChatRoomResDto room = findRoomById(roomId);
-        log.error("여긴 오는거지??? 와야되는데??");
         ChatRoomResDto room = chatRooms.get(plannerId);
-        log.error(room.toString());
         if (room != null) {
             for (WebSocketSession session : room.getSessions()) {
                 // 해당 세션에 메시지 발송

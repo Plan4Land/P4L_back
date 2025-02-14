@@ -128,6 +128,7 @@ public class MemberService {
         }
     }
 
+
     // 회원 비밀번호 체크
     public boolean validateMember(String id, String password) {
         Member member = memberRepository.findById(id)
@@ -209,7 +210,6 @@ public class MemberService {
                 Follow follow = new Follow(followerMember, followedMember);
 
                 if(followRepository.existsByFollowedAndFollower(followedMember, followerMember)){
-                    log.warn("이미 팔로우가 존재합니다.");
                     return false;
                 }
 
@@ -229,10 +229,7 @@ public class MemberService {
     // 팔로우 정보 반환
     public List<MemberResDto> loadFollowInfo(String userId, boolean following) {
         try {
-            log.info("유저 아이디 : {}", userId);
             Member member = memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원을 찾지 못했습니다"));
-            log.info("획득한 유저의 아이디 : {}", member.getId());
-            log.info("획득한 유저의 uid : {}", member.getUid());
             List<Long> lst;
             if (following) {
                 // 해당 유저가 팔로우 한 사람
@@ -242,7 +239,6 @@ public class MemberService {
                 lst = followRepository.getFollowerIdBy(member.getUid());
             }
 
-            log.warn(lst.toString());
             List<Member> members = memberRepository.findAllByIdAndActivate(lst);
 
             return members.stream()

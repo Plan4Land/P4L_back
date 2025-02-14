@@ -46,7 +46,6 @@ public class WebSocketHandlerBak extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status)
             throws Exception{
-        log.info("연결 해제 이후 동작 : {}", session);
         Long plannerId = sessionPlannerIdMap.remove(session);
         if(plannerId != null) {
             ChatMsgDto chatMessage = new ChatMsgDto();

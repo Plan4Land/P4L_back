@@ -1,6 +1,8 @@
 package com.SpringBoot.Plan4Land.Service;
 
 import com.SpringBoot.Plan4Land.Constant.Role;
+import com.SpringBoot.Plan4Land.CustomException.NotMemberException;
+import com.SpringBoot.Plan4Land.CustomException.SignOutException;
 import com.SpringBoot.Plan4Land.DTO.MemberResDto;
 import com.SpringBoot.Plan4Land.DTO.MemberReqDto;
 import com.SpringBoot.Plan4Land.DTO.TokenDto;
@@ -67,25 +69,21 @@ public class AuthService {
             // 소셜 로그인
             if (memberReqDto.getSso() != null) {
                 member = memberRepository.findBySsoAndSocialId(memberReqDto.getSso(), memberReqDto.getSocialId())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원가입이 필요합니다."));
+                        .orElseThrow(() -> new NotMemberException(HttpStatus.UNAUTHORIZED, "회원가입이 필요합니다."));
 
                 memberReqDto.setId(member.getId());
 
-                // 회원 상태 검증
-                if (!member.isActivate()) {
-                    log.error("탈퇴한 회원입니다.");
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "탈퇴한 회원입니다.");
-                }
+
             } else {
                 // 일반 로그인
                 member = memberRepository.findById(memberReqDto.getId())
-                        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                        .orElseThrow(() -> new NotMemberException(HttpStatus.UNAUTHORIZED ,"사용자를 찾을 수 없습니다."));
+            }
 
-                // 회원 상태 검증
-                if (!member.isActivate()) {
-                    log.error("탈퇴한 회원입니다.");
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다.");
-                }
+            // 회원 상태 검증
+            if (!member.isActivate()) {
+                log.error("탈퇴한 회원입니다.");
+                throw new SignOutException(HttpStatus.GONE, "탈퇴한 회원입니다.");
             }
 
             // 권한을 포함하여 UsernamePasswordAuthenticationToken 생성
@@ -111,9 +109,6 @@ public class AuthService {
             tokenRepository.save(token);
 
             return tokenDto;
-        } catch (BadCredentialsException e) {
-            log.error("Bad credentials provided: ", e);
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         } catch (ResponseStatusException e) {
             log.error("Response status exception: ", e);
             throw e;
@@ -124,17 +119,23 @@ public class AuthService {
     }
 
     // 로그아웃
-    public void logout(MemberReqDto memberReqDto) {
-        log.warn(memberReqDto.toString());
-        // ID로 사용자 검색
-        Member member = memberRepository.findById(memberReqDto.getId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    public boolean logout(MemberReqDto memberReqDto) {
+        try {// ID로 사용자 검색
+            Member member = memberRepository.findById(memberReqDto.getId())
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 토큰 삭제
-        List<Token> tokens = tokenRepository.findAllByMember(member);
-        tokenRepository.deleteAll(tokens);
+            // 토큰 삭제
+            List<Token> tokens = tokenRepository.findAllByMember(member);
+            tokenRepository.deleteAll(tokens);
 
-        log.info("로그아웃 성공: 리프레시 토큰 삭제.");
+            return true;
+        } catch (RuntimeException e) {
+            log.error("존재하지 않는 회원 : ", e);
+            return true;
+        } catch (Exception e) {
+            log.error("Authentication failed: ", e);
+            return false;
+        }
     }
 
     // 이메일로 유저 탈퇴 확인
@@ -164,4 +165,20 @@ public class AuthService {
             return "활성 회원입니다.";
         }
     }
+
+    @Transactional
+    public boolean signOut(String user) {
+        try {
+            Member member = memberRepository.findById(user).orElseThrow(()-> new RuntimeException("회원이 아님"));
+
+            memberRepository.delete(member);
+
+            return true;
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+
 }

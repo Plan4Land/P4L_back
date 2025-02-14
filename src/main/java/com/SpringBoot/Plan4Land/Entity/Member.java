@@ -7,6 +7,8 @@ import lombok.*;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name="member")
 @Entity
@@ -78,4 +80,38 @@ public class Member {
         this.socialId = socialId;
         this.sso = sso;
     }
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Ban> bans = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookmarkPlanner> bookmarkPlanners = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookmarkSpot> bookmarkSpots = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ChatMsg> chatMsgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> follows = new ArrayList<>();
+
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> follows1 = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Planner> planners = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PlannerMembers> plannerMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Token> tokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Report> reporter = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reported", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Report> reported = new ArrayList<>();
+
 }

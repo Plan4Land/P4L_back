@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Controller;
 
+import com.SpringBoot.Plan4Land.CustomException.BanUserException;
 import com.SpringBoot.Plan4Land.DTO.*;
 import com.SpringBoot.Plan4Land.JWT.JwtFilter;
 import com.SpringBoot.Plan4Land.Service.AuthService;
@@ -16,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -36,19 +36,18 @@ public class AuthController {
     public ResponseEntity<MemberResDto> signup(@RequestBody MemberReqDto memberReqDto) {
         return ResponseEntity.ok(authService.signUp(memberReqDto));
     }
-    
+
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<TokenDto> login(@RequestBody MemberReqDto memberReqDto) {
         TokenDto tokenDto = authService.login(memberReqDto);
-
-        log.info("login token: {}", tokenDto);
         return ResponseEntity.ok(tokenDto);
     }
 
 
     // 네이버 로그인
     private static final String NAVER_OAUTH_URL = "https://nid.naver.com/oauth2.0/token";
+
     @PostMapping("/naver/token")
     public ResponseEntity<String> getNaverToken(@RequestBody Map<String, String> requestBody) {
         String code = requestBody.get("code");
@@ -97,8 +96,8 @@ public class AuthController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<TokenDto> logout(@RequestBody MemberReqDto memberReqDto) {
-        authService.logout(memberReqDto);
+    public ResponseEntity<Boolean> logout(@RequestBody MemberReqDto memberReqDto) {
+        boolean isSuccess = authService.logout(memberReqDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -114,12 +113,25 @@ public class AuthController {
         return authService.isActivateByIdAndEmail(memberReqDto);
     }
 
+    // 회원 정보 삭제
+    @DeleteMapping("/sign-out/{userId}")
+    public ResponseEntity<Boolean> memberDelete(@PathVariable String userId) {
+        boolean isSuccess = authService.signOut(userId);
+        return ResponseEntity.ok(isSuccess);
+    }
+
+
     // 액세스 토큰 재발급
     @PostMapping("/token/refresh")
     public ResponseEntity<AccessTokenDto> refreshToken(@RequestBody String refreshToken) {
-        log.warn("refreshToken: {}", refreshToken);
         AccessTokenDto accessTokenDto = tokenService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok(accessTokenDto);
+    }
+
+    @DeleteMapping("/sign-out")
+    public ResponseEntity<Boolean> signOut(@RequestBody String userId) {
+        authService.signOut(userId);
+        return ResponseEntity.noContent().build();
     }
 }

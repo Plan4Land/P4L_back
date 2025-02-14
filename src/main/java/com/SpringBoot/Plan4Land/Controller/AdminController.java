@@ -15,7 +15,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -61,7 +60,6 @@ public class AdminController {
                                                            @RequestParam(defaultValue = "20") int pageSize,
                                                            @RequestParam(required = false) String select,
                                                            @RequestParam(required = false) String keyword) {
-        log.info("MemberSearch Request: {}", keyword);
         Page<MemberResDto> page = adminService.adminSearchMember(currentPage, pageSize, keyword, select);
 
         return ResponseEntity.ok(page);

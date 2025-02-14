@@ -42,7 +42,6 @@ public class TravelSpotService {
         TravelSpotResDto rsp = convertToDTO(travelSpot);
         rsp.setBookmark(bookmarked);
 
-        log.warn(rsp.toString());
 
         return rsp;
     }

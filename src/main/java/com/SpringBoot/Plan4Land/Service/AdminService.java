@@ -60,14 +60,12 @@ public class AdminService {
 
             // 해당 메소드 설정에 따라 정보를 담은 토큰 생성(여기선 아이디와 비밀번호)
             UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
-            log.info("UsernamePasswordAuthenticationToken: {}", authenticationToken);
 
             // 여기서 CustomAuthenticationProvider의 authenticate 실행 (이 안에서 비밀번호도 검증)
             Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-            log.info("Authentication 객체: {}", authentication);
 
             // Authentication 객체의 권한 출력
-            log.info("Authentication 권한: {}", authentication.getAuthorities());
+
 
             TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 

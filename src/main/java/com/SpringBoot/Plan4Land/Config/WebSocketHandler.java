@@ -23,7 +23,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
     private final WebSocketService webSocketService;
 
-//    private final Map<WebSocketSession, Long> sessionPlannerIdMap = new ConcurrentHashMap<>();
+    //    private final Map<WebSocketSession, Long> sessionPlannerIdMap = new ConcurrentHashMap<>();
     // WebSocketSession과 sender를 매핑
     private final Map<WebSocketSession, String> sessionSenderMap = new ConcurrentHashMap<>();
 
@@ -33,7 +33,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        log.info("payload : {}", payload);
         WebSocketMsgDto webSocketMsgDto = objectMapper.readValue(payload, WebSocketMsgDto.class);
         Long plannerId = webSocketMsgDto.getPlannerId();
         String sender = webSocketMsgDto.getSender();
@@ -43,6 +42,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 sessionPlannerIdMap.put(session, plannerId);
                 sessionSenderMap.put(session, sender);
                 webSocketService.addSessionAndHandleEnter(plannerId, session, webSocketMsgDto);
+//                log.warn("{} plannerId: {} sender: {}", sessionPlannerIdMap.size(), plannerId, sender);
+//                log.warn(String.valueOf(sessionSenderMap.size()));
 
                 WebSocketMsgDto lastPlannerMessage = webSocketService.getLastPlannerMessage(plannerId);
                 if (lastPlannerMessage != null) {
@@ -53,27 +54,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     }
                 }
                 break;
-//            case CLOSE:
-////                webSocketService.removePlannerMessage(plannerId);
-//                WebSocketMsgDto lastPlannerSender = webSocketService.getLastPlannerMessage(plannerId);
-//
-//                // PLANNER 타입의 sender와 CLOSE 타입의 sender 비교
-//                if (lastPlannerSender != null
-//                        && lastPlannerSender.getSender().equals(webSocketMsgDto.getSender())) {
-//                    webSocketService.removePlannerMessage(plannerId);
-//                }
-//                webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
-//                webSocketService.removeSessionAndHandleExit(plannerId, session, webSocketMsgDto);
-//                break;
             case CHAT:
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
             case PLANNER:
-//                if ("편집완료".equals(webSocketMsgDto.getMessage())) {
-//                    webSocketService.removePlannerMessage(plannerId);
-//                } else {
-//                    webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
-//                }
                 webSocketService.savePlannerMessage(plannerId, webSocketMsgDto);
                 webSocketService.sendMessageToAll(plannerId, webSocketMsgDto);
                 break;
@@ -84,7 +68,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception{
-        log.info("연결 해제 이후 동작 : {}", session);
         Long plannerId = sessionPlannerIdMap.remove(session);
         String sender = sessionSenderMap.remove(session);
         if(plannerId != null && sender != null) {
