@@ -49,8 +49,6 @@ java -jar build/libs/plan4land-0.0.1-SNAPSHOT.jar
 
 - **Spring Boot** `2.7.17`
 
-- **Spring Security** `2.7.17`
-
 - **Spring Data JPA** `2.7.17`
 
 - **Lombok** `1.18.24`
