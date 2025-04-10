@@ -35,6 +35,8 @@ java -jar build/libs/plan4land-0.0.1-SNAPSHOT.jar
 
 >Swagger UI 확인: http://localhost:8111/swagger-ui.html
 
+<br/>
+
 단, `.env` 파일이 있어야 정상적으로 작동합니다.
 
 해당 파일은 보안사항으로 공개되지 않습니다.
