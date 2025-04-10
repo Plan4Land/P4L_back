@@ -53,7 +53,7 @@ java -jar build/libs/plan4land-0.0.1-SNAPSHOT.jar
 
 - **Spring Data JPA** `2.7.17`
 
-- **Lombok** `1.18.30` ==> 버전 확인해봐야됨
+- **Lombok** `1.18.24`
 
 - **JWT** `0.11.2`
 
