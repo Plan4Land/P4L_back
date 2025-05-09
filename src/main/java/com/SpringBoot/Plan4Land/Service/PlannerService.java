@@ -197,24 +197,15 @@ public class PlannerService {
                     Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
                     return PlannerResDto.fromEntity(planner, null, bookmarkCount);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         // bookmarkCount와 id 기준 정렬
-        Comparator<PlannerResDto> comparator;
-        switch (sortBy) {
-            case "LatestAsc":
-                comparator = Comparator.comparing(PlannerResDto::getId);
-                break;
-            case "BookmarkAsc":
-                comparator = Comparator.comparing(PlannerResDto::getBookmarkCount);
-                break;
-            case "BookmarkDesc":
-                comparator = Comparator.comparing(PlannerResDto::getBookmarkCount).reversed();
-                break;
-            default:
-                comparator = Comparator.comparing(PlannerResDto::getId).reversed();
-                break;
-        }
+        Comparator<PlannerResDto> comparator = switch (sortBy) {
+            case "LatestAsc" -> Comparator.comparing(PlannerResDto::getId);
+            case "BookmarkAsc" -> Comparator.comparing(PlannerResDto::getBookmarkCount);
+            case "BookmarkDesc" -> Comparator.comparing(PlannerResDto::getBookmarkCount).reversed();
+            default -> Comparator.comparing(PlannerResDto::getId).reversed();
+        };
 
         List<PlannerResDto> sortedPlannerResDtos = plannerResDtos.stream()
                 .sorted(comparator)

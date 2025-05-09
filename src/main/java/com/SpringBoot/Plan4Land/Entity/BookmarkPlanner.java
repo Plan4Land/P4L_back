@@ -22,7 +22,7 @@ public class BookmarkPlanner {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    // 북마크 당한 플래너
+    // 북마크 된 플래너
     @ManyToOne
     @JoinColumn(name = "planner_id")
     private Planner planner;
