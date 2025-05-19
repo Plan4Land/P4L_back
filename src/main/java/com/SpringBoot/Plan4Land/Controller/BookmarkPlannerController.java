@@ -43,13 +43,13 @@ public class BookmarkPlannerController {
 
     // 내가 북마크한 플래너 리스트
     @GetMapping("/myBookmarkPlanners")
-    public ResponseEntity<Page<BookmarkPlanner>> getBookmarkedPlanners(
+    public ResponseEntity<Page<PlannerResDto>> getBookmarkedPlanners(
             @RequestParam("memberId") String memberId,  // memberId를 받음
             @RequestParam("page") int page,             // 페이지 번호
             @RequestParam("size") int size) {           // 페이지 크기
-
+        log.info("컨트롤러 도달 {} {} {}", memberId, page, size);
         // 북마크된 플래너 목록을 페이지네이션 처리하여 가져오기
-        Page<BookmarkPlanner> bookmarkedPlanners = bookmarkPlannerService.getBookmarkedPlanners(memberId, page, size);
+        Page<PlannerResDto> bookmarkedPlanners = bookmarkPlannerService.getBookmarkedPlanners(memberId, page, size);
 
         // 페이지네이션된 결과 반환
         return ResponseEntity.ok(bookmarkedPlanners);

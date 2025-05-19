@@ -1,6 +1,5 @@
 package com.SpringBoot.Plan4Land.Service;
 
-import com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto;
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Entity.TravelSpot;
 import com.SpringBoot.Plan4Land.Repository.BookMarkSpotRepository;
@@ -10,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +39,7 @@ public class TravelSpotService {
         int bookmarked = bookMarkSpotRepository.countBySpot(String.valueOf(spotId));
         TravelSpotResDto rsp = convertToDTO(travelSpot);
         rsp.setBookmark(bookmarked);
+
 
         return rsp;
     }

@@ -2,6 +2,7 @@ package com.SpringBoot.Plan4Land.Entity;
 
 
 import com.SpringBoot.Plan4Land.Constant.State;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,11 +24,13 @@ public class Report {
     // 신고자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
+    @JsonIgnore
     private Member reporter;
 
     // 피신고자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_id")
+    @JsonIgnore
     private Member reported;
 
     private LocalDateTime reportDate;

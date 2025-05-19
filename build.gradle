@@ -43,6 +43,11 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
     implementation 'io.github.cdimascio:java-dotenv:5.2.2' // dotenv
 
+    // QueryDSL 의존성
+    implementation 'com.querydsl:querydsl-jpa:5.0.0'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jpa'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api:2.2.3'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api:1.3.5'
     //implementation 'io.portone:server-sdk:0.10.0'
 }
 

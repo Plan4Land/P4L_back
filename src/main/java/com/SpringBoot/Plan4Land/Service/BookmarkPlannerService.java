@@ -1,23 +1,19 @@
 package com.SpringBoot.Plan4Land.Service;
 
-import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
+import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
 import com.SpringBoot.Plan4Land.Entity.BookmarkPlanner;
 import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Repository.BookMarkPlannerRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.SpringBoot.Plan4Land.Repository.Planner.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.awt.print.Book;
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -64,9 +60,20 @@ public class BookmarkPlannerService {
     }
 
     @Transactional
-    public Page<BookmarkPlanner> getBookmarkedPlanners(String memberId, int page, int size) {
+    public Page<PlannerResDto> getBookmarkedPlanners(String memberId, int page, int size) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("유저 찾지 못함"));
+
+        List<Long> plannerLst = bookmarkPlannerRepository.findBookmarkPlannersByMember(member);
+
+        List<Planner> planners = plannerRepository.findByIdInAndIsPublicTrue(plannerLst);
+
+        List<PlannerResDto> plannerResDtos = planners.stream()
+                .map(planner -> PlannerResDto.fromEntity(planner, null, null)).toList();
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
-        return bookmarkPlannerRepository.findByMemberIdAndPlannerIsPublicTrue(memberId, pageable);
+
+        return new PageImpl<>(plannerResDtos, pageable, planners.size());
+
     }
 
 }

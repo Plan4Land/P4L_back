@@ -2,11 +2,8 @@ package com.SpringBoot.Plan4Land.Controller;
 
 import com.SpringBoot.Plan4Land.DTO.PlannerReqDto;
 import com.SpringBoot.Plan4Land.DTO.PlannerResDto;
-import com.SpringBoot.Plan4Land.Entity.BookmarkPlanner;
-import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Plan;
 import com.SpringBoot.Plan4Land.Entity.Planner;
-import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
 import com.SpringBoot.Plan4Land.Service.BookmarkPlannerService;
 import com.SpringBoot.Plan4Land.Service.PlannerService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j

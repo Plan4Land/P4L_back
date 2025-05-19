@@ -1,6 +1,5 @@
 package com.SpringBoot.Plan4Land.Service;
 
-import com.SpringBoot.Plan4Land.DTO.ChatMsgDto;
 import com.SpringBoot.Plan4Land.DTO.WebSocketMsgDto;
 import com.SpringBoot.Plan4Land.DTO.WebSocketResDto;
 import com.SpringBoot.Plan4Land.Entity.ChatMsg;
@@ -8,7 +7,7 @@ import com.SpringBoot.Plan4Land.Entity.Member;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Repository.ChatMsgRepository;
 import com.SpringBoot.Plan4Land.Repository.MemberRepository;
-import com.SpringBoot.Plan4Land.Repository.PlannerRepository;
+import com.SpringBoot.Plan4Land.Repository.Planner.PlannerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Entity;
 
 import com.SpringBoot.Plan4Land.Constant.Theme;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -33,6 +34,7 @@ public class Planner {
     // 플래너 소유자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     private Member owner;
 
     // 여행 시작일

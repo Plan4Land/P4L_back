@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class ChatMsg {
     // 발신자
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     private Member sender;
 
     // 내용
@@ -32,6 +34,7 @@ public class ChatMsg {
     // 플래너
     @ManyToOne
     @JoinColumn(name = "planner_id")
+    @JsonIgnore
     private Planner planner;
 
     @PrePersist

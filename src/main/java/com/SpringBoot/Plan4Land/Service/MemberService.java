@@ -128,7 +128,6 @@ public class MemberService {
         }
     }
 
-
     // 회원 비밀번호 체크
     public boolean validateMember(String id, String password) {
         Member member = memberRepository.findById(id)
@@ -210,6 +209,7 @@ public class MemberService {
                 Follow follow = new Follow(followerMember, followedMember);
 
                 if(followRepository.existsByFollowedAndFollower(followedMember, followerMember)){
+                    log.warn("이미 팔로우가 존재합니다.");
                     return false;
                 }
 
@@ -270,8 +270,6 @@ public class MemberService {
             throw new RuntimeException(e);
         }
     }
-
-
 
 
     // Member Entity => MemberResDto 변환

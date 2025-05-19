@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class BookmarkSpot {
     // 북마크한 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     private Member member;
 
     // 북마크한 장소의 id

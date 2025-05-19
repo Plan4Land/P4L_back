@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
+    @JsonIgnore
     private Member member;  // 유저 고유 id
 
     @Column(nullable = false, unique = true)

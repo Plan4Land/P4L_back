@@ -1,6 +1,7 @@
 package com.SpringBoot.Plan4Land.Entity;
 
 import com.SpringBoot.Plan4Land.Constant.State;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,11 +22,13 @@ public class PlannerMembers {
     // 플래너에 초대된 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     private Member member;
 
     // 플래너
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planner_id")
+    @JsonIgnore
     private Planner planner;
 
     @Enumerated(EnumType.STRING)

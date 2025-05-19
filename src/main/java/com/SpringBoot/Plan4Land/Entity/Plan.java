@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,5 +42,6 @@ public class Plan {
 
     @ManyToOne
     @JoinColumn(name = "planner_id")
+    @JsonIgnore
     private Planner planner;
 }

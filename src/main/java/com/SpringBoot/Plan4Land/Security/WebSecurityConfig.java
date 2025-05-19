@@ -5,19 +5,15 @@ import com.SpringBoot.Plan4Land.Service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,57 +23,45 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@Component
+//@Component // 제거됨 - @Configuration으로 충분
 public class WebSecurityConfig implements WebMvcConfigurer {
     private final TokenProvider tokenProvider;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // 인증 실패 시 처리할 클래스
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler; // 인가 실패 시 처리할 클래스
-    private final CustomAuthenticationProvider customAuthenticationProvider; // 커스텀 인증 처리 클래스
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final CustomAuthenticationProvider customAuthenticationProvider;
     private final CustomUserDetailService customUserDetailService;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8111")  // 프론트엔드의 URL
-                .allowedMethods("GET", "POST", "PUT", "DELETE")  // 허용할 HTTP 메서드
-                .allowedHeaders("*");  // 허용할 헤더
+                .allowedOrigins("https://plan4land.store")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*");
     }
 
     @Bean
-    @Lazy
+    //@Lazy // 제거됨 - 불필요할 가능성 높음
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // BCrypt 암호화 객체를 Bean으로 등록
+        return new BCryptPasswordEncoder();
     }
 
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        // CustomAuthenticationProvider를 AuthenticationManager에 추가
         authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
-
-        // CustomUserDetailService를 설정
         authenticationManagerBuilder.userDetailsService(customUserDetailService);
-
         return authenticationManagerBuilder.build();
     }
 
-    @Bean // SecurityFilterChain 객체를 Bean으로 등록
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors
-                        .configurationSource(request -> {
-                            CorsConfiguration config = new CorsConfiguration();
-                            config.setAllowCredentials(true);
-                            config.setAllowedOrigins(List.of("http://localhost:8111"));
-                            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                            config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-                            config.setMaxAge(3600L);
-                            return config;
-                        })
-                )
-                .csrf().disable() // csrf 보호 비활성화 RESTful API 서버에선 일반적으로 불필요
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .and()
+                .csrf().disable()
                 .authorizeRequests(authorize -> authorize
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/", "/static/**", "/auth/**", "/member/**", "/ws/**",
@@ -94,7 +78,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-
-
-
 }

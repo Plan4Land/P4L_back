@@ -23,6 +23,9 @@ public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner
 
     Page<BookmarkPlanner> findByMemberId(String memberId, Pageable pageble);
 
+    @Query("SELECT bp.planner.id FROM BookmarkPlanner bp WHERE bp.member = :member")
+    List<Long> findBookmarkPlannersByMember(Member member);
+
     @Query("SELECT b.planner.id " +
             "FROM BookmarkPlanner b " +
             "WHERE b.planner.isPublic = true " +
@@ -40,6 +43,5 @@ public interface BookMarkPlannerRepository extends JpaRepository<BookmarkPlanner
 
 
 
-    Page<BookmarkPlanner> findByMemberIdAndPlannerIsPublicTrue(String memberId, Pageable pageable);
 
 }

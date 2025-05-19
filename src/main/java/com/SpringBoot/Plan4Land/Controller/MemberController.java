@@ -143,6 +143,7 @@ public class MemberController {
         followInfo.put("followingInfo", followingInfo);
         followInfo.put("followerInfo", followerInfo);
 
+
         return ResponseEntity.ok(followInfo);
     }
 

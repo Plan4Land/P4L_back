@@ -10,17 +10,14 @@ import com.SpringBoot.Plan4Land.Entity.Plan;
 import com.SpringBoot.Plan4Land.Entity.Planner;
 import com.SpringBoot.Plan4Land.Entity.PlannerMembers;
 import com.SpringBoot.Plan4Land.Repository.*;
+import com.SpringBoot.Plan4Land.Repository.Planner.PlannerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -186,39 +183,14 @@ public class PlannerService {
                                                   String themeList, String searchQuery, String sortBy) {
 
         String[] themes = themeList == null ? new String[0] : themeList.split(",");
-
-        List<Planner> planners = plannerRepository.getFilteredPlanners(areaCode, subAreaCode, searchQuery,
-                themes.length > 0 ? themes[0].trim() : null,
-                themes.length > 1 ? themes[1].trim() : null,
-                themes.length > 2 ? themes[2].trim() : null);
-
-        List<PlannerResDto> plannerResDtos = planners.stream()
-                .map(planner -> {
-                    Long bookmarkCount = bookMarkPlannerRepository.countByPlannerId(planner.getId());
-                    return PlannerResDto.fromEntity(planner, null, bookmarkCount);
-                })
-                .toList();
-
-        // bookmarkCount와 id 기준 정렬
-        Comparator<PlannerResDto> comparator = switch (sortBy) {
-            case "LatestAsc" -> Comparator.comparing(PlannerResDto::getId);
-            case "BookmarkAsc" -> Comparator.comparing(PlannerResDto::getBookmarkCount);
-            case "BookmarkDesc" -> Comparator.comparing(PlannerResDto::getBookmarkCount).reversed();
-            default -> Comparator.comparing(PlannerResDto::getId).reversed();
-        };
-
-        List<PlannerResDto> sortedPlannerResDtos = plannerResDtos.stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
-
-        // 정렬된 리스트에서 페이징 처리
         Pageable pageable = PageRequest.of(currentPage, pageSize);
-        int start = Math.min((int) pageable.getOffset(), sortedPlannerResDtos.size());
-        int end = Math.min((start + pageable.getPageSize()), sortedPlannerResDtos.size());
-        List<PlannerResDto> paginatedList = sortedPlannerResDtos.subList(start, end);
 
-        return new PageImpl<>(paginatedList, pageable, sortedPlannerResDtos.size());
+        // QueryDSL을 사용하는 Repository 메소드 호출
+        return plannerRepository.findFilteredPlannersWithBookmarkCount(
+                areaCode, subAreaCode, searchQuery, themes, sortBy, pageable
+        );
     }
+
 
     // 북마크 상위 3개 플래너 가져오기
     public List<PlannerResDto> getTopBookmarkedPlanners() {
