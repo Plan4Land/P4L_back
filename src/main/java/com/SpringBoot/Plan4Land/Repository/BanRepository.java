@@ -18,4 +18,7 @@ public interface BanRepository extends JpaRepository<Ban, Long> {
     List<Ban> findByIsEndFalseAndEndDateBefore(LocalDateTime endDateBefore);
 
     boolean existsByMemberAndEndDateIsAfter(Member member, LocalDateTime endDateAfter);
+
+    @Query("SELECT b FROM Ban b WHERE b.member = :member AND b.isEnd = false ORDER BY b.id DESC")
+    Ban findActiveBanByMember(Member member);;
 }

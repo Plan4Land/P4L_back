@@ -49,9 +49,6 @@ public interface TravelSpotRepository extends JpaRepository<TravelSpot, Long> {
                                          @Param("bottomThemes") List<String> bottomThemes, @Param("cat") String cat,
                                          @Param("searchQuery") String searchQuery);
 
-    Page<TravelSpot> findByAreaCodeAndSigunguCodeAndCat1AndCat2AndCat3InAndTypeId(
-            Pageable pageable, Integer areaCode, Integer sigunguCode, String cat1, String cat2, List<String> cat3, String typeId);
-
     Optional<TravelSpot> findById(Long spotId);
 
     @Query("SELECT t FROM TravelSpot t WHERE " +

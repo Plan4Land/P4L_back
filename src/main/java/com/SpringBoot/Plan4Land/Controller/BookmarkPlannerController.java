@@ -30,14 +30,14 @@ public class BookmarkPlannerController {
     // 북마크 추가
     @PutMapping()
     public ResponseEntity<Boolean> putBookmarked(@RequestParam String memberId, @RequestParam Long plannerId) {
-        boolean isSuccess = bookmarkPlannerService.putBookmarked(memberId, plannerId);
+        boolean isSuccess = bookmarkPlannerService.addBookmark(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
 
     // 북마크 삭제
     @DeleteMapping()
     public ResponseEntity<Boolean> deleteBookmarked(@RequestParam String memberId, @RequestParam Long plannerId) {
-        boolean isSuccess = bookmarkPlannerService.deleteBookmarked(memberId, plannerId);
+        boolean isSuccess = bookmarkPlannerService.removeBookmark(memberId, plannerId);
         return ResponseEntity.ok(isSuccess);
     }
 

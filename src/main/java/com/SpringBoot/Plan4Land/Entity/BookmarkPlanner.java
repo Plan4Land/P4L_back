@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Entity;
 
+import antlr.collections.impl.BitSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
+@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +31,6 @@ public class BookmarkPlanner {
     @JoinColumn(name = "planner_id")
     @JsonIgnore
     private Planner planner;
+
 
 }

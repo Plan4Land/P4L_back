@@ -1,5 +1,6 @@
 package com.SpringBoot.Plan4Land.Service;
 
+import com.SpringBoot.Plan4Land.DTO.TravelSpotReqDto;
 import com.SpringBoot.Plan4Land.DTO.TravelSpotResDto;
 import com.SpringBoot.Plan4Land.Entity.TravelSpot;
 import com.SpringBoot.Plan4Land.Repository.BookMarkSpotRepository;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,8 +29,13 @@ public class TravelSpotService {
         Page<TravelSpot> travelSpotPage = travelSpotRepository.getFilterTravelSpot(pageable, areaCode, subAreaCode,
                 topTheme, middleTheme, bottomThemes, cat, searchQuery);
 
+        Page<TravelSpotResDto> result = travelSpotPage.map(this::convertToDTO);
+
+        // 이미지 URL 변환
+        Page<TravelSpotResDto> convertedResult = result.map(this::convertImageUrlsForProxy);
+
         // 페이지된 결과를 DTO로 변환하여 반환
-        return travelSpotPage.map(this::convertToDTO);
+        return convertedResult;
     }
 
     // 상세 정보 조회
@@ -41,7 +48,7 @@ public class TravelSpotService {
         rsp.setBookmark(bookmarked);
 
 
-        return rsp;
+        return convertImageUrlsForProxy(rsp);
     }
 
     // 북마크가 많은 상위 5개 여행지 반환
@@ -70,6 +77,19 @@ public class TravelSpotService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
+    // 이미지 변환 메서드
+    private TravelSpotResDto convertImageUrlsForProxy(TravelSpotResDto dto) {
+        // 모든 visitkorea 이미지를 프록시를 통해 처리 (Firefox 호환성을 위해)
+        if (dto.getThumbnail() != null && dto.getThumbnail().contains("tong.visitkorea.or.kr")) {
+            String proxiedUrl = "/api/image-proxy?url=" + java.net.URLEncoder.encode(dto.getThumbnail(), java.nio.charset.StandardCharsets.UTF_8);
+            dto.setThumbnail(proxiedUrl);
+        }
+        // 다른 이미지 URL들도 변환 필요시 추가
+        return dto;
+    }
+
 
 
 

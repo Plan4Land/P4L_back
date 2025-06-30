@@ -156,7 +156,7 @@ public class AdminService {
             Member member = memberRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없음"));
 
-            Ban alreadyBanned = banRepository.findFirstByMemberOrderByIdDesc(member);
+            Ban alreadyBanned = banRepository.findActiveBanByMember(member);
 
             LocalDateTime endDate;
 
